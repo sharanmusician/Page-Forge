@@ -3,320 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Forge | Professional Document Foundry</title>
+    <title>Page Forge | Easy Image to PDF</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #0a0a0a;
-            --surface: #141414;
-            --accent: #3e5cf4;
-            --text-dim: #888888;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --font-main: 'Inter', sans-serif;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #3b82f6;
+            --text: #f8fafc;
         }
 
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-        
         body {
-            font-family: var(--font-main);
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            color: #fff;
+            color: var(--text);
             margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        /* Cinematic Entrance Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Hero Section */
-        header {
-            height: 40vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            text-align: center;
-            animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        header h1 {
-            font-weight: 500;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            letter-spacing: -0.04em;
-            margin: 0;
-        }
+        header { text-align: center; margin-bottom: 40px; margin-top: 40px; }
+        h1 { font-size: 2.5rem; margin: 0; letter-spacing: -1px; }
+        p { opacity: 0.7; margin-top: 8px; }
 
-        header p {
-            color: var(--text-dim);
-            font-weight: 300;
-            font-size: 1.1rem;
-            margin-top: 10px;
-            letter-spacing: 0.05em;
-        }
-
-        /* Main Workspace Container */
-        .forge-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 100px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 40px;
-            animation: fadeIn 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @media (min-width: 1024px) {
-            .forge-container { grid-template-columns: 320px 1fr; }
-        }
-
-        /* Sidebar Controls */
-        .side-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 32px;
-            height: fit-content;
-            position: sticky;
-            top: 40px;
-        }
-
-        .section-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-dim);
-            margin-bottom: 24px;
-            display: block;
-        }
-
-        /* Luxury Buttons */
-        .btn {
+        .container {
             width: 100%;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border: none;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-upload {
-            background: #fff;
-            color: #000;
-        }
-
-        .btn-upload:hover { transform: scale(1.02); background: #f0f0f0; }
-
-        .btn-forge {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        .btn-forge:disabled {
-            background: #222;
-            color: #555;
-            cursor: not-allowed;
-        }
-
-        .btn-reset {
-            background: transparent;
-            color: var(--text-dim);
-            border: 1px solid var(--border);
-        }
-
-        .btn-reset:hover { border-color: #ff4444; color: #ff4444; }
-
-        /* The Foundry (Grid) */
-        .foundry {
-            background: var(--surface);
-            border: 1px solid var(--border);
+            max-width: 900px;
+            background: var(--card);
             border-radius: 24px;
-            padding: 32px;
-            min-height: 600px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
 
-        #sortable-grid {
+        /* Simplified Buttons */
+        .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 24px;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
         @media (max-width: 600px) {
-            #sortable-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .forge-container { padding: 0 15px 50px; }
-            header { height: 30vh; }
+            .controls { grid-template-columns: 1fr; }
         }
 
-        /* Sortable Item Cards */
-        .asset-card {
-            background: var(--bg);
-            border-radius: 16px;
+        .btn {
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .btn-select { background: #fff; color: #000; }
+        .btn-make { background: var(--accent); color: #fff; }
+        .btn-make:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        .btn-clear { background: transparent; color: #94a3b8; grid-column: span 2; font-weight: 400; margin-top: 10px;}
+        @media (max-width: 600px) { .btn-clear { grid-column: span 1; } }
+
+        /* Photo Grid */
+        #photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            min-height: 150px;
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .photo-card {
+            aspect-ratio: 1;
+            border-radius: 10px;
             overflow: hidden;
-            aspect-ratio: 3/4;
-            border: 1px solid var(--border);
+            background: #000;
             cursor: grab;
             position: relative;
-            transition: border-color 0.3s;
+            border: 2px solid transparent;
         }
 
-        .asset-card:hover { border-color: var(--accent); }
-        .asset-card img { width: 100%; height: 100%; object-fit: cover; }
-
-        .order-badge {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.1);
+        .photo-card:active { cursor: grabbing; }
+        .photo-card img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .number-tag {
+            position: absolute; top: 5px; left: 5px;
+            background: rgba(0,0,0,0.6); padding: 2px 6px;
+            border-radius: 4px; font-size: 10px;
         }
-
-        /* Dragging States */
-        .sortable-ghost { opacity: 0.2; transform: scale(0.95); }
-        .sortable-chosen { cursor: grabbing; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
 
         input[type="file"] { display: none; }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 150px 0;
-            color: var(--text-dim);
-            font-weight: 300;
-        }
     </style>
 </head>
 <body>
 
 <header>
     <h1>Page Forge</h1>
-    <p>Document Architecture for Modern Enterprise</p>
+    <p>Drag photos to change their order</p>
 </header>
 
-<div class="forge-container">
-    
-    <aside class="side-panel">
-        <span class="section-label">Pipeline Controls</span>
-        
-        <label for="uploader" class="btn btn-upload">
-            Add Digital Assets
-            <input type="file" id="uploader" multiple accept="image/*" onchange="ingestImages(this.files)">
+<div class="container">
+    <div class="controls">
+        <label class="btn btn-select">
+            Add Photos
+            <input type="file" id="fileInput" multiple accept="image/*" onchange="addPhotos(this.files)">
         </label>
         
-        <button class="btn btn-forge" id="forge-btn" onclick="generatePremiumPDF()" disabled>
-            Forge Document
-        </button>
-        
-        <button class="btn btn-reset" onclick="location.reload()">
-            Reset Workspace
+        <button id="makeBtn" class="btn btn-make" onclick="makePDF()" disabled>
+            Save as PDF
         </button>
 
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim);">
-            Manual reordering enabled. <br> Drag and drop thumbnails within the foundry.
-        </div>
-    </aside>
+        <button class="btn btn-clear" onclick="window.location.reload()">
+            Start Over
+        </button>
+    </div>
 
-    <main class="foundry">
-        <div id="sortable-grid">
-            <div class="empty-state">No assets currently in pipeline.</div>
+    <div id="photo-grid">
         </div>
-    </main>
-
 </div>
 
 <script>
-    let assetVault = [];
+    let photoList = [];
 
-    // Initialize the enterprise sorting engine
+    // Drag and drop setup
     document.addEventListener('DOMContentLoaded', () => {
-        const el = document.getElementById('sortable-grid');
-        new Sortable(el, {
-            animation: 500,
-            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-            ghostClass: 'sortable-ghost',
-            chosenClass: 'sortable-chosen',
-            onEnd: updateSequence
+        const grid = document.getElementById('photo-grid');
+        new Sortable(grid, {
+            animation: 250,
+            onEnd: updateOrder
         });
     });
 
-    async function ingestImages(files) {
-        const grid = document.getElementById('sortable-grid');
-        const empty = document.querySelector('.empty-state');
-        if (empty) empty.remove();
-
-        for (let file of files) {
-            const data = await convertToBase64(file);
-            assetVault.push(data);
-            
-            const card = document.createElement('div');
-            card.className = 'asset-card';
-            card.innerHTML = `
-                <div class="order-badge">0${assetVault.length}</div>
-                <img src="${data}">
-            `;
-            grid.appendChild(card);
-        }
-        updateVaultStatus();
-    }
-
-    function convertToBase64(file) {
-        return new Promise(res => {
-            const r = new FileReader();
-            r.readAsDataURL(file);
-            r.onload = () => res(r.target.result);
-        });
-    }
-
-    function updateSequence() {
-        const cards = document.querySelectorAll('.asset-card img');
-        const badges = document.querySelectorAll('.order-badge');
-        const newVault = [];
+    async function addPhotos(files) {
+        const grid = document.getElementById('photo-grid');
         
-        cards.forEach((img, i) => {
-            newVault.push(img.src);
-            badges[i].innerText = (i + 1).toString().padStart(2, '0');
-        });
-        assetVault = newVault;
-    }
-
-    function updateVaultStatus() {
-        const btn = document.getElementById('forge-btn');
-        btn.disabled = assetVault.length === 0;
-        if (!btn.disabled) btn.innerText = `Forge ${assetVault.length} Documents`;
-    }
-
-    async function generatePremiumPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const w = doc.internal.pageSize.getWidth();
-        const h = doc.internal.pageSize.getHeight();
-
-        for (let i = 0; i < assetVault.length; i++) {
-            if (i > 0) doc.addPage();
-            // Centered corporate layout with 10mm margins
-            doc.addImage(assetVault[i], 'JPEG', 10, 10, w - 20, h - 20, undefined, 'FAST');
+        for (let file of files) {
+            const url = await convertFile(file);
+            photoList.push(url);
+            
+            const div = document.createElement('div');
+            div.className = 'photo-card';
+            div.innerHTML = `<img src="${url}"><div class="number-tag">${photoList.length}</div>`;
+            grid.appendChild(div);
         }
+        checkButton();
+    }
 
-        doc.save(`PAGE_FORGE_EXPORT_${Date.now()}.pdf`);
+    function convertFile(file) {
+        return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+        });
+    }
+
+    function updateOrder() {
+        const images = document.querySelectorAll('.photo-card img');
+        const tags = document.querySelectorAll('.number-tag');
+        const newList = [];
+        images.forEach((img, i) => {
+            newList.push(img.src);
+            tags[i].innerText = i + 1;
+        });
+        photoList = newList;
+    }
+
+    function checkButton() {
+        const btn = document.getElementById('makeBtn');
+        btn.disabled = photoList.length === 0;
+        if(photoList.length > 0) {
+            btn.innerText = `Save ${photoList.length} Photos as PDF`;
+        }
+    }
+
+    // THE FIX: Better PDF Generation
+    async function makePDF() {
+        const btn = document.getElementById('makeBtn');
+        const originalText = btn.innerText;
+        btn.innerText = "Working...";
+        btn.disabled = true;
+
+        try {
+            const { jsPDF } = window.jspdf;
+            // Use 'pt' and 'a4' for the most reliable results
+            const doc = new jsPDF('p', 'pt', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            for (let i = 0; i < photoList.length; i++) {
+                if (i > 0) doc.addPage();
+                
+                // Scale the image to fit the page properly
+                // Setting alias to 'FAST' helps with memory issues
+                doc.addImage(photoList[i], 'JPEG', 20, 20, pageWidth - 40, pageHeight - 40, undefined, 'FAST');
+            }
+
+            doc.save("my-document.pdf");
+        } catch (err) {
+            alert("Sorry, something went wrong. Try using fewer or smaller photos.");
+            console.error(err);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 </script>
 
