@@ -2,228 +2,283 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PAGE FORGE | Archive the Future</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Forge | Professional Document Foundry</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --glow: #00f2ff;
-            --deep: #020617;
-            --panel: rgba(15, 23, 42, 0.6);
-            --border: rgba(0, 242, 255, 0.2);
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --accent: #3e5cf4;
+            --text-dim: #888888;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
             --font-main: 'Inter', sans-serif;
-            --font-cinema: 'Syncopate', sans-serif;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
         
         body {
             font-family: var(--font-main);
-            background-color: var(--deep);
-            color: white;
+            background-color: var(--bg);
+            color: #fff;
             margin: 0;
+            padding: 0;
             overflow-x: hidden;
-            /* Animated background gradient */
-            background: radial-gradient(circle at 50% -20%, #1e293b, var(--deep));
         }
 
-        /* Cinematic HUD Header */
+        /* Cinematic Entrance Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Section */
         header {
-            padding: 40px 20px;
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-            position: relative;
+            animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        header::after {
-            content: ""; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
-            width: 200px; height: 1px; background: var(--glow); box-shadow: 0 0 15px var(--glow);
-        }
-
-        h1 {
-            font-family: var(--font-cinema);
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            letter-spacing: 12px;
+        header h1 {
+            font-weight: 500;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            letter-spacing: -0.04em;
             margin: 0;
-            text-transform: uppercase;
-            background: linear-gradient(to bottom, #fff 30%, var(--glow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
-        /* Main Workspace Layout */
-        .master-container {
-            max-width: 1400px; margin: 0 auto; padding: 40px 20px;
-            display: grid; grid-template-columns: 1fr; gap: 30px;
+        header p {
+            color: var(--text-dim);
+            font-weight: 300;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        /* Main Workspace Container */
+        .forge-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            animation: fadeIn 1.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @media (min-width: 1024px) {
-            .master-container { grid-template-columns: 350px 1fr; }
+            .forge-container { grid-template-columns: 320px 1fr; }
         }
 
-        /* Control Unit (The Interface) */
-        .control-unit {
-            background: var(--panel);
+        /* Sidebar Controls */
+        .side-panel {
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 4px; /* Brutalist sharp edges */
-            padding: 30px;
+            border-radius: 24px;
+            padding: 32px;
             height: fit-content;
-            position: sticky; top: 40px;
+            position: sticky;
+            top: 40px;
         }
 
-        /* Futuristic Buttons */
-        .cyber-btn {
-            width: 100%; padding: 20px; margin-bottom: 15px;
-            background: transparent; border: 1px solid var(--border);
-            color: var(--glow); font-family: var(--font-cinema); font-size: 0.7rem;
-            letter-spacing: 2px; cursor: pointer; position: relative;
-            overflow: hidden; transition: 0.4s;
+        .section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            display: block;
         }
 
-        .cyber-btn:hover {
-            background: var(--glow); color: var(--deep);
-            box-shadow: 0 0 30px var(--glow);
+        /* Luxury Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: none;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+
+        .btn-upload {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-upload:hover { transform: scale(1.02); background: #f0f0f0; }
 
         .btn-forge {
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px solid var(--glow);
-            font-weight: 700;
+            background: var(--accent);
+            color: #fff;
         }
 
-        /* Sorting Grid (The Foundry) */
+        .btn-forge:disabled {
+            background: #222;
+            color: #555;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+
+        .btn-reset:hover { border-color: #ff4444; color: #ff4444; }
+
+        /* The Foundry (Grid) */
         .foundry {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.05);
-            min-height: 60vh; border-radius: 4px; padding: 20px;
-            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            min-height: 600px;
         }
 
         #sortable-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 24px;
         }
 
-        /* The Assets */
-        .asset-card {
-            position: relative;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: #000;
-            aspect-ratio: 1;
-            cursor: grab;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-
-        .asset-card:hover { border-color: var(--glow); transform: scale(1.02); z-index: 10; }
-        .asset-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .asset-card:hover img { opacity: 1; }
-
-        .index-tag {
-            position: absolute; top: 0; left: 0;
-            background: var(--glow); color: var(--deep);
-            padding: 2px 8px; font-family: var(--font-cinema); font-size: 0.6rem;
-        }
-
-        /* Sorting Animation Classes */
-        .sortable-ghost { opacity: 0; }
-        .sortable-chosen { filter: hue-rotate(90deg); border: 2px solid var(--glow); }
-
-        /* Mobile Adjustments */
         @media (max-width: 600px) {
-            #sortable-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            h1 { letter-spacing: 5px; }
+            #sortable-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .forge-container { padding: 0 15px 50px; }
+            header { height: 30vh; }
         }
+
+        /* Sortable Item Cards */
+        .asset-card {
+            background: var(--bg);
+            border-radius: 16px;
+            overflow: hidden;
+            aspect-ratio: 3/4;
+            border: 1px solid var(--border);
+            cursor: grab;
+            position: relative;
+            transition: border-color 0.3s;
+        }
+
+        .asset-card:hover { border-color: var(--accent); }
+        .asset-card img { width: 100%; height: 100%; object-fit: cover; }
+
+        .order-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Dragging States */
+        .sortable-ghost { opacity: 0.2; transform: scale(0.95); }
+        .sortable-chosen { cursor: grabbing; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
 
         input[type="file"] { display: none; }
-        
-        .empty-msg {
-            text-align: center; padding: 100px 0; color: var(--text-muted);
-            text-transform: uppercase; font-family: var(--font-cinema); font-size: 0.7rem;
-            letter-spacing: 4px; opacity: 0.4;
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 150px 0;
+            color: var(--text-dim);
+            font-weight: 300;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>PAGE FORGE</h1>
-    <p style="font-size: 0.6rem; letter-spacing: 5px; opacity: 0.5;">ARCHIVE // VISUAL // ENGINE</p>
+    <h1>Page Forge</h1>
+    <p>Document Architecture for Modern Enterprise</p>
 </header>
 
-<div class="master-container">
+<div class="forge-container">
     
-    <aside class="control-unit">
-        <div style="margin-bottom: 40px;">
-            <div style="font-size: 0.7rem; color: var(--glow); margin-bottom: 10px;">[ SYSTEM STATUS: READY ]</div>
-            <div style="height: 2px; width: 100%; background: rgba(255,255,255,0.05);">
-                <div id="progress-bar" style="height: 100%; width: 0%; background: var(--glow); transition: 0.5s;"></div>
-            </div>
-        </div>
-
-        <label for="uploader" class="cyber-btn">
-            + UPLOAD_DATA
-            <input type="file" id="uploader" multiple accept="image/*" onchange="ingestFiles(this.files)">
+    <aside class="side-panel">
+        <span class="section-label">Pipeline Controls</span>
+        
+        <label for="uploader" class="btn btn-upload">
+            Add Digital Assets
+            <input type="file" id="uploader" multiple accept="image/*" onchange="ingestImages(this.files)">
         </label>
         
-        <button class="cyber-btn btn-forge" id="forge-btn" onclick="forgeFinalPDF()" disabled>
-            GENERATE_PDF
+        <button class="btn btn-forge" id="forge-btn" onclick="generatePremiumPDF()" disabled>
+            Forge Document
         </button>
         
-        <button class="cyber-btn" style="border-color: #ff3e3e; color: #ff3e3e;" onclick="window.location.reload()">
-            TERMINATE
+        <button class="btn btn-reset" onclick="location.reload()">
+            Reset Workspace
         </button>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim);">
+            Manual reordering enabled. <br> Drag and drop thumbnails within the foundry.
+        </div>
     </aside>
 
     <main class="foundry">
         <div id="sortable-grid">
-            <div class="empty-msg">Waiting for Data Input...</div>
+            <div class="empty-state">No assets currently in pipeline.</div>
         </div>
     </main>
 
 </div>
 
 <script>
-    let archive = [];
+    let assetVault = [];
 
-    // Initialize Sortable with touch support
+    // Initialize the enterprise sorting engine
     document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('sortable-grid');
         new Sortable(el, {
-            animation: 400,
+            animation: 500,
+            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
-            onEnd: reorderArchive
+            onEnd: updateSequence
         });
     });
 
-    async function ingestFiles(files) {
+    async function ingestImages(files) {
         const grid = document.getElementById('sortable-grid');
-        const empty = document.querySelector('.empty-msg');
+        const empty = document.querySelector('.empty-state');
         if (empty) empty.remove();
 
         for (let file of files) {
-            const data = await convert(file);
-            archive.push(data);
+            const data = await convertToBase64(file);
+            assetVault.push(data);
             
             const card = document.createElement('div');
             card.className = 'asset-card';
             card.innerHTML = `
-                <div class="index-tag">STP_${archive.length}</div>
+                <div class="order-badge">0${assetVault.length}</div>
                 <img src="${data}">
             `;
             grid.appendChild(card);
         }
-        updateUI();
+        updateVaultStatus();
     }
 
-    function convert(file) {
+    function convertToBase64(file) {
         return new Promise(res => {
             const r = new FileReader();
             r.readAsDataURL(file);
@@ -231,37 +286,37 @@
         });
     }
 
-    function reorderArchive() {
+    function updateSequence() {
         const cards = document.querySelectorAll('.asset-card img');
-        const tags = document.querySelectorAll('.index-tag');
-        const newArchive = [];
+        const badges = document.querySelectorAll('.order-badge');
+        const newVault = [];
+        
         cards.forEach((img, i) => {
-            newArchive.push(img.src);
-            tags[i].innerText = `STP_${i + 1}`;
+            newVault.push(img.src);
+            badges[i].innerText = (i + 1).toString().padStart(2, '0');
         });
-        archive = newArchive;
+        assetVault = newVault;
     }
 
-    function updateUI() {
+    function updateVaultStatus() {
         const btn = document.getElementById('forge-btn');
-        const bar = document.getElementById('progress-bar');
-        btn.disabled = archive.length === 0;
-        bar.style.width = archive.length > 0 ? '100%' : '0%';
+        btn.disabled = assetVault.length === 0;
+        if (!btn.disabled) btn.innerText = `Forge ${assetVault.length} Documents`;
     }
 
-    async function forgeFinalPDF() {
+    async function generatePremiumPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
         const w = doc.internal.pageSize.getWidth();
         const h = doc.internal.pageSize.getHeight();
 
-        for (let i = 0; i < archive.length; i++) {
+        for (let i = 0; i < assetVault.length; i++) {
             if (i > 0) doc.addPage();
-            // High fidelity fit
-            doc.addImage(archive[i], 'JPEG', 0, 0, w, h, undefined, 'FAST');
+            // Centered corporate layout with 10mm margins
+            doc.addImage(assetVault[i], 'JPEG', 10, 10, w - 20, h - 20, undefined, 'FAST');
         }
 
-        doc.save(`FORGE_RESULT_${Date.now()}.pdf`);
+        doc.save(`PAGE_FORGE_EXPORT_${Date.now()}.pdf`);
     }
 </script>
 
