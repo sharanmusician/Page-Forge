@@ -7,7 +7,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -16,184 +16,91 @@
             --accent: #ffffff;
             --text-muted: #666666;
             --border: rgba(255, 255, 255, 0.08);
-            --font-main: 'Inter', sans-serif;
         }
 
-        /* Prevent all text selection and accidental dragging */
         * { 
             box-sizing: border-box; 
             -webkit-font-smoothing: antialiased;
             user-select: none; 
             -webkit-user-select: none;
-            -webkit-touch-callout: none;
+            touch-action: pan-y; /* Improves scroll/drag stability */
         }
         
         body {
-            font-family: var(--font-main);
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: #fff;
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
             min-height: 100vh;
         }
 
-        header {
-            padding: 80px 20px 60px;
-            text-align: center;
-        }
-
-        header h1 {
-            font-weight: 400;
-            font-size: 2.8rem;
-            letter-spacing: -0.04em;
-            margin: 0;
-            text-transform: lowercase;
-        }
-
-        .branding-sub {
-            color: var(--text-muted);
-            font-weight: 200;
-            font-size: 0.75rem;
-            margin-top: 8px;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
+        header { padding: 80px 20px 60px; text-align: center; }
+        header h1 { font-weight: 400; font-size: 2.8rem; letter-spacing: -0.04em; margin: 0; text-transform: lowercase; }
+        .branding-sub { color: var(--text-muted); font-weight: 200; font-size: 0.75rem; margin-top: 8px; letter-spacing: 0.4em; text-transform: uppercase; }
 
         .workspace {
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            padding: 0 20px 100px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 40px;
+            max-width: 1200px; margin: 0 auto; width: 100%;
+            padding: 0 20px 100px; display: grid; grid-template-columns: 1fr; gap: 40px;
         }
 
-        @media (min-width: 1024px) {
-            .workspace { grid-template-columns: 320px 1fr; }
-        }
+        @media (min-width: 1024px) { .workspace { grid-template-columns: 320px 1fr; } }
 
         .control-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 35px;
-            height: fit-content;
-            position: sticky;
-            top: 40px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 24px; padding: 35px; height: fit-content;
+            position: sticky; top: 40px;
         }
 
-        .label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            display: block;
-        }
+        .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-muted); margin-bottom: 30px; display: block; }
 
         .btn {
-            width: 100%;
-            padding: 18px;
-            border-radius: 14px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border: none;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%; padding: 18px; border-radius: 14px; font-size: 0.9rem; font-weight: 500;
+            cursor: pointer; transition: all 0.3s ease; border: none; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .btn-primary { background: var(--accent); color: #000; }
-        .btn-primary:hover { background: #f0f0f0; }
-        .btn-primary:disabled { background: #1a1a1a; color: #444; cursor: not-allowed; }
+        .btn-primary:disabled { background: #1a1a1a; color: #444; }
 
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
 
-        .btn-clear { 
-            color: #ff4444; 
-            font-size: 0.75rem; 
-            margin-top: 30px; 
-            opacity: 0.4; 
-            background: none; 
-            border: none; 
-            cursor: pointer;
-            width: 100%;
+        /* Elegant Minimalist Reset */
+        .btn-reset {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+            margin-top: 40px; width: 100%; cursor: pointer; transition: 0.3s;
+            padding: 10px; opacity: 0.6;
         }
+        .btn-reset:hover { color: #fff; opacity: 1; text-decoration: line-through; }
 
-        .gallery {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 30px;
-            min-height: 500px;
-        }
+        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; min-height: 500px; }
 
-        /* Smaller Windows for Photos */
         #sortable-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 15px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px;
         }
 
         .item {
-            aspect-ratio: 1;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            cursor: default; /* Change from grab to default to signify hold requirement */
-            position: relative;
-            transition: border-color 0.4s ease, transform 0.2s ease;
+            aspect-ratio: 1; background: #000; border-radius: 10px;
+            overflow: hidden; border: 1px solid var(--border);
+            position: relative; transition: border-color 0.3s ease;
+            will-change: transform; /* Boosts drag performance */
         }
 
-        .item img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            pointer-events: none; /* Images can't be dragged individually */
-        }
+        .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
         .sort-number {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            color: #fff;
-            font-size: 0.65rem;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 2;
+            position: absolute; top: 6px; left: 6px;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
+            color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1); z-index: 2;
         }
 
-        /* Dragging States */
-        .sortable-ghost { opacity: 0; }
-        .sortable-chosen { 
-            border-color: var(--accent); 
-            transform: scale(1.05); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        /* Smooth Drag Styling */
+        .sortable-ghost { opacity: 0.2; transform: scale(0.9); }
+        .sortable-drag { opacity: 0.9; cursor: grabbing; box-shadow: 0 15px 30px rgba(0,0,0,0.6); }
 
         input[type="file"] { display: none; }
-
-        .empty {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 150px 0;
-            color: var(--text-muted);
-            font-weight: 300;
-            font-size: 0.85rem;
-            letter-spacing: 0.05em;
-        }
+        .empty { grid-column: 1 / -1; text-align: center; padding: 150px 0; color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.05em; }
     </style>
 </head>
 <body>
@@ -205,7 +112,7 @@
 
 <div class="workspace">
     <aside class="control-panel">
-        <span class="label">Workflow</span>
+        <span class="label">Architecture</span>
         
         <label for="uploader" class="btn btn-primary">
             Add Photos
@@ -217,16 +124,15 @@
         </button>
 
         <div style="margin-top: 40px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.8; font-weight: 300;">
-            <b>Hold to Drag:</b> Press and hold an image window to reorder. 
-            Text selection is disabled for a focused experience.
+            Long-press and hold an image to re-sequence your document.
         </div>
 
-        <button class="btn-clear" onclick="location.reload()">Reset Workspace</button>
+        <button class="btn-reset" onclick="location.reload()">Clear Workspace</button>
     </aside>
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div class="empty">Workspace inactive. Add photos.</div>
+            <div class="empty">Foundry inactive.</div>
         </div>
     </main>
 </div>
@@ -237,12 +143,14 @@
     document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('sortable-grid');
         new Sortable(grid, {
-            animation: 400,
-            delay: 500, // REQUIRED: Press and hold for 500ms to drag
-            delayOnTouchOnly: true, // Only require hold on mobile
-            touchStartThreshold: 5, // Prevent drag if finger moves slightly
+            animation: 300,
+            delay: 400, // Hold for 400ms to grab
+            delayOnTouchOnly: true,
+            swapThreshold: 0.65,
+            forceFallback: true, // Creates a smoother "floating" drag on mobile
+            fallbackOnBody: true,
             ghostClass: 'sortable-ghost',
-            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
             onEnd: refreshOrder
         });
     });
@@ -258,10 +166,7 @@
             
             const card = document.createElement('div');
             card.className = 'item';
-            card.innerHTML = `
-                <div class="sort-number">${photoVault.length}</div>
-                <img src="${data}">
-            `;
+            card.innerHTML = `<div class="sort-number">${photoVault.length}</div><img src="${data}">`;
             grid.appendChild(card);
         }
         updateStatus();
@@ -279,7 +184,6 @@
         const images = document.querySelectorAll('.item img');
         const badges = document.querySelectorAll('.sort-number');
         const newVault = [];
-        
         images.forEach((img, i) => {
             newVault.push(img.src);
             badges[i].innerText = i + 1;
@@ -294,30 +198,16 @@
     }
 
     async function saveAsPDF() {
-        const btn = document.getElementById('saveBtn');
-        const originalText = btn.innerText;
-        btn.innerText = "Processing...";
-        btn.disabled = true;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'pt', 'a4');
+        const pw = doc.internal.pageSize.getWidth();
+        const ph = doc.internal.pageSize.getHeight();
 
-        try {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'pt', 'a4');
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-
-            for (let i = 0; i < photoVault.length; i++) {
-                if (i > 0) doc.addPage();
-                const m = 40;
-                doc.addImage(photoVault[i], 'JPEG', m, m, pageWidth - (m * 2), pageHeight - (m * 2), undefined, 'MEDIUM');
-            }
-
-            doc.save("PageForge_Document.pdf");
-        } catch (err) {
-            alert("Memory limit. Try fewer photos.");
-        } finally {
-            btn.innerText = originalText;
-            btn.disabled = false;
+        for (let i = 0; i < photoVault.length; i++) {
+            if (i > 0) doc.addPage();
+            doc.addImage(photoVault[i], 'JPEG', 40, 40, pw - 80, ph - 80, undefined, 'MEDIUM');
         }
+        doc.save("document.pdf");
     }
 </script>
 
