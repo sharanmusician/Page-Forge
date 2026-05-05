@@ -7,203 +7,216 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #0a0a0a; --surface: #121212; --accent: #ffffff;
-            --text-muted: #666666; --border: rgba(255, 255, 255, 0.08);
+            --bg: #050505;
+            --surface: #0f0f0f;
+            --accent: #ffffff;
+            --muted: #444;
+            --danger: #ff3333;
         }
 
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; user-select: none; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: #fff; margin: 0; overflow-x: hidden; }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; }
 
-        header { padding: 80px 20px 40px; text-align: center; }
-        header h1 { font-weight: 400; font-size: 2.8rem; letter-spacing: -0.06em; margin: 0; text-transform: lowercase; }
-        .branding-sub { color: var(--text-muted); font-weight: 200; font-size: 0.7rem; margin-top: 10px; letter-spacing: 0.5em; text-transform: uppercase; }
+        header { padding: 100px 20px 60px; text-align: center; }
+        header h1 { font-weight: 900; font-size: 3.5rem; letter-spacing: -0.08em; margin: 0; text-transform: uppercase; }
+        .branding-sub { color: var(--muted); font-weight: 300; font-size: 0.8rem; margin-top: 5px; letter-spacing: 0.6em; text-transform: uppercase; }
 
-        .workspace { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; display: grid; grid-template-columns: 1fr; gap: 40px; }
-        @media (min-width: 1024px) { .workspace { grid-template-columns: 320px 1fr; } }
+        .workspace { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media (min-width: 1024px) { .workspace { grid-template-columns: 350px 1fr; } }
 
-        .control-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px; height: fit-content; }
-        .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--text-muted); margin-bottom: 30px; display: block; }
+        /* THE NEW LOOK: INDUSTRIAL BOLD */
+        .control-panel { background: var(--surface); border: 2px solid #222; padding: 40px; height: fit-content; }
+        .label { font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--muted); margin-bottom: 40px; display: block; border-left: 3px solid var(--accent); padding-left: 15px; }
 
-        /* Restored Bold Aesthetic Buttons */
         .btn {
-            width: 100%; padding: 20px; border-radius: 12px; font-size: 0.9rem; font-weight: 600;
-            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: none; margin-bottom: 15px;
-            display: flex; align-items: center; justify-content: center; text-transform: uppercase; letter-spacing: 0.1em;
+            width: 100%; padding: 22px; font-weight: 900; font-size: 0.9rem;
+            cursor: pointer; border: none; margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: center;
+            text-transform: uppercase; letter-spacing: 0.2em;
+            transition: background 0.2s, transform 0.1s;
         }
 
-        .btn-primary { background: var(--accent); color: #000; box-shadow: 0 4px 20px rgba(255,255,255,0.1); }
-        .btn-primary:active { transform: scale(0.97); }
-        .btn-primary:disabled { background: #1a1a1a; color: #444; box-shadow: none; cursor: not-allowed; }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-primary:hover { background: #ccc; }
+        .btn-primary:active { transform: translateY(2px); }
+        .btn-primary:disabled { background: #1a1a1a; color: #333; cursor: not-allowed; }
 
-        .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
-        .btn-secondary:hover { border-color: var(--accent); background: rgba(255,255,255,0.03); }
+        .btn-secondary { background: transparent; border: 2px solid #222; color: #fff; }
+        .btn-secondary:hover { border-color: #fff; }
 
         .btn-reset {
-            background: none; border: none; color: var(--text-muted); font-size: 0.65rem; 
-            letter-spacing: 0.2em; text-transform: uppercase; margin-top: 40px; 
-            width: 100%; cursor: pointer; transition: 0.3s;
+            background: none; border: none; color: #555; font-size: 0.7rem; 
+            font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; 
+            margin-top: 50px; width: 100%; cursor: pointer;
         }
-        .btn-reset:hover { color: #ff4444; text-decoration: line-through; }
+        .btn-reset:hover { color: var(--danger); }
 
-        /* Gallery Layout */
-        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 35px; min-height: 500px; }
-        #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 20px; }
+        /* GALLERY AREA */
+        .gallery { background: var(--surface); border: 2px solid #222; padding: 40px; min-height: 500px; }
+        #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; }
 
-        .item { aspect-ratio: 1; background: #000; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); position: relative; transition: border 0.3s; }
-        .item:hover { border-color: rgba(255,255,255,0.2); }
+        .item { aspect-ratio: 1; background: #000; overflow: hidden; border: 1px solid #222; position: relative; }
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         
         .sort-number {
-            position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); 
-            backdrop-filter: blur(8px); color: #fff; font-size: 0.65rem; 
-            padding: 4px 8px; border-radius: 6px; z-index: 2; border: 1px solid rgba(255,255,255,0.15);
+            position: absolute; bottom: 0; right: 0; background: var(--accent); 
+            color: #000; font-weight: 900; font-size: 0.8rem; 
+            padding: 5px 12px; z-index: 2;
         }
 
-        .limit-note { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 20px; letter-spacing: 0.05em; }
-
         input[type="file"] { display: none; }
-        #empty-state { grid-column: 1/-1; text-align: center; padding: 150px 0; color: #333; font-size: 0.8rem; letter-spacing: 0.2em; }
+        #empty-state { grid-column: 1/-1; text-align: center; padding: 150px 0; color: #222; font-weight: 900; font-size: 2rem; letter-spacing: -0.05em; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>page forge</h1>
+    <h1>PAGE FORGE</h1>
     <div class="branding-sub">Aethercore Interactive</div>
 </header>
 
 <div class="workspace">
     <aside class="control-panel">
-        <span class="label">System Input</span>
+        <span class="label">CORE INTERFACE</span>
         
-        <label for="uploader" class="btn btn-primary" id="uploadLabel">
-            <span>Add Assets</span>
+        <label for="uploader" class="btn btn-primary" id="upload-label">
+            ADD ASSETS
             <input type="file" id="uploader" multiple accept="image/*">
         </label>
         
-        <button class="btn btn-secondary" id="saveBtn" disabled>Generate PDF</button>
-        <button class="btn-reset" id="resetBtn">Reset Workspace</button>
+        <button class="btn btn-secondary" id="save-btn" disabled>GENERATE PDF</button>
+        <button class="btn-reset" id="reset-btn">PURGE WORKSPACE</button>
         
-        <div class="limit-note" id="limitText">20 Image Maximum</div>
+        <div id="status-text" style="font-size: 0.6rem; margin-top: 30px; color: #444; letter-spacing: 0.1em; text-align: center;">LIMIT: 20 SLOTS</div>
     </aside>
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div id="empty-state">ARCHIVE EMPTY</div>
+            <div id="empty-state">EMPTY ARCHIVE</div>
         </div>
     </main>
 </div>
 
 <script>
-    let photoVault = [];
-    const MAX_IMAGES = 20;
+    // CORE APP STATE
+    const state = {
+        photos: [],
+        max: 20
+    };
 
-    const uploader = document.getElementById('uploader');
-    const uploadLabel = document.getElementById('uploadLabel');
-    const saveBtn = document.getElementById('saveBtn');
-    const resetBtn = document.getElementById('resetBtn');
+    // DOM REFERENCES
     const grid = document.getElementById('sortable-grid');
-    const limitText = document.getElementById('limitText');
+    const uploader = document.getElementById('uploader');
+    const saveBtn = document.getElementById('save-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const statusText = document.getElementById('status-text');
 
-    // SMOOTH MOTION ENGINE
+    // INITIALIZE SORTING
     new Sortable(grid, {
-        animation: 300,
-        delay: 0, 
-        forceFallback: true,
-        onEnd: refreshOrder
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: syncStateFromDOM
     });
 
-    // UPLOAD LOGIC
+    // 1. ASSET UPLOAD
     uploader.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
+        const empty = document.getElementById('empty-state');
+        if (empty && files.length > 0) empty.remove();
+
         for (let file of files) {
-            if (photoVault.length >= MAX_IMAGES) break;
-            const data = await toBase64(file);
-            photoVault.push(data);
-            const empty = document.getElementById('empty-state');
-            if (empty) empty.remove();
-            const card = document.createElement('div');
-            card.className = 'item';
-            card.innerHTML = `<div class="sort-number">${photoVault.length}</div><img src="${data}">`;
-            grid.appendChild(card);
+            if (state.photos.length >= state.max) break;
+            
+            const base64 = await new Promise(r => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => r(reader.result);
+            });
+
+            state.photos.push(base64);
+            renderCard(base64, state.photos.length);
         }
-        checkLimit();
         updateUI();
-        uploader.value = ''; 
+        uploader.value = ''; // Reset input
     });
 
-    // INSTANT GENERATE (NO CONFIRMATION)
-    saveBtn.addEventListener('click', function() {
-        if (photoVault.length === 0) return;
-        saveBtn.innerText = "Processing...";
+    // 2. GENERATE PDF (CORE ENGINE)
+    saveBtn.addEventListener('click', () => {
+        if (state.photos.length === 0) return;
+        
+        saveBtn.innerText = "FORGING...";
         saveBtn.disabled = true;
 
-        setTimeout(() => {
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4', compress: true });
-                const pw = doc.internal.pageSize.getWidth();
-                const ph = doc.internal.pageSize.getHeight();
+        // Use requestAnimationFrame to ensure UI updates before heavy task
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4', compress: true });
+                    const pw = doc.internal.pageSize.getWidth();
+                    const ph = doc.internal.pageSize.getHeight();
 
-                photoVault.forEach((imgData, i) => {
-                    if (i > 0) doc.addPage();
-                    doc.addImage(imgData, 'JPEG', 40, 40, pw - 80, ph - 80, undefined, 'MEDIUM');
-                });
+                    state.photos.forEach((data, i) => {
+                        if (i > 0) doc.addPage();
+                        // Full bleed with 40pt margin
+                        doc.addImage(data, 'JPEG', 40, 40, pw - 80, ph - 80, undefined, 'MEDIUM');
+                    });
 
-                doc.save(`PageForge_Export.pdf`);
-            } finally {
-                saveBtn.innerText = "Generate PDF";
-                saveBtn.disabled = false;
-                updateUI();
-            }
-        }, 50);
+                    doc.save(`FORGE_${Date.now()}.pdf`);
+                } catch (err) {
+                    alert("FATAL: Memory limit exceeded. Use smaller files.");
+                } finally {
+                    saveBtn.innerText = "GENERATE PDF";
+                    updateUI();
+                }
+            }, 50);
+        });
     });
 
-    // INSTANT RESET (NO CONFIRMATION)
-    resetBtn.addEventListener('click', function() {
-        photoVault = [];
-        grid.innerHTML = '<div id="empty-state">ARCHIVE EMPTY</div>';
-        checkLimit();
+    // 3. PURGE WORKSPACE
+    resetBtn.addEventListener('click', () => {
+        state.photos = [];
+        grid.innerHTML = '<div id="empty-state">EMPTY ARCHIVE</div>';
         updateUI();
     });
 
-    function toBase64(file) {
-        return new Promise(resolve => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-        });
+    // HELPERS
+    function renderCard(src, index) {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `<div class="sort-number">${index}</div><img src="${src}">`;
+        grid.appendChild(div);
     }
 
-    function refreshOrder() {
-        const images = grid.querySelectorAll('.item img');
-        const badges = grid.querySelectorAll('.sort-number');
-        const newOrder = [];
-        images.forEach((img, i) => {
-            newOrder.push(img.src);
-            if (badges[i]) badges[i].innerText = i + 1;
+    function syncStateFromDOM() {
+        const imgs = grid.querySelectorAll('.item img');
+        const labels = grid.querySelectorAll('.sort-number');
+        state.photos = [];
+        imgs.forEach((img, i) => {
+            state.photos.push(img.src);
+            labels[i].innerText = i + 1;
         });
-        photoVault = newOrder;
+        updateUI();
     }
 
     function updateUI() {
-        saveBtn.disabled = photoVault.length === 0;
-        saveBtn.innerText = photoVault.length > 0 ? `Generate (${photoVault.length}/20)` : "Generate PDF";
-    }
-
-    function checkLimit() {
-        if (photoVault.length >= MAX_IMAGES) {
-            uploadLabel.style.display = "none";
-            limitText.innerText = "System Capacity Reached";
-            limitText.style.color = "#ff4444";
+        const count = state.photos.length;
+        saveBtn.disabled = count === 0;
+        saveBtn.innerText = count > 0 ? `GENERATE (${count}/${state.max})` : "GENERATE PDF";
+        
+        const label = document.getElementById('upload-label');
+        if (count >= state.max) {
+            label.style.display = 'none';
+            statusText.innerText = "CAPACITY REACHED";
+            statusText.style.color = "var(--danger)";
         } else {
-            uploadLabel.style.display = "flex";
-            limitText.innerText = "20 Image Maximum";
-            limitText.style.color = "";
+            label.style.display = 'flex';
+            statusText.innerText = `LIMIT: ${state.max} SLOTS`;
+            statusText.style.color = "";
         }
     }
 </script>
