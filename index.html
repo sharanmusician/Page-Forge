@@ -5,26 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Page Forge | Professional Image to PDF Architecture | Aethercore</title>
-    <meta name="description" content="The executive standard for converting high-resolution visual assets into structured PDF documents. Secure, browser-based architectural document forging by Aethercore Interactive.">
-    <meta name="keywords" content="Professional PDF Converter, Image to PDF, Secure Document Foundry, Aethercore Interactive, Page Forge, Executive Productivity Tool">
-    <meta name="author" content="Aethercore Interactive">
+    <meta name="description" content="Secure, browser-based architectural document forging. The executive standard for converting high-resolution visual assets into structured PDF sequences.">
     
-    <meta property="og:title" content="Page Forge | Document Architecture">
-    <meta property="og:description" content="Securely transform visual data into professional PDF sequences.">
-    <meta property="og:type" content="website">
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Page Forge",
-      "developer": "Aethercore Interactive",
-      "description": "High-end Image to PDF conversion tool with architectural reordering capabilities.",
-      "applicationCategory": "ProductivityApplication",
-      "operatingSystem": "All"
-    }
-    </script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&display=swap" rel="stylesheet">
@@ -54,37 +36,16 @@
             min-height: 100vh;
         }
 
-        /* SEO-Friendly Header */
-        header { padding: 80px 20px 40px; text-align: center; }
+        header { padding: 60px 20px 40px; text-align: center; }
         header h1 { font-weight: 400; font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -0.04em; margin: 0; text-transform: lowercase; }
         .branding-sub { color: var(--text-muted); font-weight: 200; font-size: 0.75rem; margin-top: 8px; letter-spacing: 0.4em; text-transform: uppercase; }
 
         .workspace {
             max-width: 1200px; margin: 0 auto; width: 100%;
-            padding: 0 20px 100px; display: grid; grid-template-columns: 1fr; gap: 40px;
+            padding: 0 20px 60px; display: grid; grid-template-columns: 1fr; gap: 40px;
         }
 
         @media (min-width: 1024px) { .workspace { grid-template-columns: 320px 1fr; } }
-
-        /* Description Section (Professional Methodology) */
-        .methodology {
-            grid-column: 1 / -1;
-            padding: 40px 0;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 40px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .method-step { animation: fadeIn 1s ease forwards; opacity: 0; }
-        .method-step:nth-child(2) { animation-delay: 0.2s; }
-        .method-step:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .method-step h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 15px; }
-        .method-step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; font-weight: 300; margin: 0; }
 
         /* Control Panel */
         .control-panel {
@@ -112,7 +73,7 @@
         }
         .btn-reset:hover { color: #fff; opacity: 1; text-decoration: line-through; }
 
-        /* Gallery */
+        /* Gallery / PDF Maker */
         .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; min-height: 400px; }
         #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; }
 
@@ -130,7 +91,21 @@
             border: 1px solid rgba(255, 255, 255, 0.1); z-index: 2;
         }
 
-        /* Sorting Smoothness */
+        /* Methodology Section (Below PDF Maker) */
+        .methodology {
+            grid-column: 1 / -1;
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+        }
+
+        .method-step h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 15px; }
+        .method-step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; font-weight: 300; margin: 0; }
+
+        /* Drag States */
         .sortable-ghost { opacity: 0.1; }
         .sortable-drag { opacity: 0.9; cursor: grabbing; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
 
@@ -147,21 +122,6 @@
 
 <div class="workspace">
     
-    <section class="methodology">
-        <div class="method-step">
-            <h3>01. Asset Ingestion</h3>
-            <p>Upload your high-resolution visual data into our secure foundry. We support all major photographic formats for high-fidelity conversion.</p>
-        </div>
-        <div class="method-step">
-            <h3>02. Architectural Reorder</h3>
-            <p>Press and hold any asset window to manipulate the sequence. The numerical indices update in real-time to define your document structure.</p>
-        </div>
-        <div class="method-step">
-            <h3>03. Final Synthesis</h3>
-            <p>Generate a standardized A4 document. All processing occurs locally within your browser, ensuring enterprise-grade data privacy.</p>
-        </div>
-    </section>
-
     <aside class="control-panel">
         <span class="label">Foundry Terminal</span>
         
@@ -179,9 +139,25 @@
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div class="empty">Ready for input.</div>
+            <div class="empty">Workspace ready for asset ingestion.</div>
         </div>
     </main>
+
+    <section class="methodology">
+        <div class="method-step">
+            <h3>01. Asset Ingestion</h3>
+            <p>Deploy your high-resolution visual data into our local foundry. Our architecture supports all major image formats for lossless conversion.</p>
+        </div>
+        <div class="method-step">
+            <h3>02. Architectural Reorder</h3>
+            <p>Press and hold any asset window to manipulate the sequence. Numerical indices update in real-time to define your final document structure.</p>
+        </div>
+        <div class="method-step">
+            <h3>03. Privacy-First Synthesis</h3>
+            <p>All processing is executed on-device. Your data never leaves your local environment, ensuring maximum enterprise-grade privacy.</p>
+        </div>
+    </section>
+
 </div>
 
 <script>
