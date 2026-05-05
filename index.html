@@ -3,11 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Page Forge | Digital Document Architecture</title>
     
+    <title>Page Forge | Professional Image to PDF Architecture | Aethercore</title>
+    <meta name="description" content="The executive standard for converting high-resolution visual assets into structured PDF documents. Secure, browser-based architectural document forging by Aethercore Interactive.">
+    <meta name="keywords" content="Professional PDF Converter, Image to PDF, Secure Document Foundry, Aethercore Interactive, Page Forge, Executive Productivity Tool">
+    <meta name="author" content="Aethercore Interactive">
+    
+    <meta property="og:title" content="Page Forge | Document Architecture">
+    <meta property="og:description" content="Securely transform visual data into professional PDF sequences.">
+    <meta property="og:type" content="website">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Page Forge",
+      "developer": "Aethercore Interactive",
+      "description": "High-end Image to PDF conversion tool with architectural reordering capabilities.",
+      "applicationCategory": "ProductivityApplication",
+      "operatingSystem": "All"
+    }
+    </script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -23,7 +43,7 @@
             -webkit-font-smoothing: antialiased;
             user-select: none; 
             -webkit-user-select: none;
-            touch-action: pan-y; /* Improves scroll/drag stability */
+            touch-action: pan-y;
         }
         
         body {
@@ -34,8 +54,9 @@
             min-height: 100vh;
         }
 
-        header { padding: 80px 20px 60px; text-align: center; }
-        header h1 { font-weight: 400; font-size: 2.8rem; letter-spacing: -0.04em; margin: 0; text-transform: lowercase; }
+        /* SEO-Friendly Header */
+        header { padding: 80px 20px 40px; text-align: center; }
+        header h1 { font-weight: 400; font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -0.04em; margin: 0; text-transform: lowercase; }
         .branding-sub { color: var(--text-muted); font-weight: 200; font-size: 0.75rem; margin-top: 8px; letter-spacing: 0.4em; text-transform: uppercase; }
 
         .workspace {
@@ -45,6 +66,27 @@
 
         @media (min-width: 1024px) { .workspace { grid-template-columns: 320px 1fr; } }
 
+        /* Description Section (Professional Methodology) */
+        .methodology {
+            grid-column: 1 / -1;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .method-step { animation: fadeIn 1s ease forwards; opacity: 0; }
+        .method-step:nth-child(2) { animation-delay: 0.2s; }
+        .method-step:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .method-step h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 15px; }
+        .method-step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; font-weight: 300; margin: 0; }
+
+        /* Control Panel */
         .control-panel {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: 24px; padding: 35px; height: fit-content;
@@ -55,39 +97,32 @@
 
         .btn {
             width: 100%; padding: 18px; border-radius: 14px; font-size: 0.9rem; font-weight: 500;
-            cursor: pointer; transition: all 0.3s ease; border: none; margin-bottom: 12px;
+            cursor: pointer; transition: 0.3s ease; border: none; margin-bottom: 12px;
             display: flex; align-items: center; justify-content: center;
         }
 
         .btn-primary { background: var(--accent); color: #000; }
         .btn-primary:disabled { background: #1a1a1a; color: #444; }
-
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
 
-        /* Elegant Minimalist Reset */
         .btn-reset {
             background: none; border: none; color: var(--text-muted);
-            font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
-            margin-top: 40px; width: 100%; cursor: pointer; transition: 0.3s;
-            padding: 10px; opacity: 0.6;
+            font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+            margin-top: 40px; width: 100%; cursor: pointer; opacity: 0.5;
         }
         .btn-reset:hover { color: #fff; opacity: 1; text-decoration: line-through; }
 
-        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; min-height: 500px; }
-
-        #sortable-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px;
-        }
+        /* Gallery */
+        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; min-height: 400px; }
+        #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; }
 
         .item {
             aspect-ratio: 1; background: #000; border-radius: 10px;
             overflow: hidden; border: 1px solid var(--border);
-            position: relative; transition: border-color 0.3s ease;
-            will-change: transform; /* Boosts drag performance */
+            position: relative; will-change: transform;
         }
 
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-
         .sort-number {
             position: absolute; top: 6px; left: 6px;
             background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
@@ -95,12 +130,12 @@
             border: 1px solid rgba(255, 255, 255, 0.1); z-index: 2;
         }
 
-        /* Smooth Drag Styling */
-        .sortable-ghost { opacity: 0.2; transform: scale(0.9); }
-        .sortable-drag { opacity: 0.9; cursor: grabbing; box-shadow: 0 15px 30px rgba(0,0,0,0.6); }
+        /* Sorting Smoothness */
+        .sortable-ghost { opacity: 0.1; }
+        .sortable-drag { opacity: 0.9; cursor: grabbing; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
 
         input[type="file"] { display: none; }
-        .empty { grid-column: 1 / -1; text-align: center; padding: 150px 0; color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.05em; }
+        .empty { grid-column: 1 / -1; text-align: center; padding: 120px 0; color: var(--text-muted); font-size: 0.8rem; letter-spacing: 0.1em; }
     </style>
 </head>
 <body>
@@ -111,8 +146,24 @@
 </header>
 
 <div class="workspace">
+    
+    <section class="methodology">
+        <div class="method-step">
+            <h3>01. Asset Ingestion</h3>
+            <p>Upload your high-resolution visual data into our secure foundry. We support all major photographic formats for high-fidelity conversion.</p>
+        </div>
+        <div class="method-step">
+            <h3>02. Architectural Reorder</h3>
+            <p>Press and hold any asset window to manipulate the sequence. The numerical indices update in real-time to define your document structure.</p>
+        </div>
+        <div class="method-step">
+            <h3>03. Final Synthesis</h3>
+            <p>Generate a standardized A4 document. All processing occurs locally within your browser, ensuring enterprise-grade data privacy.</p>
+        </div>
+    </section>
+
     <aside class="control-panel">
-        <span class="label">Architecture</span>
+        <span class="label">Foundry Terminal</span>
         
         <label for="uploader" class="btn btn-primary">
             Add Photos
@@ -123,16 +174,12 @@
             Save as PDF
         </button>
 
-        <div style="margin-top: 40px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.8; font-weight: 300;">
-            Long-press and hold an image to re-sequence your document.
-        </div>
-
-        <button class="btn-reset" onclick="location.reload()">Clear Workspace</button>
+        <button class="btn-reset" onclick="location.reload()">Reset Workspace</button>
     </aside>
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div class="empty">Foundry inactive.</div>
+            <div class="empty">Ready for input.</div>
         </div>
     </main>
 </div>
@@ -143,14 +190,11 @@
     document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('sortable-grid');
         new Sortable(grid, {
-            animation: 300,
-            delay: 400, // Hold for 400ms to grab
+            animation: 350,
+            delay: 450,
             delayOnTouchOnly: true,
-            swapThreshold: 0.65,
-            forceFallback: true, // Creates a smoother "floating" drag on mobile
-            fallbackOnBody: true,
-            ghostClass: 'sortable-ghost',
-            dragClass: 'sortable-drag',
+            forceFallback: true,
+            fallbackClass: "sortable-drag",
             onEnd: refreshOrder
         });
     });
@@ -163,7 +207,6 @@
         for (let file of files) {
             const data = await toBase64(file);
             photoVault.push(data);
-            
             const card = document.createElement('div');
             card.className = 'item';
             card.innerHTML = `<div class="sort-number">${photoVault.length}</div><img src="${data}">`;
@@ -198,6 +241,8 @@
     }
 
     async function saveAsPDF() {
+        const btn = document.getElementById('saveBtn');
+        btn.innerText = "Generating...";
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'pt', 'a4');
         const pw = doc.internal.pageSize.getWidth();
@@ -207,7 +252,8 @@
             if (i > 0) doc.addPage();
             doc.addImage(photoVault[i], 'JPEG', 40, 40, pw - 80, ph - 80, undefined, 'MEDIUM');
         }
-        doc.save("document.pdf");
+        doc.save("PageForge_Export.pdf");
+        btn.innerText = `Save PDF (${photoVault.length})`;
     }
 </script>
 
