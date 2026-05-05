@@ -3,222 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simple PDF Maker | Professional Tools</title>
+    <title>Page Forge | Professional PDF Export</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --bg: #0a0a0a;
             --surface: #121212;
             --accent: #ffffff;
-            --text-muted: #666666;
-            --border: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-        
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
+            background: var(--bg);
             color: #fff;
             margin: 0;
-            padding: 0;
-            overflow-y: auto;
+            padding: 40px 20px;
         }
 
-        header { padding: 60px 20px 30px; text-align: center; }
-        header h1 { font-weight: 400; font-size: 2.5rem; letter-spacing: -0.04em; margin: 0; }
-        .sub-text { color: var(--text-muted); font-size: 0.75rem; margin-top: 10px; letter-spacing: 0.3em; text-transform: uppercase; }
-
-        .container {
-            max-width: 1100px; 
-            margin: 0 auto; 
-            padding: 0 20px 100px; 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 30px;
-        }
-
-        @media (min-width: 1024px) { .container { grid-template-columns: 300px 1fr; } }
-
-        .sidebar {
-            background: var(--surface); 
+        .wrapper { max-width: 900px; margin: 0 auto; }
+        
+        .header-section { text-align: center; margin-bottom: 40px; }
+        .header-section h1 { font-weight: 600; letter-spacing: -1px; margin: 0; }
+        
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 16px;
             border: 1px solid var(--border);
-            border-radius: 20px; 
-            padding: 30px; 
-            height: fit-content;
+            margin-bottom: 30px;
+            align-items: center;
         }
-
-        .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 20px; display: block; }
 
         .btn {
-            width: 100%; padding: 16px; border-radius: 12px; font-size: 0.9rem; font-weight: 500;
-            cursor: pointer; transition: 0.2s; border: none; margin-bottom: 12px;
-            display: flex; align-items: center; justify-content: center;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            font-size: 14px;
         }
 
-        .btn-main { background: var(--accent); color: #000; }
-        .btn-main:disabled { background: #222; color: #555; cursor: not-allowed; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-add { background: var(--accent); color: #000; }
+        .btn-save { background: #222; color: #fff; border: 1px solid var(--border); }
+        .btn-save:not(:disabled):hover { background: #333; }
+        .btn-reset { background: transparent; color: #666; font-size: 12px; }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .btn-clear {
-            background: none; border: none; color: var(--text-muted);
-            font-size: 0.7rem; margin-top: 20px; width: 100%; cursor: pointer;
-        }
-        .btn-clear:hover { color: #ff4444; }
+        .stats { margin-left: auto; font-size: 12px; color: #666; text-align: right; }
 
-        .main-content { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 25px; min-height: 400px; }
-        #image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
-
-        .image-card {
-            aspect-ratio: 1; background: #000; border-radius: 10px;
-            overflow: hidden; border: 1px solid var(--border);
-            position: relative; cursor: grab;
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            min-height: 200px;
         }
 
-        .image-card img { width: 100%; height: 100%; object-fit: cover; }
-        .badge {
-            position: absolute; top: 5px; left: 5px;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
-            color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px;
+        .card {
+            aspect-ratio: 1;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border);
         }
 
-        .empty-state { grid-column: 1 / -1; text-align: center; padding: 100px 0; color: var(--text-muted); font-weight: 300; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .num {
+            position: absolute; top: 8px; left: 8px;
+            background: rgba(0,0,0,0.7);
+            padding: 2px 8px; border-radius: 4px; font-size: 10px;
+        }
+
+        .empty-hint { grid-column: 1/-1; text-align: center; padding: 60px; color: #444; border: 2px dashed #1a1a1a; border-radius: 12px; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>page forge</h1>
-    <div class="sub-text">Image to PDF Studio</div>
-</header>
+<div class="wrapper">
+    <div class="header-section">
+        <h1>page forge</h1>
+    </div>
 
-<div class="container">
-    <aside class="sidebar">
-        <span class="label">Controls</span>
-        
-        <label for="file-input" class="btn btn-main" id="upload-label">
-            Add Images
-            <input type="file" id="file-input" multiple accept="image/*" style="display:none" onchange="handleUpload(this.files)">
+    <div class="toolbar">
+        <label class="btn btn-add">
+            Add Photos
+            <input type="file" id="files" multiple accept="image/*" style="display:none" onchange="loadImages(this.files)">
         </label>
         
-        <button class="btn btn-outline" id="download-btn" onclick="generatePDF()" disabled>
-            Download PDF
-        </button>
+        <button id="saveBtn" class="btn btn-save" onclick="generatePDF()" disabled>Save PDF</button>
+        <button class="btn btn-reset" onclick="resetAll()">Reset</button>
 
-        <button class="btn-clear" onclick="resetWorkspace()">Clear All Assets</button>
-        <p id="limit-note" style="font-size: 10px; color: #444; text-align: center; margin-top: 15px;">Max: 20 images</p>
-    </aside>
-
-    <main class="main-content">
-        <div id="image-grid">
-            <div class="empty-state">No images uploaded yet.</div>
+        <div class="stats">
+            <div id="countInfo">Images: 0 / 20</div>
+            <div id="saveInfo">Exports this session: 0</div>
         </div>
-    </main>
+    </div>
+
+    <div id="grid">
+        <div class="empty-hint">Foundry empty. Please add images (Max 20).</div>
+    </div>
 </div>
 
 <script>
-    let imagesArray = [];
-    const grid = document.getElementById('image-grid');
-    const downloadBtn = document.getElementById('download-btn');
+    let saveCount = 0;
+    const grid = document.getElementById('grid');
+    const saveBtn = document.getElementById('saveBtn');
 
-    // Initialize Sortable
-    new Sortable(grid, {
-        animation: 250,
-        onEnd: () => refreshDataOrder()
+    // Enable drag and drop reordering
+    const sortable = new Sortable(grid, {
+        animation: 150,
+        filter: '.empty-hint',
+        onEnd: () => updateLabels()
     });
 
-    async function handleUpload(files) {
-        if (imagesArray.length + files.length > 20) {
-            alert("Maximum limit of 20 images reached.");
+    async function loadImages(files) {
+        const currentCount = grid.querySelectorAll('.card').length;
+        
+        if (currentCount + files.length > 20) {
+            alert("Limit reached. You can only have 20 images total.");
             return;
         }
 
-        const emptyMsg = document.querySelector('.empty-state');
-        if (emptyMsg) emptyMsg.remove();
+        const hint = document.querySelector('.empty-hint');
+        if (hint) hint.remove();
 
         for (let file of files) {
-            if (imagesArray.length >= 20) break;
-            
-            const base64 = await convertToBase64(file);
-            imagesArray.push(base64);
-            
-            const card = document.createElement('div');
-            card.className = 'image-card';
-            card.innerHTML = `<div class="badge">${imagesArray.length}</div><img src="${base64}">`;
-            grid.appendChild(card);
+            const base64 = await toBase64(file);
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `<div class="num"></div><img src="${base64}">`;
+            grid.appendChild(div);
         }
-        updateUI();
+        
+        updateLabels();
     }
 
-    function convertToBase64(file) {
-        return new Promise((resolve) => {
+    function toBase64(file) {
+        return new Promise(resolve => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
             reader.readAsDataURL(file);
         });
     }
 
-    function refreshDataOrder() {
-        const renderedImages = document.querySelectorAll('.image-card img');
-        const badges = document.querySelectorAll('.badge');
-        imagesArray = [];
-        renderedImages.forEach((img, index) => {
-            imagesArray.push(img.src);
-            badges[index].innerText = index + 1;
+    function updateLabels() {
+        const cards = grid.querySelectorAll('.card');
+        cards.forEach((card, i) => {
+            card.querySelector('.num').innerText = i + 1;
         });
+
+        const count = cards.length;
+        saveBtn.disabled = count === 0;
+        document.getElementById('countInfo').innerText = `Images: ${count} / 20`;
     }
 
-    function updateUI() {
-        downloadBtn.disabled = imagesArray.length === 0;
-        downloadBtn.innerText = imagesArray.length > 0 ? `Download PDF (${imagesArray.length})` : "Download PDF";
-        
-        // Hide upload button if at limit
-        document.getElementById('upload-label').style.display = imagesArray.length >= 20 ? 'none' : 'flex';
-    }
-
-    function resetWorkspace() {
-        imagesArray = [];
-        grid.innerHTML = '<div class="empty-state">No images uploaded yet.</div>';
-        updateUI();
-        document.getElementById('file-input').value = ""; // Clear file input
+    function resetAll() {
+        if(confirm("Clear all images and reset workspace?")) {
+            grid.innerHTML = '<div class="empty-hint">Foundry empty. Please add images (Max 20).</div>';
+            document.getElementById('files').value = "";
+            updateLabels();
+        }
     }
 
     async function generatePDF() {
+        // 1. Check exactly how many pictures are there right now
+        const images = grid.querySelectorAll('.card img');
+        const count = images.length;
+        
+        if (count === 0) return;
+
+        saveBtn.innerText = "Forging...";
+        saveBtn.disabled = true;
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'pt', 'a4');
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
+        const w = doc.internal.pageSize.getWidth();
+        const h = doc.internal.pageSize.getHeight();
 
-        downloadBtn.innerText = "Processing...";
-        downloadBtn.disabled = true;
-
-        try {
-            for (let i = 0; i < imagesArray.length; i++) {
-                if (i > 0) doc.addPage();
-                
-                // Add image with 40pt margin, auto-scaling to fit page
-                doc.addImage(
-                    imagesArray[i], 
-                    'JPEG', 
-                    40, 
-                    40, 
-                    pageWidth - 80, 
-                    pageHeight - 80, 
-                    undefined, 
-                    'FAST'
-                );
-            }
-            doc.save("document_export.pdf");
-        } catch (error) {
-            console.error("PDF Generation Error:", error);
-            alert("Error generating PDF. Please try smaller files.");
-        } finally {
-            updateUI();
+        // 2. Loop through current grid items
+        for (let i = 0; i < count; i++) {
+            if (i > 0) doc.addPage();
+            // Using MEDIUM compression to keep file size reasonable
+            doc.addImage(images[i].src, 'JPEG', 40, 40, w - 80, h - 80, undefined, 'MEDIUM');
         }
+
+        // 3. Download
+        doc.save(`Forge_Export_${count}_pages.pdf`);
+
+        // 4. Update session stats
+        saveCount++;
+        document.getElementById('saveInfo').innerText = `Exports this session: ${saveCount}`;
+        
+        saveBtn.innerText = "Save PDF";
+        saveBtn.disabled = false;
     }
 </script>
 
