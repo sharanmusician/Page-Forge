@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Page Forge | Professional Document Architecture</title>
+    <title>Page Forge | Aethercore Interactive</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -18,48 +18,55 @@
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; user-select: none; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: #fff; margin: 0; overflow-x: hidden; }
 
-        header { padding: 60px 20px 40px; text-align: center; }
-        header h1 { font-weight: 400; font-size: 2.5rem; letter-spacing: -0.04em; margin: 0; text-transform: lowercase; }
-        .branding-sub { color: var(--text-muted); font-weight: 200; font-size: 0.7rem; margin-top: 10px; letter-spacing: 0.4em; text-transform: uppercase; }
+        header { padding: 80px 20px 40px; text-align: center; }
+        header h1 { font-weight: 400; font-size: 2.8rem; letter-spacing: -0.06em; margin: 0; text-transform: lowercase; }
+        .branding-sub { color: var(--text-muted); font-weight: 200; font-size: 0.7rem; margin-top: 10px; letter-spacing: 0.5em; text-transform: uppercase; }
 
-        .workspace { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px; display: grid; grid-template-columns: 1fr; gap: 40px; }
+        .workspace { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; display: grid; grid-template-columns: 1fr; gap: 40px; }
         @media (min-width: 1024px) { .workspace { grid-template-columns: 320px 1fr; } }
 
-        .control-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; height: fit-content; }
-        .label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-muted); margin-bottom: 20px; display: block; }
+        .control-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px; height: fit-content; }
+        .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--text-muted); margin-bottom: 30px; display: block; }
 
-        /* Buttons Kept as per your design expectation */
+        /* Restored Bold Aesthetic Buttons */
         .btn {
-            width: 100%; padding: 18px; border-radius: 14px; font-size: 0.85rem; font-weight: 500;
-            cursor: pointer; transition: 0.2s; border: none; margin-bottom: 12px;
-            display: flex; align-items: center; justify-content: center;
+            width: 100%; padding: 20px; border-radius: 12px; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: none; margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: center; text-transform: uppercase; letter-spacing: 0.1em;
         }
 
-        .btn-primary { background: var(--accent); color: #000; }
-        .btn-primary:disabled { background: #1a1a1a; color: #444; cursor: not-allowed; }
+        .btn-primary { background: var(--accent); color: #000; box-shadow: 0 4px 20px rgba(255,255,255,0.1); }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-primary:disabled { background: #1a1a1a; color: #444; box-shadow: none; cursor: not-allowed; }
+
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-secondary:hover { border-color: var(--accent); background: rgba(255,255,255,0.03); }
 
         .btn-reset {
-            background: none; border: none; color: #ff4444; font-size: 0.65rem; 
-            letter-spacing: 0.1em; text-transform: uppercase; margin-top: 20px; 
-            width: 100%; cursor: pointer; opacity: 0.6; transition: 0.3s;
+            background: none; border: none; color: var(--text-muted); font-size: 0.65rem; 
+            letter-spacing: 0.2em; text-transform: uppercase; margin-top: 40px; 
+            width: 100%; cursor: pointer; transition: 0.3s;
         }
-        .btn-reset:hover { opacity: 1; text-decoration: line-through; }
+        .btn-reset:hover { color: #ff4444; text-decoration: line-through; }
 
-        /* Photo Windows */
-        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 25px; min-height: 400px; }
-        #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
+        /* Gallery Layout */
+        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 35px; min-height: 500px; }
+        #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 20px; }
 
-        .item { aspect-ratio: 1; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        .item { aspect-ratio: 1; background: #000; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); position: relative; transition: border 0.3s; }
+        .item:hover { border-color: rgba(255,255,255,0.2); }
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         
         .sort-number {
-            position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.6); 
-            backdrop-filter: blur(4px); color: #fff; font-size: 0.6rem; 
-            padding: 2px 6px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.1);
+            position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); 
+            backdrop-filter: blur(8px); color: #fff; font-size: 0.65rem; 
+            padding: 4px 8px; border-radius: 6px; z-index: 2; border: 1px solid rgba(255,255,255,0.15);
         }
 
-        .limit-note { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 15px; font-weight: 300; }
+        .limit-note { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 20px; letter-spacing: 0.05em; }
+
+        input[type="file"] { display: none; }
+        #empty-state { grid-column: 1/-1; text-align: center; padding: 150px 0; color: #333; font-size: 0.8rem; letter-spacing: 0.2em; }
     </style>
 </head>
 <body>
@@ -71,22 +78,22 @@
 
 <div class="workspace">
     <aside class="control-panel">
-        <span class="label">Foundry Terminal</span>
+        <span class="label">System Input</span>
         
         <label for="uploader" class="btn btn-primary" id="uploadLabel">
-            <span>Add Photos</span>
+            <span>Add Assets</span>
             <input type="file" id="uploader" multiple accept="image/*">
         </label>
         
-        <button class="btn btn-secondary" id="saveBtn" disabled>Save PDF</button>
+        <button class="btn btn-secondary" id="saveBtn" disabled>Generate PDF</button>
         <button class="btn-reset" id="resetBtn">Reset Workspace</button>
         
-        <div class="limit-note" id="limitText">Studio Limit: 20 images</div>
+        <div class="limit-note" id="limitText">20 Image Maximum</div>
     </aside>
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div id="empty-state" style="grid-column: 1/-1; text-align: center; padding: 120px 0; color: #333; font-weight: 300; letter-spacing: 0.1em;">READY FOR ASSETS</div>
+            <div id="empty-state">ARCHIVE EMPTY</div>
         </div>
     </main>
 </div>
@@ -102,92 +109,68 @@
     const grid = document.getElementById('sortable-grid');
     const limitText = document.getElementById('limitText');
 
-    // INITIALIZE SORTING
-    const sortable = new Sortable(grid, {
-        animation: 350,
-        delay: 500, // HOLD TO DRAG
-        delayOnTouchOnly: true,
+    // SMOOTH MOTION ENGINE
+    new Sortable(grid, {
+        animation: 300,
+        delay: 0, 
         forceFallback: true,
-        onEnd: () => {
-            refreshOrder(); // Force re-sync of photoVault on every drag
-        }
+        onEnd: refreshOrder
     });
 
-    // PHOTO INGESTION
+    // UPLOAD LOGIC
     uploader.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
-        
         for (let file of files) {
             if (photoVault.length >= MAX_IMAGES) break;
-
             const data = await toBase64(file);
             photoVault.push(data);
-
             const empty = document.getElementById('empty-state');
             if (empty) empty.remove();
-
             const card = document.createElement('div');
             card.className = 'item';
             card.innerHTML = `<div class="sort-number">${photoVault.length}</div><img src="${data}">`;
             grid.appendChild(card);
         }
-
         checkLimit();
         updateUI();
         uploader.value = ''; 
     });
 
-    // FIXED PDF SAVE LOGIC
-    saveBtn.addEventListener('click', async function() {
+    // INSTANT GENERATE (NO CONFIRMATION)
+    saveBtn.addEventListener('click', function() {
         if (photoVault.length === 0) return;
-        
-        const originalText = saveBtn.innerText;
-        saveBtn.innerText = "Synthesizing...";
+        saveBtn.innerText = "Processing...";
         saveBtn.disabled = true;
 
-        // Small delay to let the browser "breathe" before CPU-heavy PDF work
         setTimeout(() => {
             try {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'p',
-                    unit: 'pt',
-                    format: 'a4',
-                    compress: true
-                });
-
+                const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4', compress: true });
                 const pw = doc.internal.pageSize.getWidth();
                 const ph = doc.internal.pageSize.getHeight();
 
-                // Always use the latest photoVault order
                 photoVault.forEach((imgData, i) => {
                     if (i > 0) doc.addPage();
-                    doc.addImage(imgData, 'JPEG', 45, 45, pw - 90, ph - 90, undefined, 'MEDIUM');
+                    doc.addImage(imgData, 'JPEG', 40, 40, pw - 80, ph - 80, undefined, 'MEDIUM');
                 });
 
-                doc.save(`PageForge_Export_${Date.now()}.pdf`);
-            } catch (err) {
-                console.error(err);
-                alert("Processing error. Try fewer images.");
+                doc.save(`PageForge_Export.pdf`);
             } finally {
-                saveBtn.innerText = originalText;
+                saveBtn.innerText = "Generate PDF";
                 saveBtn.disabled = false;
                 updateUI();
             }
-        }, 150);
+        }, 50);
     });
 
-    // FIXED RESET LOGIC
+    // INSTANT RESET (NO CONFIRMATION)
     resetBtn.addEventListener('click', function() {
-        if (confirm("Permanently clear all images?")) {
-            photoVault = [];
-            grid.innerHTML = '<div id="empty-state" style="grid-column: 1/-1; text-align: center; padding: 120px 0; color: #333; font-weight: 300; letter-spacing: 0.1em;">READY FOR ASSETS</div>';
-            checkLimit();
-            updateUI();
-        }
+        photoVault = [];
+        grid.innerHTML = '<div id="empty-state">ARCHIVE EMPTY</div>';
+        checkLimit();
+        updateUI();
     });
 
-    // UTILITIES
     function toBase64(file) {
         return new Promise(resolve => {
             const reader = new FileReader();
@@ -200,31 +183,26 @@
         const images = grid.querySelectorAll('.item img');
         const badges = grid.querySelectorAll('.sort-number');
         const newOrder = [];
-        
         images.forEach((img, i) => {
             newOrder.push(img.src);
             if (badges[i]) badges[i].innerText = i + 1;
         });
-        
-        photoVault = newOrder; // Crucial: Re-sync the array
-        updateUI();
+        photoVault = newOrder;
     }
 
     function updateUI() {
         saveBtn.disabled = photoVault.length === 0;
-        saveBtn.innerText = photoVault.length > 0 ? `Save PDF (${photoVault.length}/${MAX_IMAGES})` : "Save PDF";
+        saveBtn.innerText = photoVault.length > 0 ? `Generate (${photoVault.length}/20)` : "Generate PDF";
     }
 
     function checkLimit() {
         if (photoVault.length >= MAX_IMAGES) {
-            uploadLabel.style.opacity = "0.2";
-            uploadLabel.style.pointerEvents = "none";
-            limitText.innerText = "Capacity Reached (20/20)";
+            uploadLabel.style.display = "none";
+            limitText.innerText = "System Capacity Reached";
             limitText.style.color = "#ff4444";
         } else {
-            uploadLabel.style.opacity = "1";
-            uploadLabel.style.pointerEvents = "all";
-            limitText.innerText = `Studio Limit: ${MAX_IMAGES} images`;
+            uploadLabel.style.display = "flex";
+            limitText.innerText = "20 Image Maximum";
             limitText.style.color = "";
         }
     }
