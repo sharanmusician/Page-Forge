@@ -19,7 +19,14 @@
             --font-main: 'Inter', sans-serif;
         }
 
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        /* Prevent all text selection and accidental dragging */
+        * { 
+            box-sizing: border-box; 
+            -webkit-font-smoothing: antialiased;
+            user-select: none; 
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
         
         body {
             font-family: var(--font-main);
@@ -104,11 +111,10 @@
         }
 
         .btn-primary { background: var(--accent); color: #000; }
-        .btn-primary:hover { background: #f0f0f0; transform: translateY(-1px); }
+        .btn-primary:hover { background: #f0f0f0; }
         .btn-primary:disabled { background: #1a1a1a; color: #444; cursor: not-allowed; }
 
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.03); border-color: #333; }
 
         .btn-clear { 
             color: #ff4444; 
@@ -120,7 +126,6 @@
             cursor: pointer;
             width: 100%;
         }
-        .btn-clear:hover { opacity: 1; }
 
         .gallery {
             background: var(--surface);
@@ -130,45 +135,53 @@
             min-height: 500px;
         }
 
+        /* Smaller Windows for Photos */
         #sortable-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 15px;
         }
 
         .item {
-            aspect-ratio: 3/4;
+            aspect-ratio: 1;
             background: #000;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border);
-            cursor: grab;
+            cursor: default; /* Change from grab to default to signify hold requirement */
             position: relative;
-            transition: border-color 0.4s ease;
+            transition: border-color 0.4s ease, transform 0.2s ease;
         }
 
-        .item img { width: 100%; height: 100%; object-fit: cover; }
+        .item img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            pointer-events: none; /* Images can't be dragged individually */
+        }
 
-        /* THE SORT NUMBER BADGE */
         .sort-number {
             position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
             color: #fff;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 2;
-            pointer-events: none;
         }
 
-        .sortable-ghost { opacity: 0.1; }
-        .sortable-chosen { cursor: grabbing; border-color: var(--accent); }
+        /* Dragging States */
+        .sortable-ghost { opacity: 0; }
+        .sortable-chosen { 
+            border-color: var(--accent); 
+            transform: scale(1.05); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
 
         input[type="file"] { display: none; }
 
@@ -204,7 +217,8 @@
         </button>
 
         <div style="margin-top: 40px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.8; font-weight: 300;">
-            The numbers on the images indicate the page order. Drag photos to re-sequence.
+            <b>Hold to Drag:</b> Press and hold an image window to reorder. 
+            Text selection is disabled for a focused experience.
         </div>
 
         <button class="btn-clear" onclick="location.reload()">Reset Workspace</button>
@@ -212,7 +226,7 @@
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div class="empty">Foundry empty. Upload photos to begin.</div>
+            <div class="empty">Workspace inactive. Add photos.</div>
         </div>
     </main>
 </div>
@@ -223,8 +237,10 @@
     document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('sortable-grid');
         new Sortable(grid, {
-            animation: 450,
-            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+            animation: 400,
+            delay: 500, // REQUIRED: Press and hold for 500ms to drag
+            delayOnTouchOnly: true, // Only require hold on mobile
+            touchStartThreshold: 5, // Prevent drag if finger moves slightly
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
             onEnd: refreshOrder
@@ -266,7 +282,7 @@
         
         images.forEach((img, i) => {
             newVault.push(img.src);
-            badges[i].innerText = i + 1; // Update visual number
+            badges[i].innerText = i + 1;
         });
         photoVault = newVault;
     }
@@ -297,7 +313,7 @@
 
             doc.save("PageForge_Document.pdf");
         } catch (err) {
-            alert("Memory limit exceeded. Try fewer photos.");
+            alert("Memory limit. Try fewer photos.");
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
