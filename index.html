@@ -3,217 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobile PDF Forge</title>
+    <title>Page Forge | Professional PDF Foundry</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #050505;
-            --card: #111;
+            --bg: #0a0a0a;
+            --surface: #121212;
             --accent: #ffffff;
-            --border: #222;
+            --text-muted: #666666;
+            --border: rgba(255, 255, 255, 0.08);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg);
+            background-color: var(--bg);
             color: #fff;
             margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 0;
+            overflow-x: hidden;
         }
 
-        .header { text-align: center; margin: 20px 0; }
-        .header h1 { font-size: 1.5rem; letter-spacing: -0.05em; margin: 0; }
+        header { padding: 40px 20px 20px; text-align: center; }
+        header h1 { font-weight: 400; font-size: 2rem; letter-spacing: -0.04em; margin: 0; text-transform: lowercase; }
+        .branding-sub { color: var(--text-muted); font-weight: 200; font-size: 0.65rem; margin-top: 5px; letter-spacing: 0.4em; text-transform: uppercase; }
 
-        .controls {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card);
-            padding: 20px;
-            border-radius: 20px;
+        .workspace {
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 0 15px 40px; 
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-panel {
+            background: var(--surface); 
             border: 1px solid var(--border);
+            border-radius: 18px; 
+            padding: 20px; 
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             position: sticky;
             top: 10px;
             z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
         }
 
         .btn {
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            font-size: 0.9rem;
+            width: 100%; padding: 16px; border-radius: 12px; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; border: none; display: flex; align-items: center; justify-content: center;
         }
 
-        .btn-add { background: var(--accent); color: #000; }
-        .btn-save { background: #222; color: #fff; border: 1px solid var(--border); }
-        .btn-reset { background: transparent; color: #666; font-size: 0.75rem; }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-secondary { background: #1a1a1a; color: #fff; border: 1px solid var(--border); }
+        .btn-secondary:disabled { opacity: 0.3; }
+        .btn-reset { background: transparent; color: #444; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; }
 
-        .grid {
-            width: 100%;
-            max-width: 500px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 20px;
+        .gallery { 
+            background: var(--surface); 
+            border: 1px solid var(--border); 
+            border-radius: 18px; 
+            padding: 15px; 
+            min-height: 300px; 
+        }
+
+        #sortable-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+            gap: 12px; 
         }
 
         .item {
-            aspect-ratio: 1;
-            background: #1a1a1a;
-            border-radius: 10px;
-            overflow: hidden;
+            aspect-ratio: 1; background: #000; border-radius: 10px;
+            overflow: hidden; border: 1px solid var(--border);
             position: relative;
-            border: 1px solid var(--border);
         }
 
-        .item img { width: 100%; height: 100%; object-fit: cover; }
-        .badge {
+        .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        .sort-number {
             position: absolute; top: 5px; left: 5px;
-            background: rgba(0,0,0,0.8);
-            font-size: 10px; padding: 2px 6px; border-radius: 4px;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px;
         }
 
-        .empty-text {
-            grid-column: 1 / -1;
-            text-align: center;
-            color: #444;
-            padding: 50px 0;
-            font-size: 0.8rem;
-        }
-
-        .footer-info {
-            margin-top: 40px;
-            padding: 20px;
+        .methodology {
+            padding: 40px 10px;
             border-top: 1px solid var(--border);
-            color: #555;
-            font-size: 0.8rem;
-            line-height: 1.5;
-            max-width: 500px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
         }
+
+        .method-step h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 10px; }
+        .method-step p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; font-weight: 300; margin: 0; }
+
+        .empty { grid-column: 1 / -1; text-align: center; padding: 80px 0; color: #333; font-size: 0.75rem; }
     </style>
 </head>
 <body>
 
-<div class="header">
+<header>
     <h1>page forge</h1>
-</div>
+    <div class="branding-sub">Aethercore Interactive</div>
+</header>
 
-<div class="controls">
-    <label class="btn btn-add">
-        Add Images (Max 20)
-        <input type="file" id="input" multiple accept="image/*" style="display:none" onchange="handleFiles(this.files)">
-    </label>
-    
-    <button id="saveBtn" class="btn btn-save" onclick="downloadPDF()" disabled>Download PDF</button>
-    <button class="btn btn-reset" onclick="clearWorkspace()">Reset All</button>
-</div>
+<div class="workspace">
+    <aside class="control-panel">
+        <label for="uploader" class="btn btn-primary">
+            Add Photos (Max 20)
+            <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
+        </label>
+        
+        <button class="btn btn-secondary" id="saveBtn" onclick="saveAsPDF()" disabled>Download PDF</button>
+        <button class="btn-reset" onclick="resetWorkspace()">Reset Workspace</button>
+    </aside>
 
-<div id="grid" class="grid">
-    <div class="empty-text">No images added yet.</div>
-</div>
+    <main class="gallery">
+        <div id="sortable-grid">
+            <div class="empty">Foundry inactive. Add images to start.</div>
+        </div>
+    </main>
 
-<div class="footer-info">
-    <h3>Instructions</h3>
-    <p>1. <b>Add:</b> Select up to 20 images.</p>
-    <p>2. <b>Order:</b> Drag and drop images to change sequence.</p>
-    <p>3. <b>Download:</b> Tap the save button. You can tap it multiple times to generate fresh copies instantly.</p>
+    <section class="methodology">
+        <div class="method-step">
+            <h3>01. Asset Ingestion</h3>
+            <p>Deploy your visual data. Our architecture supports major formats for lossless conversion and structured processing.</p>
+        </div>
+        <div class="method-step">
+            <h3>02. Architectural Reorder</h3>
+            <p>Drag and drop assets to manipulate sequence. Numerical indices update in real-time to define document structure.</p>
+        </div>
+        <div class="method-step">
+            <h3>03. Privacy-First Synthesis</h3>
+            <p>Processing is executed on-device. Your data never leaves your environment, ensuring enterprise-grade privacy.</p>
+        </div>
+    </section>
 </div>
 
 <script>
-    const grid = document.getElementById('grid');
+    const grid = document.getElementById('sortable-grid');
     const saveBtn = document.getElementById('saveBtn');
 
-    // Enable reordering
     new Sortable(grid, {
         animation: 150,
-        onEnd: updateCounters
+        onEnd: refreshOrder
     });
 
-    async function handleFiles(files) {
-        const existingCount = grid.querySelectorAll('.item').length;
-        if (existingCount + files.length > 20) {
-            alert("Limit: 20 images");
+    async function addPhotos(files) {
+        const currentItems = grid.querySelectorAll('.item').length;
+        if (currentItems + files.length > 20) {
+            alert("Limit reached: 20 images max.");
             return;
         }
 
-        const empty = document.querySelector('.empty-text');
+        const empty = document.querySelector('.empty');
         if (empty) empty.remove();
 
         for (let file of files) {
-            const base64 = await toBase64(file);
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.innerHTML = `<div class="badge"></div><img src="${base64}">`;
-            grid.appendChild(div);
+            const data = await toBase64(file);
+            const card = document.createElement('div');
+            card.className = 'item';
+            card.innerHTML = `<div class="sort-number"></div><img src="${data}">`;
+            grid.appendChild(card);
         }
-        updateCounters();
+        refreshOrder();
     }
 
     function toBase64(file) {
-        return new Promise(r => {
+        return new Promise(res => {
             const reader = new FileReader();
-            reader.onload = () => r(reader.result);
+            reader.onload = () => res(reader.result);
             reader.readAsDataURL(file);
         });
     }
 
-    function updateCounters() {
+    function refreshOrder() {
         const items = grid.querySelectorAll('.item');
         items.forEach((item, index) => {
-            item.querySelector('.badge').innerText = index + 1;
+            item.querySelector('.sort-number').innerText = index + 1;
         });
         saveBtn.disabled = items.length === 0;
     }
 
-    function clearWorkspace() {
-        if (confirm("Reset everything?")) {
-            grid.innerHTML = '<div class="empty-text">No images added yet.</div>';
-            document.getElementById('input').value = "";
-            updateCounters();
-        }
+    function resetWorkspace() {
+        grid.innerHTML = '<div class="empty">Foundry inactive. Add images to start.</div>';
+        document.getElementById('uploader').value = "";
+        refreshOrder();
     }
 
-    async function downloadPDF() {
-        const imgs = grid.querySelectorAll('.item img');
-        if (imgs.length === 0) return;
+    async function saveAsPDF() {
+        const images = grid.querySelectorAll('.item img');
+        if (images.length === 0) return;
 
-        // Visual feedback
         const originalText = saveBtn.innerText;
-        saveBtn.innerText = "Downloading...";
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'pt', 'a4');
-        const w = doc.internal.pageSize.getWidth();
-        const h = doc.internal.pageSize.getHeight();
-
-        // Immediate generation for repeat clicking
-        for (let i = 0; i < imgs.length; i++) {
-            if (i > 0) doc.addPage();
-            // 'FAST' compression for mobile performance
-            doc.addImage(imgs[i].src, 'JPEG', 20, 20, w - 40, h - 40, undefined, 'FAST');
-        }
-
-        doc.save(`Export_${Date.now()}.pdf`);
+        saveBtn.innerText = "Processing...";
         
-        // Reset button immediately so user can click again
+        // Timeout prevents UI freeze on mobile
         setTimeout(() => {
-            saveBtn.innerText = originalText;
-        }, 500);
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'pt', 'a4');
+                const pw = doc.internal.pageSize.getWidth();
+                const ph = doc.internal.pageSize.getHeight();
+
+                images.forEach((img, i) => {
+                    if (i > 0) doc.addPage();
+                    // FAST compression ensures repeated downloads work without crashing RAM
+                    doc.addImage(img.src, 'JPEG', 30, 30, pw - 60, ph - 60, undefined, 'FAST');
+                });
+
+                doc.save(`Forge_Export_${Date.now()}.pdf`);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                saveBtn.innerText = originalText;
+            }
+        }, 100);
     }
 </script>
 
