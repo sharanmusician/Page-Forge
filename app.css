@@ -1,0 +1,33 @@
+:root {
+  --forge-dark: #1a1a1a;
+  --forge-accent: #f39c12; /* Hammered gold/orange */
+  --forge-bg: #2c3e50;
+}
+
+body { background: var(--forge-bg); color: white; font-family: 'Inter', sans-serif; }
+
+.forge-container { padding: 40px; display: flex; flex-direction: column; align-items: center; }
+
+.forge-header h1 { font-size: 3rem; letter-spacing: 5px; color: var(--forge-accent); margin-bottom: 0; }
+
+.workspace { 
+  background: rgba(255, 255, 255, 0.05); 
+  backdrop-filter: blur(10px); 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px; 
+  padding: 30px; 
+  width: 100%; 
+  max-width: 1000px; 
+  margin-top: 30px; 
+}
+
+.toolbar { display: flex; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid #444; padding-bottom: 20px; }
+
+.btn-primary { background: var(--forge-accent); color: black; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.btn-secondary { background: #34495e; color: white; padding: 12px 25px; border-radius: 8px; cursor: pointer; }
+
+.preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+
+.image-card { position: relative; border-radius: 10px; overflow: hidden; border: 2px solid #444; }
+.image-card img { width: 100%; height: 180px; object-fit: cover; }
+.image-card span { position: absolute; top: 5px; left: 5px; background: var(--forge-accent); color: black; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
