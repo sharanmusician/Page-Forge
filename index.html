@@ -2,213 +2,214 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Forge | Enterprise Document Solutions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Page Forge | Digital Document Foundry</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Uncut+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --brand-primary: #000000;
-            --brand-accent: #6366f1; /* Modern Corporate Indigo */
-            --bg-light: #fafafa;
-            --glass: rgba(255, 255, 255, 0.8);
-            --border: rgba(0, 0, 0, 0.08);
+            --bg-deep: #050505;
+            --bg-panel: #111111;
+            --brand-accent: #3b82f6; /* Modern Executive Blue */
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.04);
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        * { box-sizing: border-box; transition: all 0.2s ease-in-out; }
-
+        * { box-sizing: border-box; touch-action: manipulation; }
+        
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--brand-primary);
+            font-family: 'Uncut Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
             margin: 0;
-            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Nav/Header */
+        /* Minimal Header */
         header {
-            padding: 40px 20px;
-            text-align: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            font-weight: 800;
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            letter-spacing: -0.05em;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .subtitle {
-            color: #666;
-            font-weight: 400;
-            letter-spacing: 0.1em;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-
-        /* Workspace Card */
-        .forge-panel {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 32px;
-            margin: 0 auto 100px;
-            width: 95%;
-            max-width: 1200px;
-            padding: 40px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.05);
-        }
-
-        /* Responsive Controls */
-        .control-bar {
+            padding: 20px;
             display: flex;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-
-        /* Desktop vs Mobile Control Logic */
-        @media (max-width: 768px) {
-            .control-bar { flex-direction: column; }
-            .forge-panel { padding: 20px; border-radius: 20px; }
-            h1 { text-align: left; }
-        }
-
-        /* Corporate Buttons */
-        .btn {
-            padding: 18px 32px;
-            border-radius: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid transparent;
-            font-size: 1rem;
-            display: inline-flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; background: var(--bg-deep); z-index: 100;
         }
 
-        .btn-main {
-            background: var(--brand-primary);
-            color: white;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        h1 { font-weight: 700; font-size: 1.2rem; margin: 0; letter-spacing: -0.03em; }
+        h1 span { color: var(--text-muted); font-weight: 300; }
+
+        /* Workspace Layout */
+        .viewport {
+            max-width: 1600px; margin: 0 auto;
+            padding: 20px; display: flex; flex-direction: column; gap: 20px;
         }
 
-        .btn-main:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-            background: #222;
+        @media (min-width: 1024px) {
+            .viewport { flex-direction: row-reverse; padding: 40px; }
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: #444;
+        /* Sidebar/Controls */
+        .controls-panel {
+            flex: 0 0 300px; background: var(--bg-panel);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 24px; display: flex; flex-direction: column; gap: 16px;
         }
 
-        .btn-outline:hover { background: #f0f0f0; }
+        /* Elite Action Buttons */
+        .action-btn {
+            width: 100%; padding: 16px; border-radius: 12px;
+            font-weight: 600; font-size: 0.95rem; cursor: pointer;
+            border: 1px solid transparent; text-align: center;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s var(--ease);
+        }
 
-        /* Modern Grid */
-        #gallery {
+        .btn-add { background: #222; color: #fff; }
+        .btn-add:hover { background: #333; }
+        
+        .btn-forge { background: var(--brand-accent); color: #fff; border: 1px solid rgba(0,0,0,0.2); }
+        .btn-forge:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-forge:disabled { background: #222; color: var(--text-muted); cursor: not-allowed; border-color: var(--border); }
+
+        .btn-reset { background: transparent; color: var(--text-muted); font-weight: 400; border: none; font-size: 0.85rem;}
+        .btn-reset:hover { color: #ef4444; }
+
+        /* The Foundry (Sorting Grid) */
+        .foundry {
+            flex: 1; min-height: 70vh; background: var(--bg-panel);
+            border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+        }
+
+        #sortable-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 25px;
-            padding-top: 30px;
-            border-top: 1px solid var(--border);
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
         }
 
-        @media (max-width: 480px) {
-            #gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        @media (max-width: 600px) {
+            #sortable-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .foundry { padding: 12px; }
+            .controls-panel { border-radius: 0; margin: -20px; margin-bottom: 20px;}
         }
 
-        .img-item {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            background: #eee;
-            aspect-ratio: 3/4;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        /* Thumbnail styling - Essential for Dragging */
+        .forge-item {
+            position: relative; aspect-ratio: 1; border-radius: 12px;
+            overflow: hidden; background: #000;
+            border: 2px solid transparent;
+            cursor: grab; transition: border-color 0.2s, transform 0.2s var(--ease);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        .img-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        /* State: Active dragging */
+        .sortable-ghost { opacity: 0.3; transform: scale(0.9); }
+        .sortable-chosen { border-color: var(--brand-accent); cursor: grabbing; z-index: 10; }
+
+        .forge-item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        
+        .item-number {
+            position: absolute; bottom: 8px; right: 8px;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            color: #fff; font-size: 0.7rem; font-weight: 700;
+            width: 24px; height: 24px; display: flex; align-items: center;
+            justify-content: center; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .badge {
-            position: absolute;
-            bottom: 12px;
-            right: 12px;
-            background: white;
-            padding: 4px 12px;
-            border-radius: 100px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        #file-input { display: none; }
+        
+        /* Empty State */
+        .empty-context {
+            grid-column: 1 / -1; text-align: center; color: var(--text-muted);
+            font-weight: 300; font-size: 0.9rem; padding: 100px 0;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
         }
-
-        /* Loading States */
-        .spinning {
-            animation: rotate 1s linear infinite;
-        }
-        @keyframes rotate { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Page Forge<span style="color:var(--brand-accent)">.</span></h1>
-    <div class="subtitle">ENTERPRISE PDF ARCHITECT</div>
+    <h1>Page Forge <span>Document Foundry</span></h1>
+    <div style="font-size: 0.8rem; color:var(--text-muted)">Elite Edition v1.0</div>
 </header>
 
-<div class="forge-panel">
-    <div class="control-bar">
-        <label for="uploader" class="btn btn-main" style="flex: 2;">
-            <span>Add Assets</span>
-            <input type="file" id="uploader" multiple accept="image/*" hidden onchange="processImages(this.files)">
+<div class="viewport">
+    
+    <aside class="controls-panel">
+        <div style="margin-bottom: auto">
+            <h2 style="font-weight: 600; font-size: 1.1rem; margin: 0 0 8px 0;">Asset Pipeline</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 0 20px 0;">
+                Drag thumbnails within the foundry to set the generation order.
+            </p>
+        </div>
+
+        <label for="file-input" class="action-btn btn-add">
+            <i>+</i> Add Assets
+            <input type="file" id="file-input" multiple accept="image/*" onchange="handleNewAssets(this.files)">
         </label>
         
-        <button class="btn btn-outline" id="forgeBtn" style="flex: 1;" onclick="exportPDF()">
-            Forge Final
+        <button class="action-btn btn-forge" id="forge-trigger" onclick="generatePremiumPDF()" disabled>
+            Forge Document (PDF)
         </button>
         
-        <button class="btn btn-outline" style="color:#ff4444" onclick="resetForge()">
-            Reset
+        <button class="action-btn btn-reset" onclick="extinguishForge()">
+            Reset Foundry
         </button>
-    </div>
+    </aside>
 
-    <div id="gallery">
-        <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; color: #aaa;">
-            Drag and drop images or click "Add Assets" to begin forging.
+    <main class="foundry">
+        <div id="sortable-grid">
+            <div class="empty-context">
+                <span style="font-size: 2rem; color: #333;">▧</span>
+                Foundry inactive. <br> Add images to begin the process.
+            </div>
         </div>
-    </div>
+    </main>
+
 </div>
 
 <script>
-    let vault = [];
+    let forgeVault = []; // Stores the actual base64 data
+    let sortableInstance;
 
-    async function processImages(files) {
-        const gallery = document.getElementById('gallery');
-        if (vault.length === 0) gallery.innerHTML = ''; // Clear placeholder
+    // Initialize Sortable Library
+    document.addEventListener('DOMContentLoaded', () => {
+        const grid = document.getElementById('sortable-grid');
+        sortableInstance = new Sortable(grid, {
+            animation: 300, 
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: updateOrderNumbers // Trigger whenever drag ends
+        });
+    });
+
+    async function handleNewAssets(files) {
+        const grid = document.getElementById('sortable-grid');
+        const emptyState = document.querySelector('.empty-context');
+        if (emptyState) emptyState.remove();
 
         for (let file of files) {
-            const url = await toBase64(file);
-            vault.push(url);
+            const dataUrl = await fileToBase64(file);
+            forgeVault.push(dataUrl); // Keep vault synced
             
-            const card = document.createElement('div');
-            card.className = 'img-item';
-            card.innerHTML = `
-                <img src="${url}">
-                <div class="badge">#${vault.length}</div>
+            const item = document.createElement('div');
+            item.className = 'forge-item';
+            item.innerHTML = `
+                <img src="${dataUrl}">
+                <div class="item-number">${forgeVault.length}</div>
             `;
-            gallery.appendChild(card);
+            grid.appendChild(item);
         }
+        syncVaultAndEnableForge();
     }
 
-    function toBase64(file) {
+    function fileToBase64(file) {
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -216,29 +217,53 @@
         });
     }
 
-    async function exportPDF() {
-        if (vault.length === 0) return;
+    // Crucial: Update numbers and re-sync the array based on DOM order
+    function updateOrderNumbers() {
+        const gridItems = document.querySelectorAll('.forge-item');
+        const numbers = document.querySelectorAll('.item-number');
+        const newVault = [];
+
+        gridItems.forEach((item, index) => {
+            const imgBase64 = item.querySelector('img').src;
+            newVault.push(imgBase64);
+            numbers[index].innerText = index + 1;
+        });
+
+        forgeVault = newVault; // Order is now locked
+    }
+
+    function syncVaultAndEnableForge() {
+        const btn = document.getElementById('forge-trigger');
+        btn.disabled = forgeVault.length === 0;
+        if (!btn.disabled) {
+            btn.innerText = `Forge Document (${forgeVault.length})`;
+        }
+    }
+
+    async function generatePremiumPDF() {
+        if (forgeVault.length === 0) return;
         
-        const btn = document.getElementById('forgeBtn');
-        btn.innerText = "Forging...";
+        const btn = document.getElementById('forge-trigger');
+        btn.innerText = "Processing...";
+        btn.disabled = true;
         
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'pt', 'a4');
+        const doc = new jsPDF('p', 'pt', 'a4'); // 'pt' for precise corporate layouts
         const pdfW = doc.internal.pageSize.getWidth();
         const pdfH = doc.internal.pageSize.getHeight();
 
-        for (let i = 0; i < vault.length; i++) {
+        for (let i = 0; i < forgeVault.length; i++) {
             if (i > 0) doc.addPage();
-            // Corporate Quality: Centered with padding
-            doc.addImage(vault[i], 'JPEG', 40, 40, pdfW - 80, pdfH - 80, undefined, 'FAST');
+            // Maintaining original aspect ratios while fitting to page
+            doc.addImage(forgeVault[i], 'JPEG', 50, 50, pdfW - 100, pdfH - 100, undefined, 'FAST');
         }
 
-        doc.save("Forge_Export_" + Date.now() + ".pdf");
-        btn.innerText = "Forge Final";
+        doc.save(`PageForge_ELITE_${Date.now()}.pdf`);
+        btn.innerText = `Forge Document (${forgeVault.length})`;
+        btn.disabled = false;
     }
 
-    function resetForge() {
-        vault = [];
+    function extinguishForge() {
         location.reload();
     }
 </script>
