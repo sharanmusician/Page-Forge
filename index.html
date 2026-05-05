@@ -2,217 +2,284 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Forge | Easy Image to PDF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Page Forge | Digital Document Architecture</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #3b82f6;
-            --text: #f8fafc;
+            --bg: #0a0a0a;
+            --surface: #121212;
+            --accent: #ffffff;
+            --text-muted: #666666;
+            --border: rgba(255, 255, 255, 0.08);
+            --font-main: 'Inter', sans-serif;
         }
 
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--font-main);
             background-color: var(--bg);
-            color: var(--text);
+            color: #fff;
             margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
-            padding: 20px;
         }
 
-        header { text-align: center; margin-bottom: 40px; margin-top: 40px; }
-        h1 { font-size: 2.5rem; margin: 0; letter-spacing: -1px; }
-        p { opacity: 0.7; margin-top: 8px; }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--card);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }
-
-        /* Simplified Buttons */
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        @media (max-width: 600px) {
-            .controls { grid-template-columns: 1fr; }
-        }
-
-        .btn {
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: 0.2s;
+        /* Architectural Header */
+        header {
+            padding: 80px 20px 40px;
             text-align: center;
         }
 
-        .btn-select { background: #fff; color: #000; }
-        .btn-make { background: var(--accent); color: #fff; }
-        .btn-make:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
-        .btn-clear { background: transparent; color: #94a3b8; grid-column: span 2; font-weight: 400; margin-top: 10px;}
-        @media (max-width: 600px) { .btn-clear { grid-column: span 1; } }
-
-        /* Photo Grid */
-        #photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            min-height: 150px;
-            border: 2px dashed rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 15px;
+        header h1 {
+            font-weight: 400;
+            font-size: 2.5rem;
+            letter-spacing: -0.03em;
+            margin: 0;
+            text-transform: lowercase;
         }
 
-        .photo-card {
-            aspect-ratio: 1;
-            border-radius: 10px;
-            overflow: hidden;
+        header p {
+            color: var(--text-muted);
+            font-weight: 300;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .workspace {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 20px 100px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        @media (min-width: 1024px) {
+            .workspace { grid-template-columns: 300px 1fr; }
+        }
+
+        /* Panel Styling */
+        .control-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+            position: sticky;
+            top: 40px;
+        }
+
+        .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        /* Simple, Premium Buttons */
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-primary:hover { background: #e0e0e0; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #222; color: #444; cursor: not-allowed; transform: none; }
+
+        .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+        .btn-danger { color: #ff4444; font-size: 0.8rem; margin-top: 20px; opacity: 0.6; }
+        .btn-danger:hover { opacity: 1; }
+
+        /* Photo Grid (The Foundry) */
+        .gallery {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        #sortable-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            #sortable-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            header { padding: 40px 20px; }
+        }
+
+        /* Drag and Drop Cards */
+        .item {
+            aspect-ratio: 3/4;
             background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
             cursor: grab;
             position: relative;
-            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
         }
 
-        .photo-card:active { cursor: grabbing; }
-        .photo-card img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .number-tag {
-            position: absolute; top: 5px; left: 5px;
-            background: rgba(0,0,0,0.6); padding: 2px 6px;
-            border-radius: 4px; font-size: 10px;
-        }
+        .item:hover { border-color: #444; }
+        .item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Drag States */
+        .sortable-ghost { opacity: 0.1; }
+        .sortable-chosen { cursor: grabbing; border-color: var(--accent); }
 
         input[type="file"] { display: none; }
+
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 150px 0;
+            color: var(--text-muted);
+            font-weight: 300;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Page Forge</h1>
-    <p>Drag photos to change their order</p>
+    <h1>page forge</h1>
+    <p>Premium Document Architecture</p>
 </header>
 
-<div class="container">
-    <div class="controls">
-        <label class="btn btn-select">
+<div class="workspace">
+    <aside class="control-panel">
+        <span class="label">Workspace Tools</span>
+        
+        <label for="uploader" class="btn btn-primary">
             Add Photos
-            <input type="file" id="fileInput" multiple accept="image/*" onchange="addPhotos(this.files)">
+            <input type="file" id="uploader" multiple accept="image/*" onchange="addPhotos(this.files)">
         </label>
         
-        <button id="makeBtn" class="btn btn-make" onclick="makePDF()" disabled>
+        <button class="btn btn-secondary" id="saveBtn" onclick="saveAsPDF()" disabled>
             Save as PDF
         </button>
 
-        <button class="btn btn-clear" onclick="window.location.reload()">
-            Start Over
-        </button>
-    </div>
-
-    <div id="photo-grid">
+        <div style="margin-top: 30px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.6;">
+            Images can be dragged to reorder. PDF will follow the grid sequence.
         </div>
+
+        <button class="btn btn-danger" onclick="location.reload()">Clear All</button>
+    </aside>
+
+    <main class="gallery">
+        <div id="sortable-grid">
+            <div class="empty">No photos added yet.</div>
+        </div>
+    </main>
 </div>
 
 <script>
-    let photoList = [];
+    let photoVault = [];
 
-    // Drag and drop setup
+    // Initialize Sort Engine
     document.addEventListener('DOMContentLoaded', () => {
-        const grid = document.getElementById('photo-grid');
+        const grid = document.getElementById('sortable-grid');
         new Sortable(grid, {
-            animation: 250,
-            onEnd: updateOrder
+            animation: 400,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: refreshOrder
         });
     });
 
     async function addPhotos(files) {
-        const grid = document.getElementById('photo-grid');
-        
+        const grid = document.getElementById('sortable-grid');
+        const empty = document.querySelector('.empty');
+        if (empty) empty.remove();
+
         for (let file of files) {
-            const url = await convertFile(file);
-            photoList.push(url);
+            const data = await toBase64(file);
+            photoVault.push(data);
             
-            const div = document.createElement('div');
-            div.className = 'photo-card';
-            div.innerHTML = `<img src="${url}"><div class="number-tag">${photoList.length}</div>`;
-            grid.appendChild(div);
+            const card = document.createElement('div');
+            card.className = 'item';
+            card.innerHTML = `<img src="${data}">`;
+            grid.appendChild(card);
         }
-        checkButton();
+        updateStatus();
     }
 
-    function convertFile(file) {
-        return new Promise(resolve => {
+    function toBase64(file) {
+        return new Promise(res => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
+            reader.onload = () => res(reader.result);
         });
     }
 
-    function updateOrder() {
-        const images = document.querySelectorAll('.photo-card img');
-        const tags = document.querySelectorAll('.number-tag');
-        const newList = [];
-        images.forEach((img, i) => {
-            newList.push(img.src);
-            tags[i].innerText = i + 1;
-        });
-        photoList = newList;
+    function refreshOrder() {
+        const images = document.querySelectorAll('.item img');
+        const newVault = [];
+        images.forEach(img => newVault.push(img.src));
+        photoVault = newVault;
     }
 
-    function checkButton() {
-        const btn = document.getElementById('makeBtn');
-        btn.disabled = photoList.length === 0;
-        if(photoList.length > 0) {
-            btn.innerText = `Save ${photoList.length} Photos as PDF`;
-        }
+    function updateStatus() {
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = photoVault.length === 0;
+        if (!btn.disabled) btn.innerText = `Save PDF (${photoVault.length})`;
     }
 
-    // THE FIX: Better PDF Generation
-    async function makePDF() {
-        const btn = document.getElementById('makeBtn');
-        const originalText = btn.innerText;
-        btn.innerText = "Working...";
+    // THE WORKHORSE: Robust PDF Logic
+    async function saveAsPDF() {
+        const btn = document.getElementById('saveBtn');
+        btn.innerText = "Processing...";
         btn.disabled = true;
 
         try {
             const { jsPDF } = window.jspdf;
-            // Use 'pt' and 'a4' for the most reliable results
+            // Using 'pt' and 'a4' is the most stable for browser-based PDF forge
             const doc = new jsPDF('p', 'pt', 'a4');
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
-            for (let i = 0; i < photoList.length; i++) {
+            for (let i = 0; i < photoVault.length; i++) {
                 if (i > 0) doc.addPage();
                 
-                // Scale the image to fit the page properly
-                // Setting alias to 'FAST' helps with memory issues
-                doc.addImage(photoList[i], 'JPEG', 20, 20, pageWidth - 40, pageHeight - 40, undefined, 'FAST');
+                // Centered Architectural Layout: 40pt padding
+                const padding = 40;
+                doc.addImage(photoVault[i], 'JPEG', padding, padding, pageWidth - (padding * 2), pageHeight - (padding * 2), undefined, 'MEDIUM');
             }
 
-            doc.save("my-document.pdf");
+            doc.save("PageForge_Document.pdf");
         } catch (err) {
-            alert("Sorry, something went wrong. Try using fewer or smaller photos.");
+            alert("The file size might be too large. Try fewer photos.");
             console.error(err);
         } finally {
-            btn.innerText = originalText;
+            btn.innerText = `Save PDF (${photoVault.length})`;
             btn.disabled = false;
         }
     }
