@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Forge | Premium PDF Engine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --forge-black: #0f172a;
+            --forge-accent: #fbbf24; /* Golden Forge Glow */
+            --forge-canvas: #1e293b;
+            --text-main: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--forge-black);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            width: 100%;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            font-weight: 900;
+            font-size: 3.5rem;
+            letter-spacing: -2px;
+            margin: 0;
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .workspace {
+            width: 90%;
+            max-width: 1100px;
+            margin: -40px auto 40px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-add { background: var(--text-main); color: var(--forge-black); }
+        .btn-forge { background: var(--forge-accent); color: var(--forge-black); box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+        .btn-clear { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
+
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        #gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            min-height: 200px;
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .img-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.05);
+            background: #000;
+        }
+
+        .img-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .img-card span {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--forge-accent);
+            color: black;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        input[type="file"] { display: none; }
+        
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding-top: 60px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>PAGE FORGE</h1>
+    <p style="color: #94a3b8; font-size: 1.1rem;">Precision Document Engineering</p>
+</header>
+
+<div class="workspace">
+    <div class="controls">
+        <label for="file-input" class="btn btn-add">Add Images</label>
+        <input type="file" id="file-input" multiple accept="image/*" onchange="handleFiles(this.files)">
+        
+        <button class="btn btn-forge" onclick="forgePDF()">Forge PDF</button>
+        <button class="btn btn-clear" onclick="clearForge()">Extinguish</button>
+    </div>
+
+    <div id="gallery">
+        <div class="empty-state">The forge is cold. Upload images to begin.</div>
+    </div>
+</div>
+
+<script>
+    let images = [];
+
+    async function handleFiles(files) {
+        const gallery = document.getElementById('gallery');
+        const emptyState = document.querySelector('.empty-state');
+        if (emptyState) emptyState.remove();
+
+        for (let file of files) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const url = e.target.result;
+                images.push(url);
+                
+                const card = document.createElement('div');
+                card.className = 'img-card';
+                card.innerHTML = `
+                    <span>${images.length}</span>
+                    <img src="${url}">
+                `;
+                gallery.appendChild(card);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    async function forgePDF() {
+        if (images.length === 0) return alert("The forge is empty!");
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const width = doc.internal.pageSize.getWidth();
+        const height = doc.internal.pageSize.getHeight();
+
+        for (let i = 0; i < images.length; i++) {
+            if (i > 0) doc.addPage();
+            // Maintaining high quality for 10 Lakh budget standards
+            doc.addImage(images[i], 'JPEG', 10, 10, width - 20, 0, undefined, 'FAST');
+        }
+
+        doc.save("PageForge_Export.pdf");
+    }
+
+    function clearForge() {
+        images = [];
+        const gallery = document.getElementById('gallery');
+        gallery.innerHTML = '<div class="empty-state">The forge is cold. Upload images to begin.</div>';
+    }
+</script>
+
+</body>
+</html>
