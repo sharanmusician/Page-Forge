@@ -3,199 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Forge | Premium PDF Engine</title>
+    <title>Page Forge | Enterprise Document Solutions</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --forge-black: #0f172a;
-            --forge-accent: #fbbf24; /* Golden Forge Glow */
-            --forge-canvas: #1e293b;
-            --text-main: #f8fafc;
+            --brand-primary: #000000;
+            --brand-accent: #6366f1; /* Modern Corporate Indigo */
+            --bg-light: #fafafa;
+            --glass: rgba(255, 255, 255, 0.8);
+            --border: rgba(0, 0, 0, 0.08);
         }
+
+        * { box-sizing: border-box; transition: all 0.2s ease-in-out; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--forge-black);
-            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--brand-primary);
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            line-height: 1.6;
         }
 
+        /* Nav/Header */
         header {
+            padding: 40px 20px;
             text-align: center;
-            padding: 60px 20px;
-            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-            width: 100%;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         h1 {
-            font-weight: 900;
-            font-size: 3.5rem;
-            letter-spacing: -2px;
+            font-weight: 800;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            letter-spacing: -0.05em;
             margin: 0;
-            background: linear-gradient(to right, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
         }
 
-        .workspace {
-            width: 90%;
-            max-width: 1100px;
-            margin: -40px auto 40px;
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+        .subtitle {
+            color: #666;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Workspace Card */
+        .forge-panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            margin: 0 auto 100px;
+            width: 95%;
+            max-width: 1200px;
             padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.05);
         }
 
-        .controls {
+        /* Responsive Controls */
+        .control-bar {
             display: flex;
-            justify-content: center;
             gap: 15px;
             margin-bottom: 40px;
         }
 
-        .btn {
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+        /* Desktop vs Mobile Control Logic */
+        @media (max-width: 768px) {
+            .control-bar { flex-direction: column; }
+            .forge-panel { padding: 20px; border-radius: 20px; }
+            h1 { text-align: left; }
         }
 
-        .btn-add { background: var(--text-main); color: var(--forge-black); }
-        .btn-forge { background: var(--forge-accent); color: var(--forge-black); box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
-        .btn-clear { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
+        /* Corporate Buttons */
+        .btn {
+            padding: 18px 32px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-main {
+            background: var(--brand-primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
 
+        .btn-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            background: #222;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: #444;
+        }
+
+        .btn-outline:hover { background: #f0f0f0; }
+
+        /* Modern Grid */
         #gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            min-height: 200px;
-            border: 2px dashed rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
         }
 
-        .img-card {
+        @media (max-width: 480px) {
+            #gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        }
+
+        .img-item {
             position: relative;
-            aspect-ratio: 1;
-            border-radius: 12px;
+            border-radius: 20px;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.05);
-            background: #000;
+            background: #eee;
+            aspect-ratio: 3/4;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
-        .img-card img {
+        .img-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .img-card span {
+        .badge {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--forge-accent);
-            color: black;
-            font-weight: 900;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 12px;
+            bottom: 12px;
+            right: 12px;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        input[type="file"] { display: none; }
-        
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding-top: 60px;
-            color: #64748b;
+        /* Loading States */
+        .spinning {
+            animation: rotate 1s linear infinite;
         }
+        @keyframes rotate { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>PAGE FORGE</h1>
-    <p style="color: #94a3b8; font-size: 1.1rem;">Precision Document Engineering</p>
+    <h1>Page Forge<span style="color:var(--brand-accent)">.</span></h1>
+    <div class="subtitle">ENTERPRISE PDF ARCHITECT</div>
 </header>
 
-<div class="workspace">
-    <div class="controls">
-        <label for="file-input" class="btn btn-add">Add Images</label>
-        <input type="file" id="file-input" multiple accept="image/*" onchange="handleFiles(this.files)">
+<div class="forge-panel">
+    <div class="control-bar">
+        <label for="uploader" class="btn btn-main" style="flex: 2;">
+            <span>Add Assets</span>
+            <input type="file" id="uploader" multiple accept="image/*" hidden onchange="processImages(this.files)">
+        </label>
         
-        <button class="btn btn-forge" onclick="forgePDF()">Forge PDF</button>
-        <button class="btn btn-clear" onclick="clearForge()">Extinguish</button>
+        <button class="btn btn-outline" id="forgeBtn" style="flex: 1;" onclick="exportPDF()">
+            Forge Final
+        </button>
+        
+        <button class="btn btn-outline" style="color:#ff4444" onclick="resetForge()">
+            Reset
+        </button>
     </div>
 
     <div id="gallery">
-        <div class="empty-state">The forge is cold. Upload images to begin.</div>
+        <div style="grid-column: 1/-1; text-align: center; padding: 100px 20px; color: #aaa;">
+            Drag and drop images or click "Add Assets" to begin forging.
+        </div>
     </div>
 </div>
 
 <script>
-    let images = [];
+    let vault = [];
 
-    async function handleFiles(files) {
+    async function processImages(files) {
         const gallery = document.getElementById('gallery');
-        const emptyState = document.querySelector('.empty-state');
-        if (emptyState) emptyState.remove();
+        if (vault.length === 0) gallery.innerHTML = ''; // Clear placeholder
 
         for (let file of files) {
+            const url = await toBase64(file);
+            vault.push(url);
+            
+            const card = document.createElement('div');
+            card.className = 'img-item';
+            card.innerHTML = `
+                <img src="${url}">
+                <div class="badge">#${vault.length}</div>
+            `;
+            gallery.appendChild(card);
+        }
+    }
+
+    function toBase64(file) {
+        return new Promise((resolve) => {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const url = e.target.result;
-                images.push(url);
-                
-                const card = document.createElement('div');
-                card.className = 'img-card';
-                card.innerHTML = `
-                    <span>${images.length}</span>
-                    <img src="${url}">
-                `;
-                gallery.appendChild(card);
-            };
             reader.readAsDataURL(file);
-        }
+            reader.onload = () => resolve(reader.result);
+        });
     }
 
-    async function forgePDF() {
-        if (images.length === 0) return alert("The forge is empty!");
-
+    async function exportPDF() {
+        if (vault.length === 0) return;
+        
+        const btn = document.getElementById('forgeBtn');
+        btn.innerText = "Forging...";
+        
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const width = doc.internal.pageSize.getWidth();
-        const height = doc.internal.pageSize.getHeight();
+        const doc = new jsPDF('p', 'pt', 'a4');
+        const pdfW = doc.internal.pageSize.getWidth();
+        const pdfH = doc.internal.pageSize.getHeight();
 
-        for (let i = 0; i < images.length; i++) {
+        for (let i = 0; i < vault.length; i++) {
             if (i > 0) doc.addPage();
-            // Maintaining high quality for 10 Lakh budget standards
-            doc.addImage(images[i], 'JPEG', 10, 10, width - 20, 0, undefined, 'FAST');
+            // Corporate Quality: Centered with padding
+            doc.addImage(vault[i], 'JPEG', 40, 40, pdfW - 80, pdfH - 80, undefined, 'FAST');
         }
 
-        doc.save("PageForge_Export.pdf");
+        doc.save("Forge_Export_" + Date.now() + ".pdf");
+        btn.innerText = "Forge Final";
     }
 
-    function clearForge() {
-        images = [];
-        const gallery = document.getElementById('gallery');
-        gallery.innerHTML = '<div class="empty-state">The forge is cold. Upload images to begin.</div>';
+    function resetForge() {
+        vault = [];
+        location.reload();
     }
 </script>
 
