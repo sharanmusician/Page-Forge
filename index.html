@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Page Forge | Aethercore Interactive</title>
+    <title>Page Forge | Professional Document Architecture</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -19,7 +19,7 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: #fff; margin: 0; overflow-x: hidden; }
 
         header { padding: 60px 20px 40px; text-align: center; }
-        header h1 { font-weight: 400; font-size: 2.5rem; letter-spacing: -0.04em; margin: 0; }
+        header h1 { font-weight: 400; font-size: 2.5rem; letter-spacing: -0.04em; margin: 0; text-transform: lowercase; }
         .branding-sub { color: var(--text-muted); font-weight: 200; font-size: 0.7rem; margin-top: 10px; letter-spacing: 0.4em; text-transform: uppercase; }
 
         .workspace { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px; display: grid; grid-template-columns: 1fr; gap: 40px; }
@@ -28,6 +28,7 @@
         .control-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; height: fit-content; }
         .label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-muted); margin-bottom: 20px; display: block; }
 
+        /* Buttons Kept as per your design expectation */
         .btn {
             width: 100%; padding: 18px; border-radius: 14px; font-size: 0.85rem; font-weight: 500;
             cursor: pointer; transition: 0.2s; border: none; margin-bottom: 12px;
@@ -41,9 +42,11 @@
         .btn-reset {
             background: none; border: none; color: #ff4444; font-size: 0.65rem; 
             letter-spacing: 0.1em; text-transform: uppercase; margin-top: 20px; 
-            width: 100%; cursor: pointer; opacity: 0.6;
+            width: 100%; cursor: pointer; opacity: 0.6; transition: 0.3s;
         }
+        .btn-reset:hover { opacity: 1; text-decoration: line-through; }
 
+        /* Photo Windows */
         .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 25px; min-height: 400px; }
         #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
 
@@ -52,10 +55,11 @@
         
         .sort-number {
             position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.6); 
-            color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; z-index: 2;
+            backdrop-filter: blur(4px); color: #fff; font-size: 0.6rem; 
+            padding: 2px 6px; border-radius: 4px; z-index: 2; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .limit-note { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 10px; }
+        .limit-note { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 15px; font-weight: 300; }
     </style>
 </head>
 <body>
@@ -67,7 +71,7 @@
 
 <div class="workspace">
     <aside class="control-panel">
-        <span class="label">Control Terminal</span>
+        <span class="label">Foundry Terminal</span>
         
         <label for="uploader" class="btn btn-primary" id="uploadLabel">
             <span>Add Photos</span>
@@ -77,22 +81,20 @@
         <button class="btn btn-secondary" id="saveBtn" disabled>Save PDF</button>
         <button class="btn-reset" id="resetBtn">Reset Workspace</button>
         
-        <div class="limit-note" id="limitText">Limit: 10 images maximum</div>
+        <div class="limit-note" id="limitText">Studio Limit: 20 images</div>
     </aside>
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div id="empty-state" style="grid-column: 1/-1; text-align: center; padding: 100px 0; color: #444;">No assets loaded.</div>
+            <div id="empty-state" style="grid-column: 1/-1; text-align: center; padding: 120px 0; color: #333; font-weight: 300; letter-spacing: 0.1em;">READY FOR ASSETS</div>
         </div>
     </main>
 </div>
 
 <script>
-    // CORE STATE
     let photoVault = [];
-    const MAX_IMAGES = 10;
+    const MAX_IMAGES = 20;
 
-    // DOM ELEMENTS
     const uploader = document.getElementById('uploader');
     const uploadLabel = document.getElementById('uploadLabel');
     const saveBtn = document.getElementById('saveBtn');
@@ -100,15 +102,18 @@
     const grid = document.getElementById('sortable-grid');
     const limitText = document.getElementById('limitText');
 
-    // INITIALIZE DRAG & DROP
+    // INITIALIZE SORTING
     const sortable = new Sortable(grid, {
-        animation: 300,
-        delay: 400,
+        animation: 350,
+        delay: 500, // HOLD TO DRAG
         delayOnTouchOnly: true,
-        onEnd: refreshOrder
+        forceFallback: true,
+        onEnd: () => {
+            refreshOrder(); // Force re-sync of photoVault on every drag
+        }
     });
 
-    // 1. ADD PHOTOS LOGIC
+    // PHOTO INGESTION
     uploader.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
         
@@ -118,7 +123,6 @@
             const data = await toBase64(file);
             photoVault.push(data);
 
-            // Remove empty state
             const empty = document.getElementById('empty-state');
             if (empty) empty.remove();
 
@@ -129,46 +133,59 @@
         }
 
         checkLimit();
-        updateButton();
-        uploader.value = ''; // Clear input so same file can be re-uploaded if needed
+        updateUI();
+        uploader.value = ''; 
     });
 
-    // 2. SAVE PDF LOGIC (Defensive Re-build)
-    saveBtn.onclick = async function() {
+    // FIXED PDF SAVE LOGIC
+    saveBtn.addEventListener('click', async function() {
         if (photoVault.length === 0) return;
         
+        const originalText = saveBtn.innerText;
         saveBtn.innerText = "Synthesizing...";
         saveBtn.disabled = true;
 
-        try {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'pt', 'a4', true); // Compression enabled
-            const pw = doc.internal.pageSize.getWidth();
-            const ph = doc.internal.pageSize.getHeight();
+        // Small delay to let the browser "breathe" before CPU-heavy PDF work
+        setTimeout(() => {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'p',
+                    unit: 'pt',
+                    format: 'a4',
+                    compress: true
+                });
 
-            for (let i = 0; i < photoVault.length; i++) {
-                if (i > 0) doc.addPage();
-                doc.addImage(photoVault[i], 'JPEG', 40, 40, pw - 80, ph - 80, undefined, 'FAST');
+                const pw = doc.internal.pageSize.getWidth();
+                const ph = doc.internal.pageSize.getHeight();
+
+                // Always use the latest photoVault order
+                photoVault.forEach((imgData, i) => {
+                    if (i > 0) doc.addPage();
+                    doc.addImage(imgData, 'JPEG', 45, 45, pw - 90, ph - 90, undefined, 'MEDIUM');
+                });
+
+                doc.save(`PageForge_Export_${Date.now()}.pdf`);
+            } catch (err) {
+                console.error(err);
+                alert("Processing error. Try fewer images.");
+            } finally {
+                saveBtn.innerText = originalText;
+                saveBtn.disabled = false;
+                updateUI();
             }
+        }, 150);
+    });
 
-            doc.save(`PageForge_${Date.now()}.pdf`);
-        } catch (err) {
-            console.error("PDF Error:", err);
-            alert("Error creating PDF. Please try smaller files.");
-        } finally {
-            updateButton();
-        }
-    };
-
-    // 3. RESET LOGIC
-    resetBtn.onclick = function() {
-        if (confirm("Clear all images?")) {
+    // FIXED RESET LOGIC
+    resetBtn.addEventListener('click', function() {
+        if (confirm("Permanently clear all images?")) {
             photoVault = [];
-            grid.innerHTML = '<div id="empty-state" style="grid-column: 1/-1; text-align: center; padding: 100px 0; color: #444;">No assets loaded.</div>';
+            grid.innerHTML = '<div id="empty-state" style="grid-column: 1/-1; text-align: center; padding: 120px 0; color: #333; font-weight: 300; letter-spacing: 0.1em;">READY FOR ASSETS</div>';
             checkLimit();
-            updateButton();
+            updateUI();
         }
-    };
+    });
 
     // UTILITIES
     function toBase64(file) {
@@ -182,28 +199,32 @@
     function refreshOrder() {
         const images = grid.querySelectorAll('.item img');
         const badges = grid.querySelectorAll('.sort-number');
-        photoVault = [];
+        const newOrder = [];
+        
         images.forEach((img, i) => {
-            photoVault.push(img.src);
+            newOrder.push(img.src);
             if (badges[i]) badges[i].innerText = i + 1;
         });
+        
+        photoVault = newOrder; // Crucial: Re-sync the array
+        updateUI();
     }
 
-    function updateButton() {
+    function updateUI() {
         saveBtn.disabled = photoVault.length === 0;
-        saveBtn.innerText = photoVault.length > 0 ? `Save PDF (${photoVault.length}/10)` : "Save PDF";
+        saveBtn.innerText = photoVault.length > 0 ? `Save PDF (${photoVault.length}/${MAX_IMAGES})` : "Save PDF";
     }
 
     function checkLimit() {
         if (photoVault.length >= MAX_IMAGES) {
-            uploadLabel.style.opacity = "0.3";
+            uploadLabel.style.opacity = "0.2";
             uploadLabel.style.pointerEvents = "none";
-            limitText.innerText = "Limit Reached (10/10)";
+            limitText.innerText = "Capacity Reached (20/20)";
             limitText.style.color = "#ff4444";
         } else {
             uploadLabel.style.opacity = "1";
             uploadLabel.style.pointerEvents = "all";
-            limitText.innerText = "Limit: 10 images maximum";
+            limitText.innerText = `Studio Limit: ${MAX_IMAGES} images`;
             limitText.style.color = "";
         }
     }
