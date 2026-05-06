@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Page Forge | Professional Document Architecture</title>
+    <title>Page Forge | Architectural Document Foundry</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -134,6 +134,7 @@
     const grid = document.getElementById('sortable-grid');
     const saveBtn = document.getElementById('saveBtn');
 
+    // Drag and drop setup with delay to allow natural scrolling
     new Sortable(grid, {
         animation: 300,
         delay: 200, 
@@ -179,29 +180,30 @@
         const images = grid.querySelectorAll('.item img');
         if (images.length === 0) return;
 
-        // Visual feedback on button
         const originalText = saveBtn.innerText;
         saveBtn.innerText = "Forging...";
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'pt', 'a4');
-        const pw = doc.internal.pageSize.getWidth();
-        const ph = doc.internal.pageSize.getHeight();
+        // Use a small timeout to let the UI update before the heavy process
+        setTimeout(() => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'a4');
+            const pw = doc.internal.pageSize.getWidth();
+            const ph = doc.internal.pageSize.getHeight();
 
-        // Sequential processing
-        for (let i = 0; i < images.length; i++) {
-            if (i > 0) doc.addPage();
-            doc.addImage(images[i].src, 'JPEG', 0, 0, pw, ph, undefined, 'NONE');
-        }
+            for (let i = 0; i < images.length; i++) {
+                if (i > 0) doc.addPage();
+                doc.addImage(images[i].src, 'JPEG', 0, 0, pw, ph, undefined, 'NONE');
+            }
 
-        // Trigger download with unique filename to prevent browser blocking
-        doc.save(`PageForge_${Date.now()}.pdf`);
+            // Using a unique timestamp to prevent browser caching or blocking consecutive downloads
+            doc.save(`PageForge_${Date.now()}.pdf`);
 
-        // Message appears ONLY after doc.save() is called
-        showToast();
-        
-        // Reset button immediately so it's ready for another click
-        saveBtn.innerText = originalText;
+            // Trigger success message ONLY after saving
+            showToast();
+            
+            // Re-enable button immediately for repeat use
+            saveBtn.innerText = originalText;
+        }, 100);
     }
 
     function showToast() {
