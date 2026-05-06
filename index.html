@@ -30,7 +30,6 @@
 
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
         
-        /* Ensure the whole body scrolls together */
         html, body { 
             background: var(--bg); 
             color: #fff; 
@@ -76,10 +75,11 @@
             border: 1px solid var(--border); 
             border-radius: 20px; 
             padding: 15px; 
-            min-height: 300px; 
+            min-height: 300px;
+            position: relative;
         }
         
-        #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 300px; }
 
         .item { aspect-ratio: 1; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; touch-action: none; }
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
@@ -100,7 +100,21 @@
         #focus-card img { width: 100%; height: 100%; object-fit: cover; }
         .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
 
-        .empty { grid-column: 1 / -1; text-align: center; padding: 80px 0; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        /* Locked Placeholder */
+        .empty-placeholder { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            color: #333; 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            pointer-events: none; /* Allows scrolling by tapping through it */
+            z-index: 1;
+        }
+        
         .sortable-ghost { opacity: 0; }
     </style>
 </head>
@@ -134,9 +148,8 @@
     </section>
 
     <main class="gallery">
-        <div id="sortable-grid">
-            <div class="empty">Foundry Offline</div>
-        </div>
+        <div class="empty-placeholder" id="placeholder-text">Foundry Offline</div>
+        <div id="sortable-grid"></div>
     </main>
 
     <article class="seo-content">
@@ -160,6 +173,7 @@
 <script>
     const grid = document.getElementById('sortable-grid');
     const mainBtn = document.getElementById('mainBtn');
+    const placeholder = document.getElementById('placeholder-text');
     const overlay = document.getElementById('focus-overlay');
     const focusImg = document.getElementById('focus-img');
     let isComplete = false;
@@ -174,8 +188,9 @@
 
     async function addPhotos(files) {
         if (grid.querySelectorAll('.item').length + files.length > 20) return;
-        const empty = document.querySelector('.empty');
-        if (empty) empty.remove();
+        
+        // Hide the locked placeholder when images arrive
+        placeholder.style.display = 'none';
 
         for (let file of files) {
             const data = await toBase64(file);
@@ -216,7 +231,7 @@
             targetCard.remove();
             cancelDelete();
             if (grid.querySelectorAll('.item').length === 0) {
-                grid.innerHTML = '<div class="empty">Foundry Offline</div>';
+                placeholder.style.display = 'block';
             }
             resetState();
             syncIndices();
