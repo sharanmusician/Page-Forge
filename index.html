@@ -7,7 +7,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -28,10 +28,9 @@
             color: #fff;
             margin: 0;
             padding: 0;
-            overflow-y: auto;
+            overflow-x: hidden;
         }
 
-        /* App Wrapper & Responsive Grid */
         .app-wrapper {
             max-width: 1300px;
             margin: 0 auto;
@@ -56,7 +55,6 @@
             .control-panel { position: sticky; top: 40px; }
         }
 
-        /* Premium Controls */
         .control-panel {
             background: var(--surface); 
             border: 1px solid var(--border);
@@ -78,21 +76,18 @@
         .btn-action:disabled { opacity: 0.1; cursor: not-allowed; }
         .btn-action.complete { background: var(--success); color: #000; border: none; }
 
-        /* Gallery Core */
         .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 25px; min-height: 400px; position: relative; }
         #sortable-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
             gap: 15px; 
-            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* The Asset Card */
         .item {
             aspect-ratio: 1; background: #000; border-radius: 12px;
             overflow: hidden; border: 1px solid var(--border);
             position: relative; touch-action: none; 
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
             z-index: 1;
         }
 
@@ -102,10 +97,9 @@
             position: absolute; top: 10px; left: 10px;
             background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px);
             color: #fff; font-size: 0.6rem; padding: 4px 8px; border-radius: 5px;
-            z-index: 2; pointer-events: none; font-weight: 300;
+            z-index: 2; pointer-events: none;
         }
 
-        /* Minimal Delete Trigger */
         .delete-trigger {
             position: absolute; top: 0; right: 0; width: 36px; height: 36px;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
@@ -114,46 +108,45 @@
             border-bottom-left-radius: 12px;
         }
 
-        /* PREMIUM DELETE VISUALIZATION: Dynamic Zoom & Dim */
+        /* ELEVATION STATE */
         .item.confirm-delete {
-            transform: scale(2); /* Significant upscale to verify visibility */
-            z-index: 999;
-            box-shadow: 0 40px 80px rgba(0,0,0,1);
-            border-color: rgba(255,255,255,0.2);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(2.5);
+            width: 250px; /* Base size for scale calculation */
+            height: 250px;
+            z-index: 9999;
+            box-shadow: 0 50px 100px rgba(0,0,0,1);
+            border-color: rgba(255,255,255,0.3);
         }
 
-        /* Mobile adjustment for scale */
-        @media (max-width: 600px) { .item.confirm-delete { transform: scale(1.6); } }
-
-        /* The Non-Disturbing Confirmation Prompt */
-        .confirm-prompt {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 40px;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-            color: var(--danger); display: flex; align-items: center; justify-content: center;
-            font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.15em; opacity: 0; transition: 0.3s 0.2s; pointer-events: none;
-            z-index: 4; border-top: 1px solid rgba(255,59,48,0.3);
-            transform: translateY(100%);
+        @media (max-width: 600px) {
+            .item.confirm-delete { transform: translate(-50%, -50%) scale(1.4); width: 80vw; height: 80vw; }
         }
 
-        .item.confirm-delete .confirm-prompt { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        /* Non-disturbing footer delete button */
+        .confirm-btn {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 45px;
+            background: var(--danger); color: #fff; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.15em; opacity: 0; transition: 0.3s 0.2s;
+            pointer-events: none; z-index: 4;
+        }
+
+        .item.confirm-delete .confirm-btn { opacity: 1; pointer-events: auto; cursor: pointer; }
         
-        /* Blur/Dim gallery when confirming */
-        .dim-others #sortable-grid { filter: blur(4px); opacity: 0.1; }
-        /* Keep the selected item sharp */
-        .dim-others .item.confirm-delete { filter: blur(0); opacity: 1; }
+        .dim-others #sortable-grid { filter: blur(15px); opacity: 0.3; pointer-events: none; }
 
-        /* SEO Architecture */
         .seo-section { grid-column: 1 / -1; margin-top: 80px; border-top: 1px solid var(--border); padding-top: 80px; }
         .seo-block { margin-bottom: 50px; max-width: 900px; }
         .seo-block h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 20px; font-weight: 500; }
         .seo-block p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; font-weight: 300; margin: 0; }
 
         .empty { grid-column: 1 / -1; text-align: center; padding: 120px 0; color: #222; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; }
-
-        /* Sortable styles */
+        
         .sortable-ghost { opacity: 0; }
-        .sortable-drag { opacity: 0.9; transform: scale(1.05); cursor: grabbing; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -166,12 +159,12 @@
 
     <aside class="control-panel">
         <label for="uploader" class="btn btn-primary" id="uploadLabel">
-            Deploy Visual Data
+            Upload Assets
             <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
         </label>
         
         <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>
-            Synthesize PDF
+            Generate PDF
         </button>
     </aside>
 
@@ -186,10 +179,6 @@
             <h3>Enterprise Document Architecture</h3>
             <p>Page Forge by Aethercore Interactive provides a premium, local-first document synthesis core. Engineered for high-resolution portfolios and corporate assets, we prioritize zero-loss visual data preservation and absolute client privacy.</p>
         </div>
-        <div class="seo-block">
-            <h3>Local Processing Environment</h3>
-            <p>Our document foundry operates exclusively within your browser's secure context. Your visual assets never leave your local terminal, bypassing external servers to guarantee compliance and instantaneous generation.</p>
-        </div>
     </footer>
 </div>
 
@@ -199,12 +188,10 @@
     const galleryContainer = document.getElementById('gallery-container');
     let isComplete = false;
 
-    // Premium Drag Performance Settings
     new Sortable(grid, {
         animation: 300,
         ghostClass: 'sortable-ghost',
-        dragClass: 'sortable-drag',
-        filter: '.delete-trigger, .confirm-prompt', // Exclude delete elements from triggering drag
+        filter: '.delete-trigger, .confirm-btn',
         onEnd: syncIndices
     });
 
@@ -222,7 +209,7 @@
             card.innerHTML = `
                 <div class="sort-number"></div>
                 <div class="delete-trigger" onclick="initiateDelete(this)">×</div>
-                <div class="confirm-prompt" onclick="completeDelete(this)">Tap to Remove</div>
+                <div class="confirm-btn" onclick="completeDelete(this)">Confirm Delete</div>
                 <img src="${data}">
             `;
             grid.appendChild(card);
@@ -244,25 +231,19 @@
         galleryContainer.classList.add('dim-others');
         card.classList.add('confirm-delete');
         
-        // Handle Cancel: Click anywhere outside the zoomed image
         const canceller = (e) => {
-            if (!card.contains(e.target)) {
+            if (!card.contains(e.target) && !trigger.contains(e.target)) {
                 galleryContainer.classList.remove('dim-others');
                 card.classList.remove('confirm-delete');
                 document.removeEventListener('click', canceller);
             }
         };
-        // Small timeout ensures the cancellation click doesn't fire immediately
         setTimeout(() => document.addEventListener('click', canceller), 10);
     }
 
-    function completeDelete(prompt) {
-        // Prevent click propagation back to the document canceller
-        event.stopPropagation(); 
-        
-        prompt.parentElement.remove();
+    function completeDelete(btn) {
+        btn.parentElement.remove();
         galleryContainer.classList.remove('dim-others');
-        
         if (grid.querySelectorAll('.item').length === 0) {
             grid.innerHTML = '<div class="empty">Foundry Offline</div>';
         }
@@ -275,10 +256,9 @@
         items.forEach((item, i) => {
             item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0');
         });
-        
         if (!isComplete) {
             mainBtn.disabled = items.length === 0;
-            if (items.length > 0) mainBtn.innerText = `Synthesize PDF (${items.length})`;
+            if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
         }
     }
 
@@ -289,10 +269,7 @@
     }
 
     function handleAction() {
-        // Multi-download support without page refresh
-        if (isComplete) {
-            resetDownloadCycle();
-        }
+        if (isComplete) { resetDownloadCycle(); }
         forgeDocument();
     }
 
@@ -303,7 +280,6 @@
         mainBtn.innerText = "Forging PDF...";
         mainBtn.disabled = true;
         
-        // Brief pause allows UI to update text before heavy processing
         setTimeout(() => {
             try {
                 const { jsPDF } = window.jspdf;
@@ -313,18 +289,14 @@
 
                 images.forEach((img, i) => {
                     if (i > 0) doc.addPage();
-                    // NONE compression for maximum lossless quality
                     doc.addImage(img.src, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'NONE');
                 });
 
                 doc.save(`PageForge_${Date.now()}.pdf`);
-
-                // SUCCESS CYCLE COMPLETION
                 isComplete = true;
                 mainBtn.disabled = false;
                 mainBtn.innerText = "Extraction Complete";
                 mainBtn.classList.add('complete');
-
             } catch (err) {
                 mainBtn.innerText = "Error: Retry";
                 mainBtn.disabled = false;
