@@ -3,213 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Page Forge | Architectural Document Foundry</title>
+    <title>Page Forge | Professional Document Architecture</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #000000;
-            --surface: #0a0a0a;
+            --bg: #050505;
+            --surface: #0f0f0f;
             --accent: #ffffff;
-            --border: rgba(255, 255, 255, 0.1);
-            --text-secondary: #666666;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-muted: #666666;
         }
 
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
         
-        body { background: var(--bg); color: var(--accent); margin: 0; padding: 0; overflow-x: hidden; }
-
-        .container { max-width: 600px; margin: 0 auto; padding: 60px 20px; }
-
-        header { text-align: center; margin-bottom: 50px; }
-        header h1 { font-weight: 200; font-size: 2.2rem; letter-spacing: -0.05em; margin: 0; }
-        .branding { font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--text-secondary); margin-top: 8px; }
-
-        .foundry-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 24px;
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            backdrop-filter: blur(10px);
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: #fff;
+            margin: 0;
+            overflow-x: hidden;
+            /* Normal scrolling behavior */
+            overflow-y: auto; 
         }
 
-        .progress-wrap { width: 100%; height: 2px; background: #1a1a1a; margin-bottom: 20px; border-radius: 2px; overflow: hidden; display: none; }
-        #progress-bar { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s ease; }
+        /* Premium Header */
+        header { padding: 80px 20px 40px; text-align: center; }
+        header h1 { font-weight: 200; font-size: 2.5rem; letter-spacing: -0.05em; margin: 0; text-transform: lowercase; }
+        .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.65rem; margin-top: 10px; letter-spacing: 0.4em; text-transform: uppercase; }
 
-        .btn-group { display: flex; flex-direction: column; gap: 12px; }
+        .workspace {
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 0 20px 100px;
+        }
+
+        /* Control Panel - Scrolls with the page */
+        .control-panel {
+            background: var(--surface); 
+            border: 1px solid var(--border);
+            border-radius: 24px; 
+            padding: 30px; 
+            margin-bottom: 40px;
+        }
 
         .btn {
-            width: 100%; height: 56px; border-radius: 14px; border: none; font-weight: 500;
-            font-size: 0.9rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; padding: 18px; border-radius: 14px; font-size: 0.9rem; font-weight: 500;
+            cursor: pointer; transition: 0.3s ease; border: none; margin-bottom: 12px;
             display: flex; align-items: center; justify-content: center;
         }
-
         .btn-primary { background: var(--accent); color: #000; }
-        .btn-secondary { background: transparent; color: #fff; border: 1px solid var(--border); }
-        .btn-secondary:disabled { opacity: 0.2; cursor: not-allowed; }
-        
-        .btn-reset { background: transparent; color: var(--text-secondary); font-size: 0.7rem; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-secondary:disabled { opacity: 0.2; }
 
-        #grid { 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 30px; 
-            min-height: 200px;
+        /* Gallery Grid */
+        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 20px; min-height: 300px; }
+        #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
+
+        .item {
+            aspect-ratio: 1; background: #000; border-radius: 12px;
+            overflow: hidden; border: 1px solid var(--border);
+            position: relative;
+            /* Ensure smooth scrolling isn't interrupted by accidental drags */
+            touch-action: initial; 
         }
 
-        .asset-card {
-            aspect-ratio: 1; background: #0f0f0f; border-radius: 12px; border: 1px solid var(--border);
-            position: relative; overflow: hidden; transform: translateZ(0);
+        .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        .sort-number {
+            position: absolute; top: 8px; left: 8px;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+            color: #fff; font-size: 0.6rem; padding: 3px 7px; border-radius: 5px;
         }
 
-        .asset-card img { width: 100%; height: 100%; object-fit: cover; }
-        .asset-index {
-            position: absolute; top: 8px; left: 8px; font-size: 0.6rem;
-            background: rgba(0,0,0,0.5); padding: 3px 6px; border-radius: 4px;
-            backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.05);
+        /* SEO & Methodology Section */
+        .seo-content {
+            margin-top: 80px;
+            padding-top: 60px;
+            border-top: 1px solid var(--border);
+            display: grid;
+            gap: 40px;
         }
+        .seo-block h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 15px; }
+        .seo-block p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.8; font-weight: 300; }
 
-        .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 0; color: var(--text-secondary); font-weight: 200; font-size: 0.85rem; }
+        /* Professional Toast Message */
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--accent); color: #000; padding: 12px 24px;
+            border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+            transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #toast.visible { transform: translateX(-50%) translateY(0); }
 
-        /* Smooth Dragging */
-        .sortable-ghost { opacity: 0.3; }
+        .empty { grid-column: 1 / -1; text-align: center; padding: 80px 0; color: #333; font-size: 0.8rem; letter-spacing: 0.1em; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>page forge</h1>
-        <div class="branding">Aethercore Interactive</div>
-    </header>
+<header>
+    <h1>page forge</h1>
+    <div class="branding-sub">Aethercore Interactive</div>
+</header>
 
-    <div class="foundry-panel">
-        <div class="progress-wrap" id="progress-container">
-            <div id="progress-bar"></div>
-        </div>
-
-        <div class="btn-group">
-            <label class="btn btn-primary">
-                Add Visual Assets
-                <input type="file" id="asset-input" multiple accept="image/*" style="display:none" onchange="handleAssets(this.files)">
-            </label>
-            
-            <button id="download-btn" class="btn btn-secondary" onclick="forgeDocument()" disabled>
-                Generate Document
-            </button>
-        </div>
+<div class="workspace">
+    <div class="control-panel">
+        <label for="uploader" class="btn btn-primary">
+            Upload Assets
+            <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
+        </label>
         
-        <button class="btn btn-reset" onclick="resetFoundry()">Reset Workspace</button>
+        <button class="btn btn-secondary" id="saveBtn" onclick="forgeDocument()" disabled>
+            Save as PDF
+        </button>
     </div>
 
-    <div id="grid">
-        <div class="empty-state">No assets deployed to foundry.</div>
-    </div>
+    <main class="gallery">
+        <div id="sortable-grid">
+            <div class="empty">Foundry inactive. Waiting for assets...</div>
+        </div>
+    </main>
+
+    <section class="seo-content">
+        <div class="seo-block">
+            <h3>Enterprise Document Architecture</h3>
+            <p>Page Forge by Aethercore Interactive provides a premium, on-device document foundry. We prioritize high-resolution preservation and structural integrity for professional PDF generation. Our platform is optimized for architectural portfolios, corporate presentations, and secure document management.</p>
+        </div>
+        <div class="seo-block">
+            <h3>Privacy & Local Synthesis</h3>
+            <p>Unlike traditional cloud converters, Page Forge executes all image-to-PDF synthesis locally within your browser. Your sensitive visual data never leaves your terminal, ensuring zero-footprint privacy and enterprise-standard security compliance.</p>
+        </div>
+    </section>
 </div>
 
-<script>
-    const grid = document.getElementById('grid');
-    const dlBtn = document.getElementById('download-btn');
-    const pBar = document.getElementById('progress-bar');
-    const pContainer = document.getElementById('progress-container');
+<div id="toast">Document forged successfully.</div>
 
-    new Sortable(grid, { 
-        animation: 300, 
-        ghostClass: 'sortable-ghost',
-        onEnd: updateState 
+<script>
+    const grid = document.getElementById('sortable-grid');
+    const saveBtn = document.getElementById('saveBtn');
+
+    // Drag-and-drop: Only active if held for a short duration to allow scrolling
+    new Sortable(grid, {
+        animation: 400,
+        delay: 200, 
+        delayOnTouchOnly: true,
+        onEnd: refreshIndices
     });
 
-    async function handleAssets(files) {
-        const currentCount = grid.querySelectorAll('.asset-card').length;
-        if (currentCount + files.length > 20) {
-            alert("Foundry limited to 20 assets.");
+    async function addPhotos(files) {
+        const currentItems = grid.querySelectorAll('.item').length;
+        if (currentItems + files.length > 20) {
+            alert("Foundry limit: 20 assets per document.");
             return;
         }
 
-        const empty = document.querySelector('.empty-state');
+        const empty = document.querySelector('.empty');
         if (empty) empty.remove();
 
         for (let file of files) {
-            const dataUrl = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.readAsDataURL(file);
-            });
-
+            const data = await toBase64(file);
             const card = document.createElement('div');
-            card.className = 'asset-card';
-            card.innerHTML = `<div class="asset-index"></div><img src="${dataUrl}">`;
+            card.className = 'item';
+            card.innerHTML = `<div class="sort-number"></div><img src="${data}">`;
             grid.appendChild(card);
         }
-        updateState();
+        refreshIndices();
     }
 
-    function updateState() {
-        const cards = grid.querySelectorAll('.asset-card');
-        cards.forEach((card, i) => card.querySelector('.asset-index').innerText = String(i + 1).padStart(2, '0'));
-        
-        dlBtn.disabled = cards.length === 0;
-        if (cards.length > 0) {
-            dlBtn.innerText = `Export PDF (${cards.length})`;
-        } else {
-            dlBtn.innerText = "Generate Document";
-        }
+    function toBase64(file) {
+        return new Promise(res => {
+            const reader = new FileReader();
+            reader.onload = () => res(reader.result);
+            reader.readAsDataURL(file);
+        });
     }
 
-    function resetFoundry() {
-        grid.innerHTML = '<div class="empty-state">No assets deployed to foundry.</div>';
-        document.getElementById('asset-input').value = "";
-        pContainer.style.display = 'none';
-        updateState();
+    function refreshIndices() {
+        const items = grid.querySelectorAll('.item');
+        items.forEach((item, i) => {
+            item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0');
+        });
+        saveBtn.disabled = items.length === 0;
+        if (items.length > 0) saveBtn.innerText = `Save PDF (${items.length})`;
     }
 
     async function forgeDocument() {
-        const images = grid.querySelectorAll('.asset-card img');
-        if (!images.length) return;
+        // ALWAYS scan for live images in the grid at this exact moment
+        const images = grid.querySelectorAll('.item img');
+        if (images.length === 0) return;
 
-        // Visual feedback
-        dlBtn.innerText = "Forging PDF...";
-        dlBtn.disabled = true;
-        pContainer.style.display = 'block';
-        pBar.style.width = '0%';
+        saveBtn.innerText = "Processing...";
+        saveBtn.disabled = true;
 
         const { jsPDF } = window.jspdf;
-        // Use pt for exact architectural scaling
         const doc = new jsPDF('p', 'pt', 'a4');
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
+        const pw = doc.internal.pageSize.getWidth();
+        const ph = doc.internal.pageSize.getHeight();
 
+        // Sequential processing to prevent RAM spikes
         for (let i = 0; i < images.length; i++) {
             if (i > 0) doc.addPage();
-            
-            try {
-                // We add as JPEG at 0.95 quality for RAW appearance without the crash-heavy size
-                doc.addImage(images[i].src, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
-            } catch (e) {
-                console.error("Asset generation error at index", i);
-            }
-
-            // Update UI progress
-            const progress = ((i + 1) / images.length) * 100;
-            pBar.style.width = `${progress}%`;
-            
-            // Critical: Small break to let the browser breathe
-            await new Promise(r => setTimeout(r, 60));
+            // Using 'NONE' as requested to keep quality exactly as it is
+            doc.addImage(images[i].src, 'JPEG', 0, 0, pw, ph, undefined, 'NONE');
         }
 
-        // Finalize and Save
-        const filename = `Forge_Export_${Date.now()}.pdf`;
-        doc.save(filename);
+        doc.save(`PageForge_Export_${Date.now()}.pdf`);
 
-        // Success State
+        // Professional Feedback
+        showToast();
+        
+        // Restore button state for unlimited re-clicks
         setTimeout(() => {
-            pContainer.style.display = 'none';
-            updateState();
-        }, 1000);
+            refreshIndices();
+            saveBtn.disabled = false;
+        }, 500);
+    }
+
+    function showToast() {
+        const toast = document.getElementById('toast');
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), 3000);
     }
 </script>
 
