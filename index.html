@@ -29,9 +29,27 @@
         }
 
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* Ensure the whole body scrolls together */
+        html, body { 
+            background: var(--bg); 
+            color: #fff; 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
 
-        .app-wrapper { max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 30px; }
+        .app-wrapper { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 30px; 
+        }
 
         header { text-align: center; padding: 40px 0 20px 0; }
         header h1 { font-weight: 100; font-size: 2.5rem; letter-spacing: -0.06em; margin: 0; }
@@ -45,7 +63,6 @@
             display: flex; 
             flex-direction: column; 
             gap: 12px; 
-            margin-bottom: 20px;
         }
 
         .btn { width: 100%; height: 54px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: 0.3s; border: none; display: flex; align-items: center; justify-content: center; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -54,7 +71,14 @@
         .btn-action:disabled { opacity: 0.1; cursor: not-allowed; }
         .btn-action.complete { background: var(--success); color: #000; border: none; }
 
-        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 15px; min-height: 300px; margin-bottom: 40px; }
+        .gallery { 
+            background: var(--surface); 
+            border: 1px solid var(--border); 
+            border-radius: 20px; 
+            padding: 15px; 
+            min-height: 300px; 
+        }
+        
         #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
         .item { aspect-ratio: 1; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; touch-action: none; }
@@ -242,12 +266,10 @@
                     const imgWidth = imgObj.width;
                     const imgHeight = imgObj.height;
                     
-                    // Ratio Calculation to fit without stretching or compression
                     const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
                     const finalWidth = imgWidth * ratio;
                     const finalHeight = imgHeight * ratio;
                     
-                    // Perfect Centering
                     const x = (pageWidth - finalWidth) / 2;
                     const y = (pageHeight - finalHeight) / 2;
 
