@@ -118,7 +118,7 @@
     <article class="seo-content">
         <div class="seo-block">
             <h2>The Premium PDF Foundry</h2>
-            <p>Page Forge by Aethercore Interactive represents the pinnacle of web-based document synthesis. Built for architects, designers, and corporate professionals, our tool converts high-resolution images into structured PDF portfolios with zero quality loss.</p>
+            <p>Page Forge by Aethercore Interactive represents the pinnacle of web-based document synthesis. Built for architects, designers, and corporate professionals, our tool converts images into structured PDF portfolios with zero quality loss.</p>
         </div>
 
         <div class="seo-block">
@@ -229,6 +229,7 @@
         setTimeout(() => {
             try {
                 const { jsPDF } = window.jspdf;
+                // 'NONE' compression used to keep original image quality exactly as it is
                 const doc = new jsPDF('p', 'pt', 'a4');
                 images.forEach((img, i) => {
                     if (i > 0) doc.addPage();
