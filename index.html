@@ -29,7 +29,6 @@
             padding: 0;
         }
 
-        /* Responsive Layout Architecture */
         .app-wrapper {
             max-width: 1200px;
             margin: 0 auto;
@@ -43,7 +42,7 @@
         header h1 { font-weight: 100; font-size: 2.5rem; letter-spacing: -0.06em; margin: 0; text-transform: lowercase; }
         .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.6rem; margin-top: 8px; letter-spacing: 0.5em; text-transform: uppercase; }
 
-        /* PC Optimized Grid System */
+        /* PC Dashboard Optimization */
         @media (min-width: 1024px) {
             .app-wrapper {
                 display: grid;
@@ -60,29 +59,30 @@
             border: 1px solid var(--border);
             border-radius: 24px; 
             padding: 30px; 
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .btn {
             width: 100%; height: 56px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: none; margin-bottom: 12px;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: none;
             display: flex; align-items: center; justify-content: center; letter-spacing: 0.1em; text-transform: uppercase;
         }
 
         .btn-primary { background: var(--accent); color: #000; }
         
-        /* The Dynamic Save Button States */
-        .btn-save { background: transparent; border: 1px solid var(--border); color: #fff; }
-        .btn-save:disabled { opacity: 0.1; cursor: not-allowed; }
-        .btn-save.success { background: var(--success); color: #000; border: none; }
+        /* State-Driven Main Button */
+        .btn-action { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-action:disabled { opacity: 0.1; cursor: not-allowed; }
+        
+        /* Success State */
+        .btn-action.complete { background: var(--success); color: #000; border: none; }
+        
+        /* Reset State */
+        .btn-action.reset-state { background: #ff3b30; color: #fff; border: none; }
 
-        .btn-reset { 
-            background: transparent; color: var(--text-muted); font-size: 0.65rem; 
-            text-transform: uppercase; letter-spacing: 0.2em; cursor: pointer;
-            width: 100%; border: none; margin-top: 10px;
-        }
-        .btn-reset:hover { color: #fff; }
-
-        /* Gallery Structure */
+        /* Gallery */
         .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 20px; min-height: 400px; }
         #sortable-grid { 
             display: grid; 
@@ -103,7 +103,7 @@
             color: #fff; font-size: 0.5rem; padding: 4px 8px; border-radius: 4px;
         }
 
-        /* SEO Architecture */
+        /* SEO Blocks */
         .seo-section { grid-column: 1 / -1; margin-top: 60px; border-top: 1px solid var(--border); padding-top: 60px; }
         .seo-block { margin-bottom: 40px; max-width: 800px; }
         .seo-block h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 15px; }
@@ -121,16 +121,14 @@
     </header>
 
     <aside class="control-panel">
-        <label for="uploader" class="btn btn-primary">
-            Initialize Assets
+        <label for="uploader" class="btn btn-primary" id="uploadLabel">
+            Upload Assets
             <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
         </label>
         
-        <button class="btn btn-save" id="saveBtn" onclick="forgeDocument()" disabled>
+        <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>
             Generate PDF
         </button>
-
-        <button class="btn-reset" onclick="resetFoundry()">Reset Workspace</button>
     </aside>
 
     <main class="gallery">
@@ -153,7 +151,8 @@
 
 <script>
     const grid = document.getElementById('sortable-grid');
-    const saveBtn = document.getElementById('saveBtn');
+    const mainBtn = document.getElementById('mainBtn');
+    let currentMode = 'generate'; // generate -> complete -> reset
 
     new Sortable(grid, {
         animation: 400,
@@ -163,6 +162,8 @@
     });
 
     async function addPhotos(files) {
+        if (currentMode !== 'generate') return;
+        
         const currentCount = grid.querySelectorAll('.item').length;
         if (currentCount + files.length > 20) return;
 
@@ -192,25 +193,27 @@
         items.forEach((item, i) => {
             item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0');
         });
-        saveBtn.disabled = items.length === 0;
-        if (items.length > 0 && !saveBtn.classList.contains('success')) {
-            saveBtn.innerText = `Save PDF (${items.length})`;
+        
+        if (currentMode === 'generate') {
+            mainBtn.disabled = items.length === 0;
+            if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
         }
     }
 
-    function resetFoundry() {
-        grid.innerHTML = '<div class="empty">Foundry Offline</div>';
-        document.getElementById('uploader').value = "";
-        saveBtn.className = 'btn btn-save';
-        syncIndices();
+    function handleAction() {
+        if (currentMode === 'generate') {
+            forgeDocument();
+        } else if (currentMode === 'reset') {
+            window.location.reload();
+        }
     }
 
     function forgeDocument() {
         const images = grid.querySelectorAll('.item img');
         if (images.length === 0) return;
 
-        const originalText = saveBtn.innerText;
-        saveBtn.innerText = "Forging Assets...";
+        mainBtn.innerText = "Forging Assets...";
+        mainBtn.disabled = true;
         
         setTimeout(() => {
             try {
@@ -226,23 +229,29 @@
 
                 doc.save(`PageForge_${Date.now()}.pdf`);
 
-                // TRANSFORMATION: Button becomes the success message
-                saveBtn.innerText = "Extraction Complete";
-                saveBtn.classList.add('success');
+                // SUCCESS STATE
+                currentMode = 'complete';
+                mainBtn.innerText = "Extraction Complete";
+                mainBtn.classList.add('complete');
 
-                // Revert button after 3 seconds so they can download again
+                // TRANSITION TO RESET after 2 seconds
                 setTimeout(() => {
-                    saveBtn.classList.remove('success');
-                    syncIndices();
-                }, 3000);
+                    currentMode = 'reset';
+                    mainBtn.disabled = false;
+                    mainBtn.classList.remove('complete');
+                    mainBtn.classList.add('reset-state');
+                    mainBtn.innerText = "Reset Foundry";
+                }, 2000);
 
             } catch (err) {
-                console.error("Foundry Error:", err);
-                saveBtn.innerText = originalText;
+                console.error(err);
+                mainBtn.innerText = "Error: Retry";
+                mainBtn.disabled = false;
             }
         }, 150);
     }
 </script>
 
 </body>
-</html>
+    </html>
+    
