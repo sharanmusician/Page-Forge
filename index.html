@@ -240,7 +240,7 @@
                 doc.save(`PageForge_${Date.now()}.pdf`);
                 isComplete = true;
                 mainBtn.disabled = false;
-                mainBtn.innerText = "Download Again";
+                mainBtn.innerText = "Document Downloaded";
                 mainBtn.classList.add('complete');
             } catch (err) {
                 mainBtn.innerText = "Error";
