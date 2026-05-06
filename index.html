@@ -26,22 +26,15 @@
             color: #fff;
             margin: 0;
             overflow-x: hidden;
-            /* Normal scrolling behavior */
             overflow-y: auto; 
         }
 
-        /* Premium Header */
         header { padding: 80px 20px 40px; text-align: center; }
         header h1 { font-weight: 200; font-size: 2.5rem; letter-spacing: -0.05em; margin: 0; text-transform: lowercase; }
         .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.65rem; margin-top: 10px; letter-spacing: 0.4em; text-transform: uppercase; }
 
-        .workspace {
-            max-width: 800px; 
-            margin: 0 auto; 
-            padding: 0 20px 100px;
-        }
+        .workspace { max-width: 800px; margin: 0 auto; padding: 0 20px 100px; }
 
-        /* Control Panel - Scrolls with the page */
         .control-panel {
             background: var(--surface); 
             border: 1px solid var(--border);
@@ -57,9 +50,8 @@
         }
         .btn-primary { background: var(--accent); color: #000; }
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
-        .btn-secondary:disabled { opacity: 0.2; }
+        .btn-secondary:disabled { opacity: 0.1; }
 
-        /* Gallery Grid */
         .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 20px; min-height: 300px; }
         #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
 
@@ -67,7 +59,6 @@
             aspect-ratio: 1; background: #000; border-radius: 12px;
             overflow: hidden; border: 1px solid var(--border);
             position: relative;
-            /* Ensure smooth scrolling isn't interrupted by accidental drags */
             touch-action: initial; 
         }
 
@@ -78,7 +69,6 @@
             color: #fff; font-size: 0.6rem; padding: 3px 7px; border-radius: 5px;
         }
 
-        /* SEO & Methodology Section */
         .seo-content {
             margin-top: 80px;
             padding-top: 60px;
@@ -89,17 +79,16 @@
         .seo-block h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 15px; }
         .seo-block p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.8; font-weight: 300; }
 
-        /* Professional Toast Message */
         #toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: var(--accent); color: #000; padding: 12px 24px;
             border-radius: 50px; font-size: 0.8rem; font-weight: 600;
             transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1000;
         }
         #toast.visible { transform: translateX(-50%) translateY(0); }
 
-        .empty { grid-column: 1 / -1; text-align: center; padding: 80px 0; color: #333; font-size: 0.8rem; letter-spacing: 0.1em; }
+        .empty { grid-column: 1 / -1; text-align: center; padding: 80px 0; color: #222; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -130,24 +119,23 @@
     <section class="seo-content">
         <div class="seo-block">
             <h3>Enterprise Document Architecture</h3>
-            <p>Page Forge by Aethercore Interactive provides a premium, on-device document foundry. We prioritize high-resolution preservation and structural integrity for professional PDF generation. Our platform is optimized for architectural portfolios, corporate presentations, and secure document management.</p>
+            <p>Page Forge by Aethercore Interactive provides a premium, on-device document foundry. Optimized for architectural portfolios and corporate presentations, we prioritize lossless visual data synthesis.</p>
         </div>
         <div class="seo-block">
-            <h3>Privacy & Local Synthesis</h3>
-            <p>Unlike traditional cloud converters, Page Forge executes all image-to-PDF synthesis locally within your browser. Your sensitive visual data never leaves your terminal, ensuring zero-footprint privacy and enterprise-standard security compliance.</p>
+            <h3>Secure Local Processing</h3>
+            <p>Our architecture executes all image-to-PDF synthesis locally. Your visual assets never leave your local terminal, ensuring absolute privacy and enterprise-grade security compliance.</p>
         </div>
     </section>
 </div>
 
-<div id="toast">Document forged successfully.</div>
+<div id="toast">Document Downloaded Successfully</div>
 
 <script>
     const grid = document.getElementById('sortable-grid');
     const saveBtn = document.getElementById('saveBtn');
 
-    // Drag-and-drop: Only active if held for a short duration to allow scrolling
     new Sortable(grid, {
-        animation: 400,
+        animation: 300,
         delay: 200, 
         delayOnTouchOnly: true,
         onEnd: refreshIndices
@@ -155,10 +143,7 @@
 
     async function addPhotos(files) {
         const currentItems = grid.querySelectorAll('.item').length;
-        if (currentItems + files.length > 20) {
-            alert("Foundry limit: 20 assets per document.");
-            return;
-        }
+        if (currentItems + files.length > 20) return;
 
         const empty = document.querySelector('.empty');
         if (empty) empty.remove();
@@ -191,41 +176,38 @@
     }
 
     async function forgeDocument() {
-        // ALWAYS scan for live images in the grid at this exact moment
         const images = grid.querySelectorAll('.item img');
         if (images.length === 0) return;
 
-        saveBtn.innerText = "Processing...";
-        saveBtn.disabled = true;
+        // Visual feedback on button
+        const originalText = saveBtn.innerText;
+        saveBtn.innerText = "Forging...";
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'pt', 'a4');
         const pw = doc.internal.pageSize.getWidth();
         const ph = doc.internal.pageSize.getHeight();
 
-        // Sequential processing to prevent RAM spikes
+        // Sequential processing
         for (let i = 0; i < images.length; i++) {
             if (i > 0) doc.addPage();
-            // Using 'NONE' as requested to keep quality exactly as it is
             doc.addImage(images[i].src, 'JPEG', 0, 0, pw, ph, undefined, 'NONE');
         }
 
-        doc.save(`PageForge_Export_${Date.now()}.pdf`);
+        // Trigger download with unique filename to prevent browser blocking
+        doc.save(`PageForge_${Date.now()}.pdf`);
 
-        // Professional Feedback
+        // Message appears ONLY after doc.save() is called
         showToast();
         
-        // Restore button state for unlimited re-clicks
-        setTimeout(() => {
-            refreshIndices();
-            saveBtn.disabled = false;
-        }, 500);
+        // Reset button immediately so it's ready for another click
+        saveBtn.innerText = originalText;
     }
 
     function showToast() {
         const toast = document.getElementById('toast');
         toast.classList.add('visible');
-        setTimeout(() => toast.classList.remove('visible'), 3000);
+        setTimeout(() => toast.classList.remove('visible'), 2500);
     }
 </script>
 
