@@ -24,15 +24,14 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
+            background: var(--bg);
             color: #fff;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
         }
 
         .app-wrapper {
-            max-width: 1300px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
             display: flex;
@@ -40,34 +39,30 @@
             gap: 40px;
         }
 
-        header { text-align: center; padding: 40px 0; }
-        header h1 { font-weight: 100; font-size: 2.8rem; letter-spacing: -0.06em; margin: 0; text-transform: lowercase; }
-        .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.6rem; margin-top: 10px; letter-spacing: 0.5em; text-transform: uppercase; }
+        header { text-align: center; padding: 20px 0; }
+        header h1 { font-weight: 100; font-size: 2.2rem; letter-spacing: -0.06em; margin: 0; text-transform: lowercase; }
+        .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.55rem; margin-top: 8px; letter-spacing: 0.5em; text-transform: uppercase; }
 
         @media (min-width: 1024px) {
-            .app-wrapper {
-                display: grid;
-                grid-template-columns: 350px 1fr;
-                align-items: start;
-                padding-top: 80px;
-            }
-            header { grid-column: 1 / -1; text-align: left; padding: 0 0 50px 0; }
+            .app-wrapper { display: grid; grid-template-columns: 320px 1fr; align-items: start; padding-top: 60px; }
+            header { grid-column: 1 / -1; text-align: left; }
             .control-panel { position: sticky; top: 40px; }
         }
 
         .control-panel {
             background: var(--surface); 
             border: 1px solid var(--border);
-            border-radius: 24px; 
-            padding: 30px; 
+            border-radius: 20px; 
+            padding: 25px; 
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            z-index: 10;
         }
 
         .btn {
-            width: 100%; height: 60px; border-radius: 14px; font-size: 0.85rem; font-weight: 500;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border: none;
+            width: 100%; height: 54px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;
+            cursor: pointer; transition: 0.3s; border: none;
             display: flex; align-items: center; justify-content: center; letter-spacing: 0.1em; text-transform: uppercase;
         }
 
@@ -76,76 +71,87 @@
         .btn-action:disabled { opacity: 0.1; cursor: not-allowed; }
         .btn-action.complete { background: var(--success); color: #000; border: none; }
 
-        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 25px; min-height: 400px; position: relative; }
+        .gallery { 
+            background: var(--surface); 
+            border: 1px solid var(--border); 
+            border-radius: 20px; 
+            padding: 15px; 
+            min-height: 400px;
+        }
+
+        /* STRICT 3-IMAGE ROW ORDER */
         #sortable-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-            gap: 15px; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            transition: 0.4s ease;
         }
 
         .item {
-            aspect-ratio: 1; background: #000; border-radius: 12px;
-            overflow: hidden; border: 1px solid var(--border);
-            position: relative; touch-action: none; 
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+            aspect-ratio: 1; 
+            background: #000; 
+            border-radius: 10px;
+            overflow: hidden; 
+            border: 1px solid var(--border);
+            position: relative; 
+            touch-action: none;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
             z-index: 1;
         }
 
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         
         .sort-number {
-            position: absolute; top: 10px; left: 10px;
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px);
-            color: #fff; font-size: 0.6rem; padding: 4px 8px; border-radius: 5px;
-            z-index: 2; pointer-events: none;
+            position: absolute; top: 8px; left: 8px;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+            color: #fff; font-size: 0.55rem; padding: 4px 8px; border-radius: 5px;
+            z-index: 2;
         }
 
         .delete-trigger {
-            position: absolute; top: 0; right: 0; width: 36px; height: 36px;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            position: absolute; top: 0; right: 0; width: 34px; height: 34px;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
             color: #fff; display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; font-weight: 100; cursor: pointer; z-index: 3;
-            border-bottom-left-radius: 12px;
+            font-size: 1.2rem; font-weight: 200; cursor: pointer; z-index: 5;
+            border-bottom-left-radius: 10px;
         }
 
-        /* ELEVATION STATE */
+        /* ELEVATION & POP-UP CONFIRMATION */
         .item.confirm-delete {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(2.5);
-            width: 250px; /* Base size for scale calculation */
-            height: 250px;
+            width: 320px; /* Elevated size */
+            height: 320px;
+            margin-top: -160px;
+            margin-left: -160px;
             z-index: 9999;
-            box-shadow: 0 50px 100px rgba(0,0,0,1);
-            border-color: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+            box-shadow: 0 40px 100px rgba(0,0,0,1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
         }
 
         @media (max-width: 600px) {
-            .item.confirm-delete { transform: translate(-50%, -50%) scale(1.4); width: 80vw; height: 80vw; }
+            .item.confirm-delete { width: 85vw; height: 85vw; margin-top: -42.5vw; margin-left: -42.5vw; }
         }
 
-        /* Non-disturbing footer delete button */
-        .confirm-btn {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 45px;
+        .confirm-footer {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 50px;
             background: var(--danger); color: #fff; 
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
             letter-spacing: 0.15em; opacity: 0; transition: 0.3s 0.2s;
-            pointer-events: none; z-index: 4;
+            pointer-events: none; z-index: 6;
         }
 
-        .item.confirm-delete .confirm-btn { opacity: 1; pointer-events: auto; cursor: pointer; }
+        .item.confirm-delete .confirm-footer { opacity: 1; pointer-events: auto; cursor: pointer; }
         
-        .dim-others #sortable-grid { filter: blur(15px); opacity: 0.3; pointer-events: none; }
+        /* Blur Background Layers */
+        .dim-others #sortable-grid { filter: blur(10px); opacity: 0.2; pointer-events: none; }
+        .dim-others header, .dim-others .control-panel { filter: blur(5px); opacity: 0.5; pointer-events: none; }
 
-        .seo-section { grid-column: 1 / -1; margin-top: 80px; border-top: 1px solid var(--border); padding-top: 80px; }
-        .seo-block { margin-bottom: 50px; max-width: 900px; }
-        .seo-block h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 20px; font-weight: 500; }
-        .seo-block p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; font-weight: 300; margin: 0; }
-
-        .empty { grid-column: 1 / -1; text-align: center; padding: 120px 0; color: #222; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; }
-        
+        .empty { grid-column: 1 / -1; text-align: center; padding: 100px 0; color: #222; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; }
         .sortable-ghost { opacity: 0; }
     </style>
 </head>
@@ -158,13 +164,13 @@
     </header>
 
     <aside class="control-panel">
-        <label for="uploader" class="btn btn-primary" id="uploadLabel">
+        <label for="uploader" class="btn btn-primary">
             Upload Assets
             <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
         </label>
         
         <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>
-            Generate PDF
+            Synthesize PDF
         </button>
     </aside>
 
@@ -173,13 +179,6 @@
             <div class="empty">Foundry Offline</div>
         </div>
     </main>
-
-    <footer class="seo-section">
-        <div class="seo-block">
-            <h3>Enterprise Document Architecture</h3>
-            <p>Page Forge by Aethercore Interactive provides a premium, local-first document synthesis core. Engineered for high-resolution portfolios and corporate assets, we prioritize zero-loss visual data preservation and absolute client privacy.</p>
-        </div>
-    </footer>
 </div>
 
 <script>
@@ -191,7 +190,7 @@
     new Sortable(grid, {
         animation: 300,
         ghostClass: 'sortable-ghost',
-        filter: '.delete-trigger, .confirm-btn',
+        filter: '.delete-trigger, .confirm-footer',
         onEnd: syncIndices
     });
 
@@ -208,13 +207,13 @@
             card.className = 'item';
             card.innerHTML = `
                 <div class="sort-number"></div>
-                <div class="delete-trigger" onclick="initiateDelete(this)">×</div>
-                <div class="confirm-btn" onclick="completeDelete(this)">Confirm Delete</div>
+                <div class="delete-trigger" onclick="initiateDelete(event, this)">×</div>
+                <div class="confirm-footer" onclick="completeDelete(event, this)">Confirm Delete</div>
                 <img src="${data}">
             `;
             grid.appendChild(card);
         }
-        resetDownloadCycle();
+        resetDownloadState();
         syncIndices();
     }
 
@@ -226,28 +225,31 @@
         });
     }
 
-    function initiateDelete(trigger) {
+    function initiateDelete(e, trigger) {
+        e.stopPropagation();
         const card = trigger.parentElement;
-        galleryContainer.classList.add('dim-others');
+        document.body.classList.add('dim-others');
         card.classList.add('confirm-delete');
         
-        const canceller = (e) => {
-            if (!card.contains(e.target) && !trigger.contains(e.target)) {
-                galleryContainer.classList.remove('dim-others');
+        // Cancel deletion if clicking outside the elevated image
+        const closeOnOuterClick = (ev) => {
+            if (!card.contains(ev.target)) {
+                document.body.classList.remove('dim-others');
                 card.classList.remove('confirm-delete');
-                document.removeEventListener('click', canceller);
+                document.removeEventListener('click', closeOnOuterClick);
             }
         };
-        setTimeout(() => document.addEventListener('click', canceller), 10);
+        setTimeout(() => document.addEventListener('click', closeOnOuterClick), 10);
     }
 
-    function completeDelete(btn) {
+    function completeDelete(e, btn) {
+        e.stopPropagation();
         btn.parentElement.remove();
-        galleryContainer.classList.remove('dim-others');
+        document.body.classList.remove('dim-others');
         if (grid.querySelectorAll('.item').length === 0) {
             grid.innerHTML = '<div class="empty">Foundry Offline</div>';
         }
-        resetDownloadCycle();
+        resetDownloadState();
         syncIndices();
     }
 
@@ -258,18 +260,18 @@
         });
         if (!isComplete) {
             mainBtn.disabled = items.length === 0;
-            if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
+            if (items.length > 0) mainBtn.innerText = `Synthesize PDF (${items.length})`;
         }
     }
 
-    function resetDownloadCycle() {
+    function resetDownloadState() {
         isComplete = false;
         mainBtn.classList.remove('complete');
         syncIndices();
     }
 
     function handleAction() {
-        if (isComplete) { resetDownloadCycle(); }
+        if (isComplete) resetDownloadState();
         forgeDocument();
     }
 
@@ -277,28 +279,28 @@
         const images = grid.querySelectorAll('.item img');
         if (images.length === 0) return;
 
-        mainBtn.innerText = "Forging PDF...";
+        mainBtn.innerText = "Forging Assets...";
         mainBtn.disabled = true;
         
         setTimeout(() => {
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'pt', 'a4');
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
+                const pw = doc.internal.pageSize.getWidth();
+                const ph = doc.internal.pageSize.getHeight();
 
                 images.forEach((img, i) => {
                     if (i > 0) doc.addPage();
-                    doc.addImage(img.src, 'JPEG', 0, 0, pageWidth, pageHeight, undefined, 'NONE');
+                    doc.addImage(img.src, 'JPEG', 0, 0, pw, ph, undefined, 'NONE');
                 });
 
                 doc.save(`PageForge_${Date.now()}.pdf`);
                 isComplete = true;
                 mainBtn.disabled = false;
-                mainBtn.innerText = "Extraction Complete";
+                mainBtn.innerText = "Extraction Successful";
                 mainBtn.classList.add('complete');
             } catch (err) {
-                mainBtn.innerText = "Error: Retry";
+                mainBtn.innerText = "Foundry Error";
                 mainBtn.disabled = false;
             }
         }, 200);
