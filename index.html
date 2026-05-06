@@ -16,6 +16,7 @@
             --accent: #ffffff;
             --border: rgba(255, 255, 255, 0.08);
             --text-muted: #555555;
+            --success: #f0f0f0;
         }
 
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -28,104 +29,126 @@
             padding: 0;
         }
 
-        header { padding: 100px 20px 50px; text-align: center; }
-        header h1 { font-weight: 100; font-size: 2.8rem; letter-spacing: -0.06em; margin: 0; text-transform: lowercase; }
-        .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.6rem; margin-top: 12px; letter-spacing: 0.5em; text-transform: uppercase; }
+        /* Responsive Layout Architecture */
+        .app-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
 
-        .workspace { max-width: 700px; margin: 0 auto; padding: 0 20px 100px; }
+        header { text-align: center; padding: 40px 0; }
+        header h1 { font-weight: 100; font-size: 2.5rem; letter-spacing: -0.06em; margin: 0; text-transform: lowercase; }
+        .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.6rem; margin-top: 8px; letter-spacing: 0.5em; text-transform: uppercase; }
+
+        /* PC Optimized Grid System */
+        @media (min-width: 1024px) {
+            .app-wrapper {
+                display: grid;
+                grid-template-columns: 350px 1fr;
+                align-items: start;
+                padding-top: 80px;
+            }
+            header { grid-column: 1 / -1; text-align: left; padding: 0 0 40px 0; }
+            .control-panel { position: sticky; top: 40px; }
+        }
 
         .control-panel {
             background: var(--surface); 
             border: 1px solid var(--border);
-            border-radius: 30px; 
-            padding: 40px; 
-            margin-bottom: 50px;
+            border-radius: 24px; 
+            padding: 30px; 
         }
 
         .btn {
-            width: 100%; height: 60px; border-radius: 15px; font-size: 0.85rem; font-weight: 500;
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: none; margin-bottom: 15px;
-            display: flex; align-items: center; justify-content: center; letter-spacing: 0.05em;
+            width: 100%; height: 56px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: none; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: center; letter-spacing: 0.1em; text-transform: uppercase;
         }
-        .btn-primary { background: var(--accent); color: #000; }
-        .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
-        .btn-secondary:disabled { opacity: 0.1; }
 
-        /* Gallery Grid */
-        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 30px; padding: 25px; min-height: 200px; }
-        #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .btn-primary { background: var(--accent); color: #000; }
+        
+        /* The Dynamic Save Button States */
+        .btn-save { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .btn-save:disabled { opacity: 0.1; cursor: not-allowed; }
+        .btn-save.success { background: var(--success); color: #000; border: none; }
+
+        .btn-reset { 
+            background: transparent; color: var(--text-muted); font-size: 0.65rem; 
+            text-transform: uppercase; letter-spacing: 0.2em; cursor: pointer;
+            width: 100%; border: none; margin-top: 10px;
+        }
+        .btn-reset:hover { color: #fff; }
+
+        /* Gallery Structure */
+        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 20px; min-height: 400px; }
+        #sortable-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+            gap: 12px; 
+        }
 
         .item {
-            aspect-ratio: 1; background: #000; border-radius: 12px;
+            aspect-ratio: 1; background: #000; border-radius: 10px;
             overflow: hidden; border: 1px solid var(--border);
             position: relative; touch-action: initial; 
         }
 
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .sort-number {
-            position: absolute; top: 10px; left: 10px;
+            position: absolute; top: 8px; left: 8px;
             background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px);
-            color: #fff; font-size: 0.55rem; padding: 4px 8px; border-radius: 5px;
-            font-weight: 300;
+            color: #fff; font-size: 0.5rem; padding: 4px 8px; border-radius: 4px;
         }
 
-        /* SEO Section */
-        .seo-content { margin-top: 100px; padding-top: 80px; border-top: 1px solid var(--border); }
-        .seo-block { margin-bottom: 50px; }
-        .seo-block h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 20px; font-weight: 500; }
-        .seo-block p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; font-weight: 300; margin: 0; }
+        /* SEO Architecture */
+        .seo-section { grid-column: 1 / -1; margin-top: 60px; border-top: 1px solid var(--border); padding-top: 60px; }
+        .seo-block { margin-bottom: 40px; max-width: 800px; }
+        .seo-block h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 15px; }
+        .seo-block p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.8; font-weight: 300; margin: 0; }
 
-        /* Premium Aesthetic Notification */
-        #toast {
-            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: #fff; color: #000; padding: 14px 28px;
-            border-radius: 10px; font-size: 0.75rem; font-weight: 500;
-            letter-spacing: 0.1em; text-transform: uppercase;
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            z-index: 9999; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-        #toast.visible { transform: translateX(-50%) translateY(0); }
-
-        .empty { grid-column: 1 / -1; text-align: center; padding: 60px 0; color: #222; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
+        .empty { grid-column: 1 / -1; text-align: center; padding: 100px 0; color: #222; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<div id="toast">Extraction Complete</div>
+<div class="app-wrapper">
+    <header>
+        <h1>page forge</h1>
+        <div class="branding-sub">Aethercore Interactive</div>
+    </header>
 
-<header>
-    <h1>page forge</h1>
-    <div class="branding-sub">Aethercore Interactive</div>
-</header>
-
-<div class="workspace">
-    <div class="control-panel">
+    <aside class="control-panel">
         <label for="uploader" class="btn btn-primary">
             Initialize Assets
             <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
         </label>
         
-        <button class="btn btn-secondary" id="saveBtn" onclick="forgeDocument()" disabled>
-            Save as PDF
+        <button class="btn btn-save" id="saveBtn" onclick="forgeDocument()" disabled>
+            Generate PDF
         </button>
-    </div>
+
+        <button class="btn-reset" onclick="resetFoundry()">Reset Workspace</button>
+    </aside>
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div class="empty">Waiting for visual data...</div>
+            <div class="empty">Foundry Offline</div>
         </div>
     </main>
 
-    <section class="seo-content">
+    <footer class="seo-section">
         <div class="seo-block">
-            <h3>Architectural Document Integrity</h3>
-            <p>Page Forge by Aethercore Interactive delivers a specialized foundry for visual data synthesis. Designed for architects and premium content creators, our engine ensures structural document precision with zero cloud dependency.</p>
+            <h3>Enterprise Document Foundry</h3>
+            <p>Page Forge by Aethercore Interactive provides an ultra-premium, local-first document synthesis environment. Optimized for high-resolution architectural portfolios and corporate assets, we ensure zero-loss quality and absolute data privacy.</p>
         </div>
         <div class="seo-block">
-            <h3>End-to-End Privacy</h3>
-            <p>Processing occurs exclusively on your local terminal. By bypassing external servers, Page Forge guarantees enterprise-grade security and immediate asset conversion within the secure bounds of your browser.</p>
+            <h3>Local Processing Core</h3>
+            <p>Our synthesis engine operates exclusively within your browser's secure context. Visual data never leaves your local terminal, bypassing external servers to guarantee enterprise-grade security and immediate document generation.</p>
         </div>
-    </section>
+    </footer>
 </div>
 
 <script>
@@ -133,15 +156,15 @@
     const saveBtn = document.getElementById('saveBtn');
 
     new Sortable(grid, {
-        animation: 500,
+        animation: 400,
         delay: 150, 
         delayOnTouchOnly: true,
-        onEnd: refreshIndices
+        onEnd: syncIndices
     });
 
     async function addPhotos(files) {
-        const currentItems = grid.querySelectorAll('.item').length;
-        if (currentItems + files.length > 20) return;
+        const currentCount = grid.querySelectorAll('.item').length;
+        if (currentCount + files.length > 20) return;
 
         const empty = document.querySelector('.empty');
         if (empty) empty.remove();
@@ -153,7 +176,7 @@
             card.innerHTML = `<div class="sort-number"></div><img src="${data}">`;
             grid.appendChild(card);
         }
-        refreshIndices();
+        syncIndices();
     }
 
     function toBase64(file) {
@@ -164,34 +187,35 @@
         });
     }
 
-    function refreshIndices() {
+    function syncIndices() {
         const items = grid.querySelectorAll('.item');
         items.forEach((item, i) => {
             item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0');
         });
         saveBtn.disabled = items.length === 0;
-        if (items.length > 0) saveBtn.innerText = `Save PDF (${items.length})`;
+        if (items.length > 0 && !saveBtn.classList.contains('success')) {
+            saveBtn.innerText = `Save PDF (${items.length})`;
+        }
     }
 
-    // This is the fixed, multi-download function
+    function resetFoundry() {
+        grid.innerHTML = '<div class="empty">Foundry Offline</div>';
+        document.getElementById('uploader').value = "";
+        saveBtn.className = 'btn btn-save';
+        syncIndices();
+    }
+
     function forgeDocument() {
         const images = grid.querySelectorAll('.item img');
         if (images.length === 0) return;
 
         const originalText = saveBtn.innerText;
-        saveBtn.innerText = "Forging...";
+        saveBtn.innerText = "Forging Assets...";
         
-        // Timeout ensures the browser is ready for the download event
         setTimeout(() => {
             try {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'p',
-                    unit: 'pt',
-                    format: 'a4',
-                    compress: false // Raw quality
-                });
-
+                const doc = new jsPDF('p', 'pt', 'a4');
                 const pw = doc.internal.pageSize.getWidth();
                 const ph = doc.internal.pageSize.getHeight();
 
@@ -200,25 +224,23 @@
                     doc.addImage(img.src, 'JPEG', 0, 0, pw, ph, undefined, 'NONE');
                 });
 
-                // Unique filename ensures browser doesn't block the second download
-                const filename = `Forge_${Math.floor(Date.now() / 1000)}.pdf`;
-                doc.save(filename);
+                doc.save(`PageForge_${Date.now()}.pdf`);
 
-                showToast();
+                // TRANSFORMATION: Button becomes the success message
+                saveBtn.innerText = "Extraction Complete";
+                saveBtn.classList.add('success');
+
+                // Revert button after 3 seconds so they can download again
+                setTimeout(() => {
+                    saveBtn.classList.remove('success');
+                    syncIndices();
+                }, 3000);
+
             } catch (err) {
                 console.error("Foundry Error:", err);
-            } finally {
                 saveBtn.innerText = originalText;
-                // Explicitly refocus the window to keep it active
-                window.focus();
             }
         }, 150);
-    }
-
-    function showToast() {
-        const toast = document.getElementById('toast');
-        toast.classList.add('visible');
-        setTimeout(() => toast.classList.remove('visible'), 3000);
     }
 </script>
 
