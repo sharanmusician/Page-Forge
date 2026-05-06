@@ -7,15 +7,15 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #050505;
-            --surface: #0f0f0f;
+            --bg: #000000;
+            --surface: #0a0a0a;
             --accent: #ffffff;
             --border: rgba(255, 255, 255, 0.08);
-            --text-muted: #666666;
+            --text-muted: #555555;
         }
 
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -25,73 +25,73 @@
             background-color: var(--bg);
             color: #fff;
             margin: 0;
-            overflow-x: hidden;
-            overflow-y: auto; 
+            padding: 0;
         }
 
-        header { padding: 80px 20px 40px; text-align: center; }
-        header h1 { font-weight: 200; font-size: 2.5rem; letter-spacing: -0.05em; margin: 0; text-transform: lowercase; }
-        .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.65rem; margin-top: 10px; letter-spacing: 0.4em; text-transform: uppercase; }
+        header { padding: 100px 20px 50px; text-align: center; }
+        header h1 { font-weight: 100; font-size: 2.8rem; letter-spacing: -0.06em; margin: 0; text-transform: lowercase; }
+        .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.6rem; margin-top: 12px; letter-spacing: 0.5em; text-transform: uppercase; }
 
-        .workspace { max-width: 800px; margin: 0 auto; padding: 0 20px 100px; }
+        .workspace { max-width: 700px; margin: 0 auto; padding: 0 20px 100px; }
 
         .control-panel {
             background: var(--surface); 
             border: 1px solid var(--border);
-            border-radius: 24px; 
-            padding: 30px; 
-            margin-bottom: 40px;
+            border-radius: 30px; 
+            padding: 40px; 
+            margin-bottom: 50px;
         }
 
         .btn {
-            width: 100%; padding: 18px; border-radius: 14px; font-size: 0.9rem; font-weight: 500;
-            cursor: pointer; transition: 0.3s ease; border: none; margin-bottom: 12px;
-            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 60px; border-radius: 15px; font-size: 0.85rem; font-weight: 500;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); border: none; margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: center; letter-spacing: 0.05em;
         }
         .btn-primary { background: var(--accent); color: #000; }
         .btn-secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
         .btn-secondary:disabled { opacity: 0.1; }
 
-        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 20px; min-height: 300px; }
-        #sortable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
+        /* Gallery Grid */
+        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 30px; padding: 25px; min-height: 200px; }
+        #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
         .item {
             aspect-ratio: 1; background: #000; border-radius: 12px;
             overflow: hidden; border: 1px solid var(--border);
-            position: relative;
-            touch-action: initial; 
+            position: relative; touch-action: initial; 
         }
 
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .sort-number {
-            position: absolute; top: 8px; left: 8px;
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
-            color: #fff; font-size: 0.6rem; padding: 3px 7px; border-radius: 5px;
+            position: absolute; top: 10px; left: 10px;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px);
+            color: #fff; font-size: 0.55rem; padding: 4px 8px; border-radius: 5px;
+            font-weight: 300;
         }
 
-        .seo-content {
-            margin-top: 80px;
-            padding-top: 60px;
-            border-top: 1px solid var(--border);
-            display: grid;
-            gap: 40px;
-        }
-        .seo-block h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 15px; }
-        .seo-block p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.8; font-weight: 300; }
+        /* SEO Section */
+        .seo-content { margin-top: 100px; padding-top: 80px; border-top: 1px solid var(--border); }
+        .seo-block { margin-bottom: 50px; }
+        .seo-block h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 20px; font-weight: 500; }
+        .seo-block p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; font-weight: 300; margin: 0; }
 
+        /* Premium Aesthetic Notification */
         #toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: var(--accent); color: #000; padding: 12px 24px;
-            border-radius: 50px; font-size: 0.8rem; font-weight: 600;
-            transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-            z-index: 1000;
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: #fff; color: #000; padding: 14px 28px;
+            border-radius: 10px; font-size: 0.75rem; font-weight: 500;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 9999; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
         #toast.visible { transform: translateX(-50%) translateY(0); }
 
-        .empty { grid-column: 1 / -1; text-align: center; padding: 80px 0; color: #222; font-size: 0.8rem; }
+        .empty { grid-column: 1 / -1; text-align: center; padding: 60px 0; color: #222; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
     </style>
 </head>
 <body>
+
+<div id="toast">Extraction Complete</div>
 
 <header>
     <h1>page forge</h1>
@@ -101,7 +101,7 @@
 <div class="workspace">
     <div class="control-panel">
         <label for="uploader" class="btn btn-primary">
-            Upload Assets
+            Initialize Assets
             <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
         </label>
         
@@ -112,32 +112,29 @@
 
     <main class="gallery">
         <div id="sortable-grid">
-            <div class="empty">Foundry inactive. Waiting for assets...</div>
+            <div class="empty">Waiting for visual data...</div>
         </div>
     </main>
 
     <section class="seo-content">
         <div class="seo-block">
-            <h3>Enterprise Document Architecture</h3>
-            <p>Page Forge by Aethercore Interactive provides a premium, on-device document foundry. Optimized for architectural portfolios and corporate presentations, we prioritize lossless visual data synthesis.</p>
+            <h3>Architectural Document Integrity</h3>
+            <p>Page Forge by Aethercore Interactive delivers a specialized foundry for visual data synthesis. Designed for architects and premium content creators, our engine ensures structural document precision with zero cloud dependency.</p>
         </div>
         <div class="seo-block">
-            <h3>Secure Local Processing</h3>
-            <p>Our architecture executes all image-to-PDF synthesis locally. Your visual assets never leave your local terminal, ensuring absolute privacy and enterprise-grade security compliance.</p>
+            <h3>End-to-End Privacy</h3>
+            <p>Processing occurs exclusively on your local terminal. By bypassing external servers, Page Forge guarantees enterprise-grade security and immediate asset conversion within the secure bounds of your browser.</p>
         </div>
     </section>
 </div>
-
-<div id="toast">Document Downloaded Successfully</div>
 
 <script>
     const grid = document.getElementById('sortable-grid');
     const saveBtn = document.getElementById('saveBtn');
 
-    // Drag and drop setup with delay to allow natural scrolling
     new Sortable(grid, {
-        animation: 300,
-        delay: 200, 
+        animation: 500,
+        delay: 150, 
         delayOnTouchOnly: true,
         onEnd: refreshIndices
     });
@@ -176,40 +173,52 @@
         if (items.length > 0) saveBtn.innerText = `Save PDF (${items.length})`;
     }
 
-    async function forgeDocument() {
+    // This is the fixed, multi-download function
+    function forgeDocument() {
         const images = grid.querySelectorAll('.item img');
         if (images.length === 0) return;
 
         const originalText = saveBtn.innerText;
         saveBtn.innerText = "Forging...";
-
-        // Use a small timeout to let the UI update before the heavy process
+        
+        // Timeout ensures the browser is ready for the download event
         setTimeout(() => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'pt', 'a4');
-            const pw = doc.internal.pageSize.getWidth();
-            const ph = doc.internal.pageSize.getHeight();
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'p',
+                    unit: 'pt',
+                    format: 'a4',
+                    compress: false // Raw quality
+                });
 
-            for (let i = 0; i < images.length; i++) {
-                if (i > 0) doc.addPage();
-                doc.addImage(images[i].src, 'JPEG', 0, 0, pw, ph, undefined, 'NONE');
+                const pw = doc.internal.pageSize.getWidth();
+                const ph = doc.internal.pageSize.getHeight();
+
+                images.forEach((img, i) => {
+                    if (i > 0) doc.addPage();
+                    doc.addImage(img.src, 'JPEG', 0, 0, pw, ph, undefined, 'NONE');
+                });
+
+                // Unique filename ensures browser doesn't block the second download
+                const filename = `Forge_${Math.floor(Date.now() / 1000)}.pdf`;
+                doc.save(filename);
+
+                showToast();
+            } catch (err) {
+                console.error("Foundry Error:", err);
+            } finally {
+                saveBtn.innerText = originalText;
+                // Explicitly refocus the window to keep it active
+                window.focus();
             }
-
-            // Using a unique timestamp to prevent browser caching or blocking consecutive downloads
-            doc.save(`PageForge_${Date.now()}.pdf`);
-
-            // Trigger success message ONLY after saving
-            showToast();
-            
-            // Re-enable button immediately for repeat use
-            saveBtn.innerText = originalText;
-        }, 100);
+        }, 150);
     }
 
     function showToast() {
         const toast = document.getElementById('toast');
         toast.classList.add('visible');
-        setTimeout(() => toast.classList.remove('visible'), 2500);
+        setTimeout(() => toast.classList.remove('visible'), 3000);
     }
 </script>
 
