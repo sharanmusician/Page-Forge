@@ -31,15 +31,15 @@
         * { 
             box-sizing: border-box; 
             -webkit-font-smoothing: antialiased; 
-            user-select: none;
             -webkit-user-select: none;
+            user-select: none;
             -webkit-touch-callout: none;
         }
 
-        /* Allow selection ONLY in the input field */
+        /* Allow selection and interaction in the input field */
         input {
-            user-select: text !important;
             -webkit-user-select: text !important;
+            user-select: text !important;
         }
         
         html, body { 
@@ -156,7 +156,7 @@
     <section class="control-panel">
         <div class="input-group">
             <label for="filename-input">Document Filename</label>
-            <input type="text" id="filename-input" placeholder="e.g. Project_Documentation_2026">
+            <input type="text" id="filename-input" placeholder="e.g. Project_Documentation_2026" oncontextmenu="return true;">
         </div>
         <label for="uploader" class="btn btn-primary">
             Upload Images
