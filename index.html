@@ -39,17 +39,18 @@
             overflow-y: auto;
             overflow-x: hidden;
             font-family: 'Inter', sans-serif;
-            /* Disable selection and context menu globally */
+            /* Disable selection and native context menu globally */
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
         }
 
-        /* Allow selection and context menu specifically for the input */
+        /* Explicitly allow standard interaction for the input */
         #filename-input {
-            -webkit-user-select: text;
-            user-select: text;
-            -webkit-touch-callout: default;
+            -webkit-user-select: text !important;
+            user-select: text !important;
+            -webkit-touch-callout: default !important;
+            pointer-events: auto !important;
         }
 
         .app-wrapper { 
@@ -133,7 +134,7 @@
         .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
     </style>
 </head>
-<body oncontextmenu="return event.target.id !== 'filename-input'">
+<body oncontextmenu="if(event.target.id !== 'filename-input') return false;">
 
 <div id="focus-overlay" onclick="cancelDelete()">
     <div class="cancel-hint">Tap anywhere to cancel</div>
