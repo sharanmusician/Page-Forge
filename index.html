@@ -28,6 +28,7 @@
             --danger: #ff3b30;
         }
 
+        /* Protect the entire site from selection */
         * { 
             box-sizing: border-box; 
             -webkit-font-smoothing: antialiased; 
@@ -36,10 +37,11 @@
             -webkit-touch-callout: none;
         }
 
-        /* Allow selection and interaction in the input field */
+        /* Specifically allow text selection and touch-callout (copy/paste) for input */
         input {
             -webkit-user-select: text !important;
             user-select: text !important;
+            -webkit-touch-callout: default !important;
         }
         
         html, body { 
