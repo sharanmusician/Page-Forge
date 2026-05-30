@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Page Forge | Professional Image to PDF Converter | Aethercore Interactive</title>
-    <meta name="description" content="The ultimate premium web tool for converting images to high-quality PDF documents. Local processing, zero data tracking, and architectural precision by Aethercore Interactive.">
-    <meta name="keywords" content="Image to PDF, Professional PDF Foundry, Aethercore Interactive, High-res PDF converter, Private PDF tool, Page Forge">
-    <meta name="author" content="Aethercore Interactive">
-    
-    <meta property="og:title" content="Page Forge | Architectural Document Foundry">
-    <meta property="og:description" content="Transform visual assets into professional PDF documents with enterprise-grade precision.">
-    <meta property="og:type" content="website">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -28,7 +21,7 @@
             --danger: #ff3b30;
         }
 
-        /* Protect everything except form inputs from selection */
+        /* 1. Global protection: No selection, no default browser callouts */
         * { 
             box-sizing: border-box; 
             -webkit-font-smoothing: antialiased; 
@@ -37,12 +30,13 @@
             -webkit-touch-callout: none;
         }
 
-        /* Explicitly enable native selection and callout menu for inputs */
+        /* 2. Exception for the Input field to allow Copy/Paste/Select */
         input {
             -webkit-user-select: text !important;
             user-select: text !important;
             -webkit-touch-callout: default !important;
             pointer-events: auto !important;
+            font-size: 16px !important; /* Mobile optimization: avoid zoom */
         }
         
         html, body { 
@@ -51,38 +45,23 @@
             margin: 0; 
             padding: 0; 
             min-height: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .app-wrapper { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 40px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 30px; 
-        }
-
+        .app-wrapper { max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 30px; }
         header { text-align: center; padding: 40px 0 20px 0; }
         header h1 { font-weight: 100; font-size: 2.5rem; letter-spacing: -0.06em; margin: 0; }
         .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.6rem; margin-top: 8px; letter-spacing: 0.5em; text-transform: uppercase; }
 
-        .control-panel { 
-            background: var(--surface); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            padding: 25px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-        }
-
+        .control-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 25px; display: flex; flex-direction: column; gap: 12px; }
         .input-group { display: flex; flex-direction: column; gap: 8px; }
         .input-group label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.1em; }
-        #filename-input { width: 100%; height: 54px; background: #000; border: 1px solid var(--border); border-radius: 12px; color: #fff; padding: 0 15px; font-family: 'Inter', sans-serif; outline: none; }
+        
+        #filename-input { 
+            width: 100%; height: 54px; background: #000; border: 1px solid var(--border); 
+            border-radius: 12px; color: #fff; padding: 0 15px; font-family: 'Inter', sans-serif; outline: none; 
+        }
         #filename-input:focus { border-color: var(--accent); }
 
         .btn { width: 100%; height: 54px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: 0.3s; border: none; display: flex; align-items: center; justify-content: center; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -91,61 +70,22 @@
         .btn-action:disabled { opacity: 0.1; cursor: not-allowed; }
         .btn-action.complete { background: var(--success); color: #000; border: none; }
 
-        .gallery { 
-            background: var(--surface); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            padding: 15px; 
-            min-height: 300px;
-            position: relative;
-        }
-        
+        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 15px; min-height: 300px; position: relative; }
         #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 300px; }
-
         .item { aspect-ratio: 1; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; cursor: pointer; }
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .sort-number { position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); color: #fff; font-size: 0.5rem; padding: 3px 6px; border-radius: 4px; z-index: 2; pointer-events: none; }
 
-        .seo-content { padding-top: 40px; border-top: 1px solid var(--border); }
-        .seo-block { margin-bottom: 50px; }
-        .seo-block h2 { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.3em; font-weight: 500; margin-bottom: 20px; }
-        .seo-block p { color: var(--text-muted); line-height: 1.8; font-weight: 300; font-size: 0.95rem; margin: 0; }
-
         #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
         #focus-overlay.active { display: flex; }
-        .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
-        #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-width: 90vw; max-height: 80vh; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        #focus-card { max-width: 100%; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); }
-        #focus-card img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; }
         .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
-
-        .empty-placeholder { 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            text-align: center; 
-            color: #333; 
-            font-size: 0.7rem; 
-            text-transform: uppercase; 
-            letter-spacing: 0.1em; 
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .sortable-ghost { opacity: 0; }
-        .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
 <div id="focus-overlay" onclick="cancelDelete()">
-    <div class="cancel-hint">Tap anywhere to cancel</div>
     <div id="focus-container" onclick="event.stopPropagation()">
-        <div id="focus-card">
-            <img id="focus-img" src="">
-        </div>
+        <div id="focus-card"><img id="focus-img" src=""></div>
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
     </div>
 </div>
@@ -159,76 +99,40 @@
     <section class="control-panel">
         <div class="input-group">
             <label for="filename-input">Document Filename</label>
-            <input type="text" id="filename-input" placeholder="e.g. Project_Documentation_2026">
+            <input type="text" id="filename-input" placeholder="e.g. Project_Documentation_2026" oncontextmenu="return true;">
         </div>
         <label for="uploader" class="btn btn-primary">
             Upload Images
             <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
         </label>
-        
-        <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>
-            Generate PDF
-        </button>
+        <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>Generate PDF</button>
     </section>
 
     <main class="gallery">
-        <div class="empty-placeholder" id="placeholder-text">Foundry Offline</div>
         <div id="sortable-grid"></div>
     </main>
-
-    <article class="seo-content">
-        <div class="seo-block">
-            <h2>The Premium PDF Foundry</h2>
-            <p>Page Forge by Aethercore Interactive represents the pinnacle of web-based document synthesis. Built for architects, designers, and corporate professionals, our tool converts images into structured PDF portfolios with zero quality loss.</p>
-        </div>
-
-        <div class="seo-block">
-            <h2>Local-First Privacy Architecture</h2>
-            <p>Unlike standard online converters, Page Forge operates entirely within your browser's local environment. Your data never touches a server, ensuring that your intellectual property and private visual assets remain strictly confidential and secure.</p>
-        </div>
-
-        <div class="seo-block">
-            <h2>Optimized Digital Workflow</h2>
-            <p>Streamline your document creation with our architectural drag-and-drop interface. Reorder assets instantaneously, preview with focus mode, and generate production-ready PDFs in seconds. Experience the standard of Aethercore Interactive excellence.</p>
-        </div>
-    </article>
 </div>
 
 <script>
     const grid = document.getElementById('sortable-grid');
     const mainBtn = document.getElementById('mainBtn');
     const filenameInput = document.getElementById('filename-input');
-    const placeholder = document.getElementById('placeholder-text');
     const overlay = document.getElementById('focus-overlay');
     const focusImg = document.getElementById('focus-img');
     let isComplete = false;
     let targetCard = null;
 
-    new Sortable(grid, {
-        animation: 250,
-        ghostClass: 'sortable-ghost',
-        delay: 200, 
-        delayOnTouchOnly: true,
-        touchStartThreshold: 5, 
-        onEnd: syncIndices
-    });
+    new Sortable(grid, { animation: 250, ghostClass: 'sortable-ghost', delay: 200, delayOnTouchOnly: true, onEnd: syncIndices });
 
     async function addPhotos(files) {
-        if (grid.querySelectorAll('.item').length + files.length > 20) return;
-        placeholder.style.display = 'none';
-
         for (let file of files) {
             const data = await toBase64(file);
             const card = document.createElement('div');
             card.className = 'item';
             card.onclick = function() { openFocus(this); };
-            card.innerHTML = `
-                <div class="sort-number"></div>
-                <img src="${data}">
-            `;
+            card.innerHTML = `<div class="sort-number"></div><img src="${data}">`;
             grid.appendChild(card);
         }
-        resetState();
         syncIndices();
     }
 
@@ -246,82 +150,29 @@
         overlay.classList.add('active');
     }
 
-    function cancelDelete() {
-        overlay.classList.remove('active');
-        targetCard = null;
-    }
+    function cancelDelete() { overlay.classList.remove('active'); targetCard = null; }
 
     function executeDelete() {
-        if (targetCard) {
-            targetCard.remove();
-            cancelDelete();
-            if (grid.querySelectorAll('.item').length === 0) {
-                placeholder.style.display = 'block';
-            }
-            resetState();
-            syncIndices();
-        }
+        if (targetCard) { targetCard.remove(); cancelDelete(); syncIndices(); }
     }
 
     function syncIndices() {
         const items = grid.querySelectorAll('.item');
-        items.forEach((item, i) => {
-            item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0');
-        });
-        if (!isComplete) {
-            mainBtn.disabled = items.length === 0;
-            if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
-        }
-    }
-
-    function resetState() {
-        isComplete = false;
-        mainBtn.classList.remove('complete');
-        syncIndices();
+        items.forEach((item, i) => item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0'));
+        mainBtn.disabled = items.length === 0;
+        if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
     }
 
     function handleAction() {
-        if (isComplete) resetState();
-        forgeDocument();
-    }
-
-    function forgeDocument() {
         const images = grid.querySelectorAll('.item img');
         const fileName = filenameInput.value.trim() || "Exported_Document";
-        mainBtn.innerText = "Forging...";
-        mainBtn.disabled = true;
-        
-        setTimeout(() => {
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'a4');
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-
-                images.forEach((img, i) => {
-                    if (i > 0) doc.addPage();
-                    const imgObj = new Image();
-                    imgObj.src = img.src;
-                    const imgWidth = imgObj.width;
-                    const imgHeight = imgObj.height;
-                    const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-                    const finalWidth = imgWidth * ratio;
-                    const finalHeight = imgHeight * ratio;
-                    const x = (pageWidth - finalWidth) / 2;
-                    const y = (pageHeight - finalHeight) / 2;
-                    doc.addImage(img.src, 'JPEG', x, y, finalWidth, finalHeight, undefined, 'NONE');
-                });
-                
-                doc.save(`${fileName}.pdf`);
-                isComplete = true;
-                mainBtn.disabled = false;
-                mainBtn.innerText = "Document Downloaded";
-                mainBtn.classList.add('complete');
-            } catch (err) {
-                mainBtn.innerText = "Error";
-                mainBtn.disabled = false;
-            }
-        }, 200);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'pt', 'a4');
+        images.forEach((img, i) => {
+            if (i > 0) doc.addPage();
+            doc.addImage(img.src, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight(), undefined, 'NONE');
+        });
+        doc.save(`${fileName}.pdf`);
     }
 </script>
 
