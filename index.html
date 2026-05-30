@@ -45,10 +45,11 @@
             -webkit-touch-callout: none;
         }
 
-        /* Allow selection and interaction only for filename-input */
+        /* Allow selection and context menu specifically for the input */
         #filename-input {
             -webkit-user-select: text;
             user-select: text;
+            -webkit-touch-callout: default;
         }
 
         .app-wrapper { 
@@ -132,7 +133,7 @@
         .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body oncontextmenu="return event.target.id !== 'filename-input'">
 
 <div id="focus-overlay" onclick="cancelDelete()">
     <div class="cancel-hint">Tap anywhere to cancel</div>
