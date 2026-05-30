@@ -142,8 +142,8 @@
 
     <section class="control-panel">
         <div class="input-group">
-            <label for="filename-input">Document Name</label>
-            <input type="text" id="filename-input" placeholder="Enter document name..." value="PageForge_Document">
+            <label for="filename-input">Document Filename</label>
+            <input type="text" id="filename-input" placeholder="e.g. Project_Documentation_2026">
         </div>
         <label for="uploader" class="btn btn-primary">
             Upload Images
@@ -271,7 +271,7 @@
 
     function forgeDocument() {
         const images = grid.querySelectorAll('.item img');
-        const fileName = filenameInput.value.trim() || "PageForge_Document";
+        const fileName = filenameInput.value.trim() || "Exported_Document";
         mainBtn.innerText = "Forging...";
         mainBtn.disabled = true;
         
