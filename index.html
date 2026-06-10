@@ -4,203 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>Page Forge | Professional Image to PDF Converter | Aethercore Interactive</title>
-    <meta name="description" content="The ultimate premium web tool for converting images to high-quality PDF documents. Local processing, zero data tracking, and architectural precision by Aethercore Interactive.">
-    <meta name="keywords" content="Image to PDF, Professional PDF Foundry, Aethercore Interactive, High-res PDF converter, Private PDF tool, Page Forge">
-    <meta name="author" content="Aethercore Interactive">
-    
-    <meta property="og:title" content="Page Forge | Architectural Document Foundry">
-    <meta property="og:description" content="Transform visual assets into professional PDF documents with enterprise-grade precision.">
-    <meta property="og:type" content="website">
-    
+    <title>Page Forge | Professional Image to PDF Converter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --bg: #000000;
-            --surface: #0a0a0a;
-            --accent: #ffffff;
-            --border: rgba(255, 255, 255, 0.08);
-            --text-muted: #666666;
-            --success: #f0f0f0;
-            --danger: #ff3b30;
-        }
-
+        :root { --bg: #000000; --surface: #0a0a0a; --accent: #ffffff; --border: rgba(255, 255, 255, 0.08); --text-muted: #666666; --danger: #ff3b30; }
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        html, body { background: var(--bg); color: #fff; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-user-select: none; user-select: none; }
         
-        html, body { 
-            background: var(--bg); 
-            color: #fff; 
-            margin: 0; 
-            padding: 0; 
-            min-height: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            font-family: 'Inter', sans-serif;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-        }
-
-        #filename-input {
-            -webkit-user-select: text !important;
-            user-select: text !important;
-            -webkit-touch-callout: default !important;
-            pointer-events: auto !important;
-        }
-
         .app-wrapper { max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 30px; }
-        header { text-align: center; padding: 40px 0 20px 0; }
-        header h1 { font-weight: 100; font-size: 2.5rem; letter-spacing: -0.06em; margin: 0; }
-        .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.6rem; margin-top: 8px; letter-spacing: 0.5em; text-transform: uppercase; }
-
         .control-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 25px; display: flex; flex-direction: column; gap: 12px; }
-        .input-group { display: flex; flex-direction: column; gap: 8px; }
-        .input-group label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.1em; }
-        #filename-input { width: 100%; height: 54px; background: #000; border: 1px solid var(--border); border-radius: 12px; color: #fff; padding: 0 15px; font-family: 'Inter', sans-serif; outline: none; }
-        #filename-input:focus { border-color: var(--accent); }
-
-        .btn { width: 100%; height: 54px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: 0.3s; border: none; display: flex; align-items: center; justify-content: center; letter-spacing: 0.1em; text-transform: uppercase; }
+        #filename-input { width: 100%; height: 54px; background: #000; border: 1px solid var(--border); border-radius: 12px; color: #fff; padding: 0 15px; outline: none; }
+        .btn { width: 100%; height: 54px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; text-transform: uppercase; }
         .btn-primary { background: var(--accent); color: #000; }
         .btn-action { background: transparent; border: 1px solid var(--border); color: #fff; }
-        .btn-action:disabled { opacity: 0.1; cursor: not-allowed; }
-        .btn-action.complete { background: var(--success); color: #000; border: none; }
-
+        
         .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 15px; min-height: 300px; position: relative; }
-        #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 300px; }
+        #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .item { aspect-ratio: 1; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; cursor: pointer; }
-        .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-        .sort-number { position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); color: #fff; font-size: 0.5rem; padding: 3px 6px; border-radius: 4px; z-index: 2; pointer-events: none; }
+        .item img { width: 100%; height: 100%; object-fit: cover; }
+        .sort-number { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.6); padding: 3px 6px; border-radius: 4px; font-size: 0.5rem; }
 
-        .seo-content { padding-top: 40px; border-top: 1px solid var(--border); }
-        .seo-block { margin-bottom: 50px; }
-        .seo-block h2 { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.3em; font-weight: 500; margin-bottom: 20px; }
-        .seo-block p { color: var(--text-muted); line-height: 1.8; font-weight: 300; font-size: 0.95rem; margin: 0; }
-
-        #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 20px; touch-action: none; }
+        #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; touch-action: none; }
         #focus-overlay.active { display: flex; }
-        .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
-        
-        #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; position: relative; }
-        #focus-card { width: 70vw; max-width: 380px; aspect-ratio: 1 / 1.4142; background: #050505; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); position: relative; }
-        
-        .gallery-track { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
-        .focus-img-pane { position: absolute; width: 100%; height: 100%; padding: 10px; display: flex; align-items: center; justify-content: center; pointer-events: none; will-change: transform; }
-        .focus-img-pane img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
-        #pane-current { left: 0; z-index: 2; }
-        #pane-adjacent { left: 0; z-index: 1; display: none; }
-
-        .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
-        .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; z-index: 1; }
-        .sortable-ghost { opacity: 0; }
-        .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
+        #focus-container { width: 70vw; max-width: 380px; aspect-ratio: 1 / 1.4142; position: relative; display: flex; align-items: center; overflow: hidden; }
+        .gallery-track { width: 100%; height: 100%; position: relative; }
+        .focus-img-pane { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        .focus-img-pane img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .delete-btn-focused { margin-top: 20px; width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; border: none; cursor: pointer; }
     </style>
 </head>
-<body oncontextmenu="if(event.target.id !== 'filename-input') return false;">
+<body>
 
 <div id="focus-overlay" onclick="cancelDelete()">
-    <div class="cancel-hint">Tap anywhere to cancel</div>
     <div id="focus-container" onclick="event.stopPropagation()">
-        <div id="focus-card">
-            <div class="gallery-track">
-                <div id="pane-current" class="focus-img-pane"><img id="focus-img-curr" src=""></div>
-                <div id="pane-adjacent" class="focus-img-pane"><img id="focus-img-adj" src=""></div>
-            </div>
+        <div class="gallery-track">
+            <div id="pane-current" class="focus-img-pane"><img id="focus-img-curr" src=""></div>
+            <div id="pane-adjacent" class="focus-img-pane"><img id="focus-img-adj" src=""></div>
         </div>
-        <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
     </div>
+    <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
 </div>
 
 <div class="app-wrapper">
-    <header><h1>Page Forge</h1><div class="branding-sub">Aethercore Interactive</div></header>
+    <h1>Page Forge</h1>
     <section class="control-panel">
-        <div class="input-group">
-            <label for="filename-input">Document Filename</label>
-            <input type="text" id="filename-input" placeholder="e.g. Project_Documentation_2026">
-        </div>
+        <input type="text" id="filename-input" placeholder="Document Name">
         <label for="uploader" class="btn btn-primary">Upload Images<input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)"></label>
-        <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>Generate PDF</button>
+        <button class="btn btn-action" id="mainBtn" onclick="forgeDocument()">Generate PDF</button>
     </section>
-    <main class="gallery"><div class="empty-placeholder" id="placeholder-text">Foundry Offline</div><div id="sortable-grid"></div></main>
-    <article class="seo-content">
-        <div class="seo-block"><h2>The Premium PDF Foundry</h2><p>Page Forge by Aethercore Interactive represents the pinnacle of web-based document synthesis. Built for architects, designers, and corporate professionals, our tool converts images into structured PDF portfolios with zero quality loss.</p></div>
-        <div class="seo-block"><h2>Local-First Privacy Architecture</h2><p>Unlike standard online converters, Page Forge operates entirely within your browser's local environment. Your data never touches a server, ensuring that your intellectual property and private visual assets remain strictly confidential and secure.</p></div>
-        <div class="seo-block"><h2>Optimized Digital Workflow</h2><p>Streamline your document creation with our architectural drag-and-drop interface. Reorder assets instantaneously, preview with focus mode, and generate production-ready PDFs in seconds. Experience the standard of Aethercore Interactive excellence.</p></div>
-    </article>
+    <main class="gallery"><div id="sortable-grid"></div></main>
 </div>
 
 <script>
-    const grid = document.getElementById('sortable-grid'), mainBtn = document.getElementById('mainBtn'), filenameInput = document.getElementById('filename-input'), placeholder = document.getElementById('placeholder-text'), overlay = document.getElementById('focus-overlay'), paneCurrent = document.getElementById('pane-current'), paneAdjacent = document.getElementById('pane-adjacent'), imgCurrent = document.getElementById('focus-img-curr'), imgAdjacent = document.getElementById('focus-img-adj');
-    let isComplete = false, targetCard = null, touchStartX = 0, currentXOffset = 0, isSwiping = false, activeDirection = null;
+    const grid = document.getElementById('sortable-grid'), overlay = document.getElementById('focus-overlay');
+    const paneCurr = document.getElementById('pane-current'), paneAdj = document.getElementById('pane-adjacent');
+    const imgCurr = document.getElementById('focus-img-curr'), imgAdj = document.getElementById('focus-img-adj');
+    let targetCard = null, touchStartX = 0, currentX = 0, isSwiping = false, activeDir = null;
 
-    new Sortable(grid, { animation: 250, ghostClass: 'sortable-ghost', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: syncIndices });
+    new Sortable(grid, { animation: 250, onEnd: syncIndices });
 
     overlay.addEventListener('touchstart', (e) => {
-        if (!targetCard) return;
         touchStartX = e.touches[0].clientX;
-        isSwiping = true; currentXOffset = 0; activeDirection = null;
-        paneCurrent.style.transition = 'none'; paneAdjacent.style.transition = 'none'; paneAdjacent.style.display = 'none';
-    }, { passive: true });
+        isSwiping = true;
+        paneAdj.style.display = 'none';
+    });
 
     overlay.addEventListener('touchmove', (e) => {
         if (!isSwiping) return;
-        currentXOffset = e.touches[0].clientX - touchStartX;
-        const items = Array.from(grid.querySelectorAll('.item')), currentIndex = items.indexOf(targetCard);
-        let targetDirection = currentXOffset < 0 ? 'next' : (currentXOffset > 0 ? 'prev' : null);
-        if (targetDirection !== activeDirection) {
-            activeDirection = targetDirection;
-            let adjIndex = activeDirection === 'next' ? currentIndex + 1 : currentIndex - 1;
-            if (items[adjIndex]) { imgAdjacent.src = items[adjIndex].querySelector('img').src; paneAdjacent.style.display = 'flex'; }
-            else { paneAdjacent.style.display = 'none'; activeDirection = null; }
-        }
-        paneCurrent.style.transform = `translateX(${currentXOffset}px)`;
-        if (activeDirection === 'next') paneAdjacent.style.transform = `translateX(${380 + currentXOffset}px)`;
-        else if (activeDirection === 'prev') paneAdjacent.style.transform = `translateX(${-380 + currentXOffset}px)`;
-    }, { passive: true });
+        currentX = e.touches[0].clientX - touchStartX;
+        const items = Array.from(grid.querySelectorAll('.item')), idx = items.indexOf(targetCard);
+        activeDir = currentX < 0 ? 'next' : 'prev';
+        let adjIdx = activeDir === 'next' ? idx + 1 : idx - 1;
 
-    overlay.addEventListener('touchend', (e) => {
-        if (!isSwiping) return;
-        isSwiping = false;
-        paneCurrent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
-        paneAdjacent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
-        if (activeDirection && Math.abs(currentXOffset) > 150) {
-            const items = Array.from(grid.querySelectorAll('.item'));
-            targetCard = items[items.indexOf(targetCard) + (activeDirection === 'next' ? 1 : -1)];
-            imgCurrent.src = imgAdjacent.src;
-            paneCurrent.style.transform = `translateX(${activeDirection === 'next' ? -380 : 380}px)`;
-            paneAdjacent.style.transform = 'translateX(0px)';
-            setTimeout(() => { paneCurrent.style.transition = 'none'; paneCurrent.style.transform = 'translateX(0px)'; paneAdjacent.style.display = 'none'; activeDirection = null; }, 300);
-        } else { paneCurrent.style.transform = 'translateX(0px)'; setTimeout(() => { paneAdjacent.style.display = 'none'; activeDirection = null; }, 300); }
+        if (items[adjIdx]) {
+            imgAdj.src = items[adjIdx].querySelector('img').src;
+            paneAdj.style.display = 'flex';
+            paneAdj.style.transform = `translateX(${activeDir === 'next' ? 100 : -100}%)`;
+            paneAdj.style.transform = `translateX(${activeDir === 'next' ? (100 + (currentX/window.innerWidth)*100) : (-100 + (currentX/window.innerWidth)*100)}%)`;
+        }
+        paneCurr.style.transform = `translateX(${currentX}px)`;
     });
 
-    async function addPhotos(files) {
-        if (grid.querySelectorAll('.item').length + files.length > 20) return;
-        placeholder.style.display = 'none';
-        for (let file of files) {
-            const data = await new Promise(r => { const reader = new FileReader(); reader.onload = () => r(reader.result); reader.readAsDataURL(file); });
-            const card = document.createElement('div'); card.className = 'item'; card.onclick = function() { targetCard = this; imgCurrent.src = this.querySelector('img').src; overlay.classList.add('active'); };
-            card.innerHTML = `<div class="sort-number"></div><img src="${data}">`;
-            grid.appendChild(card);
+    overlay.addEventListener('touchend', () => {
+        isSwiping = false;
+        if (Math.abs(currentX) > 100) {
+            const items = Array.from(grid.querySelectorAll('.item'));
+            targetCard = items[items.indexOf(targetCard) + (activeDir === 'next' ? 1 : -1)];
+            if(targetCard) imgCurr.src = targetCard.querySelector('img').src;
         }
-        resetState(); syncIndices();
+        paneCurr.style.transition = 'transform 0.3s ease';
+        paneCurr.style.transform = 'translateX(0px)';
+        setTimeout(() => { paneCurr.style.transition = 'none'; paneAdj.style.display = 'none'; }, 300);
+    });
+
+    function addPhotos(files) {
+        for (let file of files) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const div = document.createElement('div'); div.className = 'item';
+                div.innerHTML = `<div class="sort-number"></div><img src="${e.target.result}">`;
+                div.onclick = () => { targetCard = div; imgCurr.src = e.target.result; overlay.classList.add('active'); };
+                grid.appendChild(div);
+                syncIndices();
+            };
+            reader.readAsDataURL(file);
+        }
     }
 
-    function cancelDelete() { overlay.classList.remove('active'); targetCard = null; }
-    function executeDelete() { if (targetCard) { targetCard.remove(); cancelDelete(); if (grid.children.length === 0) placeholder.style.display = 'block'; resetState(); syncIndices(); } }
-    function syncIndices() { grid.querySelectorAll('.item').forEach((item, i) => item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0')); mainBtn.disabled = grid.children.length === 0; if (grid.children.length > 0) mainBtn.innerText = `Generate PDF (${grid.children.length})`; }
-    function resetState() { isComplete = false; mainBtn.classList.remove('complete'); }
-    function handleAction() { if (isComplete) resetState(); forgeDocument(); }
+    function executeDelete() { targetCard.remove(); overlay.classList.remove('active'); syncIndices(); }
+    function cancelDelete() { overlay.classList.remove('active'); }
+    function syncIndices() { grid.querySelectorAll('.item').forEach((item, i) => item.querySelector('.sort-number').innerText = i + 1); }
 
     function forgeDocument() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'pt', 'a4');
         grid.querySelectorAll('.item img').forEach((img, i) => {
             if (i > 0) doc.addPage();
-            doc.addImage(img.src, 'JPEG', 0, 0, 595.28, 841.89, undefined, 'NONE');
+            doc.addImage(img.src, 'JPEG', 0, 0, 595, 842);
         });
-        doc.save(`${filenameInput.value.trim() || "Exported_Document"}.pdf`);
-        isComplete = true; mainBtn.innerText = "Document Downloaded"; mainBtn.classList.add('complete');
+        doc.save("Document.pdf");
     }
 </script>
 </body>
