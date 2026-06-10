@@ -95,72 +95,82 @@
 
         .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; z-index: 1; }
 
-        /* OPTIMIZED MOBILE POPUP FRAMEWORK */
+        /* ABSOLUTE MOBILE-SAFE OVERLAY CORE */
         #focus-overlay { 
             position: fixed; 
             inset: 0; 
+            width: 100vw;
+            height: 100dvh; /* Uses Dynamic Viewport Height to protect against mobile status bars */
             background: rgba(0, 0, 0, 0.98); 
             backdrop-filter: blur(25px); 
             display: none; 
-            flex-direction: column; 
-            justify-content: space-between;
-            align-items: center; 
+            
+            /* Rigorous 3-Row Grid System: Header, Center slider, Footer. Absolutely zero overlap possible */
+            display: none;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            align-items: center;
+            justify-items: center;
             z-index: 10000; 
-            padding-top: max(20px, env(safe-area-inset-top));
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            padding-top: max(10px, env(safe-area-inset-top));
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
             overflow: hidden; 
         }
-        #focus-overlay.active { display: flex; animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        #focus-overlay.active { display: grid; animation: fadeIn 0.15s linear; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* PERFECT ACCENT ALIGNMENT: HEADER BAR */
+        /* ROW 1: HEADER BAR CONTROLS */
         .header-controls { 
+            grid-row: 1;
             width: 100%; 
-            max-width: 500px;
-            padding: 0 24px; 
+            max-width: 600px;
+            padding: 10px 24px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            height: 60px;
-            flex-shrink: 0;
         }
         
         .focus-counter { 
             background: rgba(255, 255, 255, 0.05); 
             backdrop-filter: blur(10px); 
-            padding: 10px 18px; 
+            padding: 8px 16px; 
             border-radius: 20px; 
             font-size: 0.7rem; 
             font-weight: 600; 
             letter-spacing: 0.15em; 
             color: var(--accent); 
             border: 1px solid rgba(255, 255, 255, 0.08); 
-            pointer-events: none; 
         }
         
         .close-btn { 
-            width: 42px; 
-            height: 42px; 
+            width: 40px; 
+            height: 40px; 
             border-radius: 50%; 
             background: rgba(255, 255, 255, 0.05); 
             border: 1px solid rgba(255, 255, 255, 0.08); 
             color: #fff; 
-            font-size: 1rem; 
+            font-size: 0.9rem; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             cursor: pointer; 
             backdrop-filter: blur(10px); 
-            transition: background 0.2s;
         }
         .close-btn:active { background: rgba(255, 255, 255, 0.2); }
 
-        /* 1:1 SCROLL SENSOR TRACK */
+        /* ROW 2: CONTIGUOUS PREVIEW TRACK CONTAINER */
+        .slider-viewport-container {
+            grid-row: 2;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+        }
+
         .slider-track { 
             display: flex; 
             width: 100%; 
-            flex: 1;
-            min-height: 0; /* Prevents flex boxes from blowing out item sizing bounds */
+            height: 100%;
             overflow-x: auto; 
             scroll-snap-type: x mandatory; 
             scrollbar-width: none; 
@@ -176,47 +186,46 @@
             justify-content: center; 
             align-items: center; 
             scroll-snap-align: center; 
-            padding: 16px 24px;
+            padding: 10px 24px;
         }
         
-        /* HARD IMMUTABLE STANDARD A4 FRAMING CORE */
+        /* STRICT A4 BOUNDARY AUTO-SCALER */
         .a4-frame { 
             width: 100%;
             height: 100%;
             max-width: 100%;
             max-height: 100%;
-            aspect-ratio: 210 / 297; /* Dynamic Mathematical A4 Form Factor */
+            aspect-ratio: 210 / 297; /* Preserves absolute geometric profile */
             background: #060606; 
             border-radius: 12px; 
             border: 1px solid rgba(255, 255, 255, 0.12); 
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9); 
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); 
             overflow: hidden; 
             display: flex; 
             justify-content: center; 
             align-items: center;
         }
         
-        /* Forces any uploaded landscape or disproportionate asset to fit safely within boundaries */
         .a4-frame img { 
-            width: 100%; 
-            height: 100%; 
+            max-width: 100%; 
+            max-height: 100%; 
             object-fit: contain; 
             display: block; 
         }
 
-        /* PERFECT ACCENT ALIGNMENT: FOOTER BAR */
+        /* ROW 3: FOOTER ACTION BUTTONS */
         .footer-controls { 
+            grid-row: 3;
             width: 100%; 
             display: flex; 
             justify-content: center; 
             align-items: center;
-            padding: 12px 24px 0 24px; 
-            flex-shrink: 0;
+            padding: 15px 24px; 
         }
         .delete-btn-focused { 
             width: 100%; 
             max-width: 320px; 
-            height: 54px; 
+            height: 52px; 
             background: var(--danger); 
             color: #fff; 
             border-radius: 14px; 
@@ -229,9 +238,8 @@
             letter-spacing: 0.15em; 
             cursor: pointer; 
             border: none; 
-            box-shadow: 0 4px 20px rgba(255, 59, 48, 0.2);
         }
-        .delete-btn-focused:active { opacity: 0.82; }
+        .delete-btn-focused:active { opacity: 0.8; }
 
         .sortable-ghost { opacity: 0; }
         .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
@@ -245,8 +253,10 @@
         <button class="close-btn" onclick="closeFocus()">✕</button>
     </div>
     
-    <div id="slider-track" class="slider-track">
-        </div>
+    <div class="slider-viewport-container">
+        <div id="slider-track" class="slider-track">
+            </div>
+    </div>
     
     <div class="footer-controls">
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
@@ -303,7 +313,7 @@
                     updateCounter();
                 }
             });
-        }, { threshold: 0.55, root: track });
+        }, { threshold: 0.51, root: track }); // Highly defensive center snap registration
     }
 
     function generateId() {
@@ -369,7 +379,6 @@
             slide.dataset.id = item.dataset.id;
             
             const imgSrc = item.querySelector('img').src;
-            // Native structural A4 framing injected seamlessly here
             slide.innerHTML = `<div class="a4-frame"><img src="${imgSrc}"></div>`;
             track.appendChild(slide);
             
