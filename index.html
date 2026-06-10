@@ -15,7 +15,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=100;300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -118,8 +118,8 @@
         .focus-img-pane { position: absolute; width: 100%; height: 100%; padding: 10px; display: flex; align-items: center; justify-content: center; pointer-events: none; will-change: transform; }
         .focus-img-pane img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
         
-        #pane-current { left: 0; }
-        #pane-adjacent { left: 0; display: none; }
+        #pane-current { left: 0; z-index: 2; }
+        #pane-adjacent { left: 0; z-index: 1; display: none; }
 
         .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; box-shadow: none; }
 
@@ -211,6 +211,7 @@
     const filenameInput = document.getElementById('filename-input');
     const placeholder = document.getElementById('placeholder-text');
     const overlay = document.getElementById('focus-overlay');
+    const focusCard = document.getElementById('focus-card');
     const paneCurrent = document.getElementById('pane-current');
     const paneAdjacent = document.getElementById('pane-adjacent');
     const imgCurrent = document.getElementById('focus-img-curr');
@@ -222,7 +223,7 @@
     let touchStartX = 0;
     let currentXOffset = 0;
     let isSwiping = false;
-    let activeDirection = null; // 'next' | 'prev' | null
+    let activeDirection = null; 
 
     new Sortable(grid, {
         animation: 250,
@@ -239,6 +240,8 @@
         isSwiping = true;
         currentXOffset = 0;
         activeDirection = null;
+        paneCurrent.style.transition = 'none';
+        paneAdjacent.style.transition = 'none';
         paneAdjacent.style.display = 'none';
     }, { passive: true });
 
@@ -267,10 +270,11 @@
         }
 
         paneCurrent.style.transform = `translateX(${currentXOffset}px)`;
+        const cardWidth = focusCard.offsetWidth;
         if (activeDirection === 'next') {
-            paneAdjacent.style.transform = `translateX(${focusCard.offsetWidth + currentXOffset}px)`;
+            paneAdjacent.style.transform = `translateX(${cardWidth + currentXOffset}px)`;
         } else if (activeDirection === 'prev') {
-            paneAdjacent.style.transform = `translateX(${-focusCard.offsetWidth + currentXOffset}px)`;
+            paneAdjacent.style.transform = `translateX(${-cardWidth + currentXOffset}px)`;
         }
     }, { passive: true });
 
@@ -278,28 +282,54 @@
         if (!isSwiping) return;
         isSwiping = false;
         const cardWidth = focusCard.offsetWidth;
-        const threshold = cardWidth * 0.25;
+        const threshold = cardWidth * 0.5; // Half cross threshold
+
+        paneCurrent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+        paneAdjacent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
 
         if (activeDirection && Math.abs(currentXOffset) > threshold) {
-            const items = Array.from(grid.querySelectorAll('.item'));
-            const currentIndex = items.indexOf(targetCard);
-            let adjIndex = activeDirection === 'next' ? currentIndex + 1 : currentIndex - 1;
-            
-            targetCard = items[adjIndex];
-            imgCurrent.src = imgAdjacent.src;
-            updatePageCounter();
-        }
-        
-        resetPanes();
-    });
+            // Animate completely out
+            if (activeDirection === 'next') {
+                paneCurrent.style.transform = `translateX(${-cardWidth}px)`;
+                paneAdjacent.style.transform = 'translateX(0px)';
+            } else {
+                paneCurrent.style.transform = `translateX(${cardWidth}px)`;
+                paneAdjacent.style.transform = 'translateX(0px)';
+            }
 
-    function resetPanes() {
-        paneCurrent.style.transform = 'translateX(0px)';
-        paneAdjacent.style.display = 'none';
-        paneAdjacent.style.transform = 'translateX(0px)';
-        currentXOffset = 0;
-        activeDirection = null;
-    }
+            // Perform image target swap clean after complete frame alignment
+            setTimeout(() => {
+                const items = Array.from(grid.querySelectorAll('.item'));
+                const currentIndex = items.indexOf(targetCard);
+                let adjIndex = activeDirection === 'next' ? currentIndex + 1 : currentIndex - 1;
+                
+                targetCard = items[adjIndex];
+                imgCurrent.src = imgAdjacent.src;
+                
+                paneCurrent.style.transition = 'none';
+                paneAdjacent.style.transition = 'none';
+                paneCurrent.style.transform = 'translateX(0px)';
+                paneAdjacent.style.display = 'none';
+                
+                updatePageCounter();
+                activeDirection = null;
+                currentXOffset = 0;
+            }, 300);
+        } else {
+            // Snap back home safely
+            paneCurrent.style.transform = 'translateX(0px)';
+            if (activeDirection === 'next') {
+                paneAdjacent.style.transform = `translateX(${cardWidth}px)`;
+            } else if (activeDirection === 'prev') {
+                paneAdjacent.style.transform = `translateX(${-cardWidth}px)`;
+            }
+            setTimeout(() => {
+                paneAdjacent.style.display = 'none';
+                activeDirection = null;
+                currentXOffset = 0;
+            }, 300);
+        }
+    });
 
     function updatePageCounter() {
         if (!targetCard) return;
@@ -340,14 +370,18 @@
         targetCard = card;
         imgCurrent.src = targetCard.querySelector('img').src;
         overlay.classList.add('active');
-        resetPanes();
+        paneCurrent.style.transition = 'none';
+        paneAdjacent.style.transition = 'none';
+        paneCurrent.style.transform = 'translateX(0px)';
+        paneAdjacent.style.display = 'none';
+        currentXOffset = 0;
+        activeDirection = null;
         updatePageCounter();
     }
 
     function cancelDelete() {
         overlay.classList.remove('active');
         targetCard = null;
-        resetPanes();
     }
 
     function executeDelete() {
@@ -412,25 +446,4 @@
                     const imgWidth = imgObj.width;
                     const imgHeight = imgObj.height;
                     const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-                    const finalWidth = imgWidth * ratio;
-                    const finalHeight = imgHeight * ratio;
-                    const x = (pageWidth - finalWidth) / 2;
-                    const y = (pageHeight - finalHeight) / 2;
-                    doc.addImage(img.src, 'JPEG', x, y, finalWidth, finalHeight, undefined, 'NONE');
-                });
-                
-                doc.save(`${fileName}.pdf`);
-                isComplete = true;
-                mainBtn.disabled = false;
-                mainBtn.innerText = "Document Downloaded";
-                mainBtn.classList.add('complete');
-            } catch (err) {
-                mainBtn.innerText = "Error";
-                mainBtn.disabled = false;
-            }
-        }, 200);
-    }
-</script>
-
-</body>
-</html>
+      
