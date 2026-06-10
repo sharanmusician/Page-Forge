@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Page Forge | Professional Image to PDF Converter | Aethercore Interactive</title>
-    <meta name="description" content="The ultimate premium web tool for converting images to high-quality PDF documents. Local processing, zero data tracking, and architectural precision by Aethercore Interactive.">
-    <meta name="keywords" content="Image to PDF, Professional PDF Foundry, Aethercore Interactive, High-res PDF converter, Private PDF tool, Page Forge">
-    <meta name="author" content="Aethercore Interactive">
-    
-    <meta property="og:title" content="Page Forge | Architectural Document Foundry">
-    <meta property="og:description" content="Transform visual assets into professional PDF documents with enterprise-grade precision.">
-    <meta property="og:type" content="website">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -39,13 +32,11 @@
             overflow-y: auto;
             overflow-x: hidden;
             font-family: 'Inter', sans-serif;
-            /* Disable selection and native context menu globally */
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
         }
 
-        /* Explicitly allow standard interaction for the input */
         #filename-input {
             -webkit-user-select: text !important;
             user-select: text !important;
@@ -102,61 +93,47 @@
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .sort-number { position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); color: #fff; font-size: 0.5rem; padding: 3px 6px; border-radius: 4px; z-index: 2; pointer-events: none; }
 
-        .seo-content { padding-top: 40px; border-top: 1px solid var(--border); }
-        .seo-block { margin-bottom: 50px; }
-        .seo-block h2 { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.3em; font-weight: 500; margin-bottom: 20px; }
-        .seo-block p { color: var(--text-muted); line-height: 1.8; font-weight: 300; font-size: 0.95rem; margin: 0; }
+        .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; z-index: 1; }
 
-        #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 20px; overflow: hidden; }
-        #focus-overlay.active { display: flex; }
-        
-        .cancel-hint { position: absolute; top: 20px; color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
-        .focus-counter { position: absolute; top: 50px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 6px 14px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; color: var(--accent); z-index: 10001; border: 1px solid rgba(255,255,255,0.1); pointer-events: none; }
-        
-        #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-width: 90vw; max-height: 80vh; position: relative; width: 100%; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        /* Smooth infinite canvas viewport layout for immediate response */
-        .slider-viewport { width: 100%; display: flex; align-items: center; justify-content: center; position: relative; will-change: transform; touch-action: none; }
-        
-        .card-wrap { max-width: 100%; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); flex-shrink: 0; }
-        .card-wrap img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; width: auto; height: auto; }
-        
-        #focus-card { position: relative; z-index: 2; }
-        #prev-card { position: absolute; right: calc(100% + 40px); display: none; }
-        #next-card { position: absolute; left: calc(100% + 40px); display: none; }
+        /* Focus Mode Styles */
+        #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; z-index: 10000; overflow: hidden; }
+        #focus-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; position: relative; z-index: 3; }
-
-        .empty-placeholder { 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            text-align: center; 
-            color: #333; 
-            font-size: 0.7rem; 
-            text-transform: uppercase; 
-            letter-spacing: 0.1em; 
-            pointer-events: none;
-            z-index: 1;
-        }
+        .header-controls { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10001; }
         
+        .focus-counter { background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; color: var(--accent); border: 1px solid rgba(255,255,255,0.1); pointer-events: none; }
+        
+        .close-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); }
+
+        /* NATIVE HORIZONTAL SCROLL SNAP */
+        .slider-track { display: flex; width: 100%; height: 75vh; margin-top: 80px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-behavior: auto; align-items: center; }
+        .slider-track::-webkit-scrollbar { display: none; }
+        
+        .slide { flex: 0 0 100vw; height: 100%; display: flex; justify-content: center; align-items: center; scroll-snap-align: center; padding: 0 20px; }
+        
+        .slide-inner { max-width: 100%; max-height: 100%; background: #000; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); overflow: hidden; display: flex; }
+        .slide-inner img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+        .footer-controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; z-index: 10001; padding: 0 20px; }
+        .delete-btn-focused { width: 100%; max-width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
+
         .sortable-ghost { opacity: 0; }
         .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
     </style>
 </head>
 <body oncontextmenu="if(event.target.id !== 'filename-input') return false;">
 
-<div id="focus-overlay" onclick="cancelDelete()">
-    <div class="cancel-hint">Tap anywhere to cancel</div>
-    <div id="focus-counter" class="focus-counter"></div>
-    <div id="focus-container" onclick="event.stopPropagation()">
-        <div id="slider-viewport" class="slider-viewport">
-            <div id="prev-card" class="card-wrap side-buffer"><img src=""></div>
-            <div id="focus-card" class="card-wrap"><img id="focus-img" src=""></div>
-            <div id="next-card" class="card-wrap side-buffer"><img src=""></div>
+<div id="focus-overlay">
+    <div class="header-controls">
+        <div id="focus-counter" class="focus-counter">0 OF 0</div>
+        <button class="close-btn" onclick="closeFocus()">✕</button>
+    </div>
+    
+    <div id="slider-track" class="slider-track">
         </div>
+    
+    <div class="footer-controls">
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
     </div>
 </div>
@@ -186,23 +163,6 @@
         <div class="empty-placeholder" id="placeholder-text">Foundry Offline</div>
         <div id="sortable-grid"></div>
     </main>
-
-    <article class="seo-content">
-        <div class="seo-block">
-            <h2>The Premium PDF Foundry</h2>
-            <p>Page Forge by Aethercore Interactive represents the pinnacle of web-based document synthesis. Built for architects, designers, and corporate professionals, our tool converts images into structured PDF portfolios with zero quality loss.</p>
-        </div>
-
-        <div class="seo-block">
-            <h2>Local-First Privacy Architecture</h2>
-            <p>Unlike standard online converters, Page Forge operates entirely within your browser's local environment. Your data never touches a server, ensuring that your intellectual property and private visual assets remain strictly confidential and secure.</p>
-        </div>
-
-        <div class="seo-block">
-            <h2>Optimized Digital Workflow</h2>
-            <p>Streamline your document creation with our architectural drag-and-drop interface. Reorder assets instantaneously, preview with focus mode, and generate production-ready PDFs in seconds. Experience the standard of Aethercore Interactive excellence.</p>
-        </div>
-    </article>
 </div>
 
 <script>
@@ -210,83 +170,32 @@
     const mainBtn = document.getElementById('mainBtn');
     const filenameInput = document.getElementById('filename-input');
     const placeholder = document.getElementById('placeholder-text');
-    const overlay = document.getElementById('focus-overlay');
-    const focusImg = document.getElementById('focus-img');
-    const focusCard = document.getElementById('focus-card');
     
-    const sliderViewport = document.getElementById('slider-viewport');
-    const prevCard = document.getElementById('prev-card');
-    const nextCard = document.getElementById('next-card');
-    const prevImg = prevCard.querySelector('img');
-    const nextImg = nextCard.querySelector('img');
+    const overlay = document.getElementById('focus-overlay');
+    const track = document.getElementById('slider-track');
     const focusCounter = document.getElementById('focus-counter');
 
     let isComplete = false;
-    let targetCard = null;
-    let slideTimeout;
+    let currentActiveId = null;
+    let observer;
 
-    let startX = 0;
-    let currentX = 0;
-    let isDragging = false;
+    // Intersection Observer to detect exactly which slide is in the center
+    function initObserver() {
+        if(observer) observer.disconnect();
+        observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    currentActiveId = entry.target.dataset.id;
+                    updateCounter();
+                }
+            });
+        }, { threshold: 0.6, root: track }); // Triggers when slide is 60% visible
+    }
 
-    sliderViewport.addEventListener('touchstart', (e) => {
-        clearTimeout(slideTimeout);
-        startX = e.touches[0].clientX;
-        currentX = startX;
-        isDragging = true;
-        
-        sliderViewport.style.transition = 'none';
-
-        if (targetCard.previousElementSibling) {
-            prevImg.src = targetCard.previousElementSibling.querySelector('img').src;
-            prevCard.style.display = 'block';
-        } else {
-            prevCard.style.display = 'none';
-        }
-
-        if (targetCard.nextElementSibling) {
-            nextImg.src = targetCard.nextElementSibling.querySelector('img').src;
-            nextCard.style.display = 'block';
-        } else {
-            nextCard.style.display = 'none';
-        }
-    }, { passive: true });
-
-    sliderViewport.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        currentX = e.touches[0].clientX;
-        const diffX = currentX - startX;
-
-        sliderViewport.style.transform = `translateX(${diffX}px)`;
-
-        if (e.cancelable) e.preventDefault();
-    }, { passive: false });
-
-    sliderViewport.addEventListener('touchend', () => {
-        if (!isDragging) return;
-        isDragging = false;
-        const diffX = currentX - startX;
-        const threshold = window.innerWidth * 0.15;
-
-        const ease = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
-        sliderViewport.style.transition = ease;
-
-        if (diffX > threshold && targetCard.previousElementSibling) {
-            const offset = (focusCard.offsetWidth / 2) + 40 + (prevCard.offsetWidth / 2);
-            sliderViewport.style.transform = `translateX(${offset}px)`;
-            slideTimeout = setTimeout(() => {
-                openFocus(targetCard.previousElementSibling);
-            }, 300);
-        } else if (diffX < -threshold && targetCard.nextElementSibling) {
-            const offset = (focusCard.offsetWidth / 2) + 40 + (nextCard.offsetWidth / 2);
-            sliderViewport.style.transform = `translateX(${-offset}px)`;
-            slideTimeout = setTimeout(() => {
-                openFocus(targetCard.nextElementSibling);
-            }, 300);
-        } else {
-            sliderViewport.style.transform = 'none';
-        }
-    });
+    // Generate unique ID for linking Grid Items to Focus Slides
+    function generateId() {
+        return 'id-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    }
 
     new Sortable(grid, {
         animation: 250,
@@ -305,6 +214,7 @@
             const data = await toBase64(file);
             const card = document.createElement('div');
             card.className = 'item';
+            card.dataset.id = generateId(); // Attach ID
             card.onclick = function() { openFocus(this); };
             card.innerHTML = `
                 <div class="sort-number"></div>
@@ -323,46 +233,75 @@
             reader.readAsDataURL(file);
         });
     }
-    
+
     function updateCounter() {
-        const items = Array.from(grid.querySelectorAll('.item'));
-        if(items.length === 0) return;
-        const index = items.indexOf(targetCard) + 1;
-        focusCounter.innerText = `${index} OF ${items.length}`;
+        if(!currentActiveId) return;
+        const slides = Array.from(track.querySelectorAll('.slide'));
+        const activeSlide = track.querySelector(`.slide[data-id="${currentActiveId}"]`);
+        if(!activeSlide) return;
+        
+        const index = slides.indexOf(activeSlide) + 1;
+        focusCounter.innerText = `${index} OF ${slides.length}`;
     }
 
-    function openFocus(card) {
-        targetCard = card;
-        focusImg.src = targetCard.querySelector('img').src;
+    function openFocus(clickedCard) {
+        initObserver();
+        track.innerHTML = ''; // Clear track before opening
+        
+        const items = Array.from(grid.querySelectorAll('.item'));
+        
+        // Build the contiguous slide track
+        items.forEach((item) => {
+            const slide = document.createElement('div');
+            slide.className = 'slide';
+            slide.dataset.id = item.dataset.id;
+            
+            const imgSrc = item.querySelector('img').src;
+            slide.innerHTML = `<div class="slide-inner"><img src="${imgSrc}"></div>`;
+            track.appendChild(slide);
+            
+            observer.observe(slide);
+        });
+
         overlay.classList.add('active');
         
-        sliderViewport.style.transition = 'none';
-        sliderViewport.style.transform = 'none';
-        
-        prevCard.style.display = 'none';
-        nextCard.style.display = 'none';
-        
-        updateCounter();
+        // Instantly snap to the clicked image without animating the scroll
+        const targetIndex = items.indexOf(clickedCard);
+        requestAnimationFrame(() => {
+            track.scrollLeft = targetIndex * window.innerWidth;
+        });
     }
 
-    function cancelDelete() {
+    function closeFocus() {
         overlay.classList.remove('active');
-        targetCard = null;
+        if(observer) observer.disconnect();
+        currentActiveId = null;
     }
 
     function executeDelete() {
-        if (targetCard) {
-            const nextToSecure = targetCard.nextElementSibling || targetCard.previousElementSibling;
-            targetCard.remove();
-            if (nextToSecure) {
-                openFocus(nextToSecure);
-            } else {
-                cancelDelete();
-                placeholder.style.display = 'block';
-            }
-            resetState();
-            syncIndices();
+        if (!currentActiveId) return;
+        
+        const gridItem = grid.querySelector(`.item[data-id="${currentActiveId}"]`);
+        const slideItem = track.querySelector(`.slide[data-id="${currentActiveId}"]`);
+        
+        if (gridItem) gridItem.remove();
+        if (slideItem) {
+            observer.unobserve(slideItem);
+            slideItem.remove();
         }
+        
+        const remainingSlides = track.querySelectorAll('.slide');
+        if (remainingSlides.length === 0) {
+            closeFocus();
+            placeholder.style.display = 'block';
+        } else {
+            // The next slide automatically falls into place natively, 
+            // the observer will detect it and update the counter.
+            setTimeout(updateCounter, 100);
+        }
+        
+        resetState();
+        syncIndices();
     }
 
     function syncIndices() {
@@ -373,9 +312,6 @@
         if (!isComplete) {
             mainBtn.disabled = items.length === 0;
             if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
-        }
-        if (overlay.classList.contains('active') && targetCard) {
-            updateCounter();
         }
     }
 
