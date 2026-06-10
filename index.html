@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Page Forge | Professional Image to PDF Converter | Aethercore Interactive</title>
+    <meta name="description" content="The ultimate premium web tool for converting images to high-quality PDF documents. Local processing, zero data tracking, and architectural precision by Aethercore Interactive.">
+    <meta name="keywords" content="Image to PDF, Professional PDF Foundry, Aethercore Interactive, High-res PDF converter, Private PDF tool, Page Forge">
+    <meta name="author" content="Aethercore Interactive">
+    
+    <meta property="og:title" content="Page Forge | Architectural Document Foundry">
+    <meta property="og:description" content="Transform visual assets into professional PDF documents with enterprise-grade precision.">
+    <meta property="og:type" content="website">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -32,11 +39,13 @@
             overflow-y: auto;
             overflow-x: hidden;
             font-family: 'Inter', sans-serif;
+            /* Disable selection and native context menu globally */
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
         }
 
+        /* Explicitly allow standard interaction for the input */
         #filename-input {
             -webkit-user-select: text !important;
             user-select: text !important;
@@ -93,168 +102,47 @@
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .sort-number { position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); color: #fff; font-size: 0.5rem; padding: 3px 6px; border-radius: 4px; z-index: 2; pointer-events: none; }
 
-        .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; z-index: 1; }
+        .seo-content { padding-top: 40px; border-top: 1px solid var(--border); }
+        .seo-block { margin-bottom: 50px; }
+        .seo-block h2 { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.3em; font-weight: 500; margin-bottom: 20px; }
+        .seo-block p { color: var(--text-muted); line-height: 1.8; font-weight: 300; font-size: 0.95rem; margin: 0; }
 
-        /* PERSISTENT NON-COLLAPSIBLE OVERLAY WORKSPACE */
-        #focus-overlay { 
-            position: fixed; 
-            inset: 0; 
-            width: 100vw;
-            height: 100dvh;
-            background: rgba(0, 0, 0, 0.98); 
-            backdrop-filter: blur(25px); 
-            display: none; 
-            grid-template-rows: auto minmax(0, 1fr) auto;
-            align-items: center;
-            justify-items: center;
-            z-index: 10000; 
-            padding-top: max(10px, env(safe-area-inset-top));
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
-            overflow: hidden; 
-        }
-        #focus-overlay.active { display: grid; animation: fadeIn 0.15s linear; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 20px; touch-action: none; }
+        #focus-overlay.active { display: flex; }
+        .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
+        .page-counter { position: absolute; top: 75px; color: var(--accent); font-size: 0.85rem; font-weight: 400; letter-spacing: 0.1em; pointer-events: none; }
+        #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 90vw; max-height: 80vh; position: relative; }
+        #focus-card { width: 70vw; max-width: 380px; aspect-ratio: 1 / 1.4142; background: #050505; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; padding: 10px; position: relative; will-change: transform, opacity; }
+        #focus-card img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; pointer-events: none; }
+        .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
 
-        /* ROW 1: CONTROLS */
-        .header-controls { 
-            grid-row: 1;
-            width: 100%; 
-            max-width: 600px;
-            padding: 10px 24px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        
-        .focus-counter { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(10px); 
-            padding: 8px 16px; 
-            border-radius: 20px; 
+        .empty-placeholder { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            color: #333; 
             font-size: 0.7rem; 
-            font-weight: 600; 
-            letter-spacing: 0.15em; 
-            color: var(--accent); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-        }
-        
-        .close-btn { 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            color: #fff; 
-            font-size: 0.9rem; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            cursor: pointer; 
-            backdrop-filter: blur(10px); 
-        }
-        .close-btn:active { background: rgba(255, 255, 255, 0.2); }
-
-        /* ROW 2: TRACK VIEWPORT */
-        .slider-viewport-container {
-            grid-row: 2;
-            width: 100%;
-            height: 100%;
-            min-height: 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .slider-track { 
-            display: flex; 
-            width: 100%; 
-            height: 100%;
-            overflow-x: auto; 
-            scroll-snap-type: x mandatory; 
-            scrollbar-width: none; 
-            -webkit-overflow-scrolling: touch; 
-            align-items: center; 
-        }
-        .slider-track::-webkit-scrollbar { display: none; }
-        
-        .slide { 
-            flex: 0 0 100vw; 
-            height: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            scroll-snap-align: center; 
-            padding: 12px 24px;
-        }
-        
-        /* RESPONSIVE MOBILE-OPTIMIZED A4 FRAME ENGINE */
-        .a4-frame { 
-            /* Mathematical formula makes sure height never overflows the viewport on tall landscape or narrow mobile phones */
-            width: min(100%, calc((100dvh - 180px) * (210 / 297)));
-            height: min(calc(100vw * (297 / 210)), calc(100dvh - 180px));
-            aspect-ratio: 210 / 297; 
-            background: #060606; 
-            border-radius: 12px; 
-            border: 1px solid rgba(255, 255, 255, 0.12); 
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); 
-            overflow: hidden; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-        }
-        
-        .a4-frame img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-            display: block; 
-        }
-
-        /* ROW 3: FOOTER ACTIONS */
-        .footer-controls { 
-            grid-row: 3;
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            padding: 15px 24px; 
-        }
-        .delete-btn-focused { 
-            width: 100%; 
-            max-width: 320px; 
-            height: 52px; 
-            background: var(--danger); 
-            color: #fff; 
-            border-radius: 14px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 0.75rem; 
-            font-weight: 600; 
             text-transform: uppercase; 
-            letter-spacing: 0.15em; 
-            cursor: pointer; 
-            border: none; 
+            letter-spacing: 0.1em; 
+            pointer-events: none;
+            z-index: 1;
         }
-        .delete-btn-focused:active { opacity: 0.8; }
-
+        
         .sortable-ghost { opacity: 0; }
         .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
     </style>
 </head>
 <body oncontextmenu="if(event.target.id !== 'filename-input') return false;">
 
-<div id="focus-overlay">
-    <div class="header-controls">
-        <div id="focus-counter" class="focus-counter">00 OF 00</div>
-        <button class="close-btn" onclick="closeFocus()">✕</button>
-    </div>
-    
-    <div class="slider-viewport-container">
-        <div id="slider-track" class="slider-track">
-            </div>
-    </div>
-    
-    <div class="footer-controls">
+<div id="focus-overlay" onclick="cancelDelete()">
+    <div class="cancel-hint">Tap anywhere to cancel</div>
+    <div class="page-counter" id="focus-page-counter">00 / 00</div>
+    <div id="focus-container" onclick="event.stopPropagation()">
+        <div id="focus-card">
+            <img id="focus-img" src="">
+        </div>
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
     </div>
 </div>
@@ -284,6 +172,23 @@
         <div class="empty-placeholder" id="placeholder-text">Foundry Offline</div>
         <div id="sortable-grid"></div>
     </main>
+
+    <article class="seo-content">
+        <div class="seo-block">
+            <h2>The Premium PDF Foundry</h2>
+            <p>Page Forge by Aethercore Interactive represents the pinnacle of web-based document synthesis. Built for architects, designers, and corporate professionals, our tool converts images into structured PDF portfolios with zero quality loss.</p>
+        </div>
+
+        <div class="seo-block">
+            <h2>Local-First Privacy Architecture</h2>
+            <p>Unlike standard online converters, Page Forge operates entirely within your browser's local environment. Your data never touches a server, ensuring that your intellectual property and private visual assets remain strictly confidential and secure.</p>
+        </div>
+
+        <div class="seo-block">
+            <h2>Optimized Digital Workflow</h2>
+            <p>Streamline your document creation with our architectural drag-and-drop interface. Reorder assets instantaneously, preview with focus mode, and generate production-ready PDFs in seconds. Experience the standard of Aethercore Interactive excellence.</p>
+        </div>
+    </article>
 </div>
 
 <script>
@@ -291,30 +196,16 @@
     const mainBtn = document.getElementById('mainBtn');
     const filenameInput = document.getElementById('filename-input');
     const placeholder = document.getElementById('placeholder-text');
-    
     const overlay = document.getElementById('focus-overlay');
-    const track = document.getElementById('slider-track');
-    const focusCounter = document.getElementById('focus-counter');
-
+    const focusImg = document.getElementById('focus-img');
+    const focusCard = document.getElementById('focus-card');
+    const pageCounter = document.getElementById('focus-page-counter');
     let isComplete = false;
-    let currentActiveId = null;
-    let observer;
+    let targetCard = null;
 
-    function initObserver() {
-        if(observer) observer.disconnect();
-        observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting) {
-                    currentActiveId = entry.target.dataset.id;
-                    updateCounter();
-                }
-            });
-        }, { threshold: 0.51, root: track });
-    }
-
-    function generateId() {
-        return 'id-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    }
+    let touchStartX = 0;
+    let currentXOffset = 0;
+    let isSwiping = false;
 
     new Sortable(grid, {
         animation: 250,
@@ -325,6 +216,73 @@
         onEnd: syncIndices
     });
 
+    overlay.addEventListener('touchstart', (e) => {
+        if (!targetCard) return;
+        touchStartX = e.touches[0].clientX;
+        isSwiping = true;
+        focusCard.style.transition = 'none';
+    }, { passive: true });
+
+    overlay.addEventListener('touchmove', (e) => {
+        if (!isSwiping) return;
+        currentXOffset = e.touches[0].clientX - touchStartX;
+        focusCard.style.transform = `translateX(${currentXOffset}px)`;
+    }, { passive: true });
+
+    overlay.addEventListener('touchend', (e) => {
+        if (!isSwiping) return;
+        isSwiping = false;
+        const threshold = window.innerWidth * 0.25;
+
+        if (currentXOffset < -threshold) {
+            navigateFocus('next');
+        } else if (currentXOffset > threshold) {
+            navigateFocus('prev');
+        } else {
+            resetFocusCardPosition();
+        }
+    });
+
+    function navigateFocus(direction) {
+        const items = Array.from(grid.querySelectorAll('.item'));
+        const currentIndex = items.indexOf(targetCard);
+        let targetIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+
+        if (targetIndex >= 0 && targetIndex < items.length) {
+            focusCard.style.transition = 'transform 0.2s ease-out, opacity 0.2s';
+            focusCard.style.opacity = '0';
+            focusCard.style.transform = `translateX(${direction === 'next' ? -100 : 100}%)`;
+
+            setTimeout(() => {
+                openFocus(items[targetIndex]);
+                focusCard.style.transition = 'none';
+                focusCard.style.transform = `translateX(${direction === 'next' ? 100 : -100}%)`;
+                
+                requestAnimationFrame(() => {
+                    focusCard.style.transition = 'transform 0.2s ease-out, opacity 0.2s';
+                    focusCard.style.opacity = '1';
+                    focusCard.style.transform = 'translateX(0px)';
+                });
+            }, 200);
+        } else {
+            resetFocusCardPosition();
+        }
+    }
+
+    function resetFocusCardPosition() {
+        focusCard.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+        focusCard.style.transform = 'translateX(0px)';
+        currentXOffset = 0;
+    }
+
+    function updatePageCounter() {
+        if (!targetCard) return;
+        const items = Array.from(grid.querySelectorAll('.item'));
+        const currentIndex = items.indexOf(targetCard) + 1;
+        const totalItems = items.length;
+        pageCounter.innerText = `${String(currentIndex).padStart(2, '0')} / ${String(totalItems).padStart(2, '0')}`;
+    }
+
     async function addPhotos(files) {
         if (grid.querySelectorAll('.item').length + files.length > 20) return;
         placeholder.style.display = 'none';
@@ -333,7 +291,6 @@
             const data = await toBase64(file);
             const card = document.createElement('div');
             card.className = 'item';
-            card.dataset.id = generateId();
             card.onclick = function() { openFocus(this); };
             card.innerHTML = `
                 <div class="sort-number"></div>
@@ -353,70 +310,37 @@
         });
     }
 
-    function updateCounter() {
-        if(!currentActiveId) return;
-        const slides = Array.from(track.querySelectorAll('.slide'));
-        const activeSlide = track.querySelector(`.slide[data-id="${currentActiveId}"]`);
-        if(!activeSlide) return;
-        
-        const index = slides.indexOf(activeSlide) + 1;
-        focusCounter.innerText = `${String(index).padStart(2, '0')} OF ${String(slides.length).padStart(2, '0')}`;
-    }
-
-    function openFocus(clickedCard) {
-        initObserver();
-        track.innerHTML = '';
-        
-        const items = Array.from(grid.querySelectorAll('.item'));
-        
-        items.forEach((item) => {
-            const slide = document.createElement('div');
-            slide.className = 'slide';
-            slide.dataset.id = item.dataset.id;
-            
-            const imgSrc = item.querySelector('img').src;
-            slide.innerHTML = `<div class="a4-frame"><img src="${imgSrc}"></div>`;
-            track.appendChild(slide);
-            
-            observer.observe(slide);
-        });
-
+    function openFocus(card) {
+        targetCard = card;
+        focusImg.src = targetCard.querySelector('img').src;
         overlay.classList.add('active');
-        
-        const targetIndex = items.indexOf(clickedCard);
-        requestAnimationFrame(() => {
-            track.scrollLeft = targetIndex * window.innerWidth;
-        });
+        currentXOffset = 0;
+        updatePageCounter();
     }
 
-    function closeFocus() {
+    function cancelDelete() {
         overlay.classList.remove('active');
-        if(observer) observer.disconnect();
-        currentActiveId = null;
+        targetCard = null;
+        focusCard.style.transform = 'translateX(0px)';
     }
 
     function executeDelete() {
-        if (!currentActiveId) return;
-        
-        const gridItem = grid.querySelector(`.item[data-id="${currentActiveId}"]`);
-        const slideItem = track.querySelector(`.slide[data-id="${currentActiveId}"]`);
-        
-        if (gridItem) gridItem.remove();
-        if (slideItem) {
-            observer.unobserve(slideItem);
-            slideItem.remove();
+        if (targetCard) {
+            const nextItem = targetCard.nextElementSibling || targetCard.previousElementSibling;
+            targetCard.remove();
+            
+            const remainingItems = grid.querySelectorAll('.item');
+            if (remainingItems.length === 0) {
+                placeholder.style.display = 'block';
+                cancelDelete();
+            } else if (nextItem) {
+                openFocus(nextItem);
+            } else {
+                cancelDelete();
+            }
+            resetState();
+            syncIndices();
         }
-        
-        const remainingSlides = track.querySelectorAll('.slide');
-        if (remainingSlides.length === 0) {
-            closeFocus();
-            placeholder.style.display = 'block';
-        } else {
-            setTimeout(updateCounter, 50);
-        }
-        
-        resetState();
-        syncIndices();
     }
 
     function syncIndices() {
@@ -428,6 +352,7 @@
             mainBtn.disabled = items.length === 0;
             if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
         }
+        updatePageCounter();
     }
 
     function resetState() {
