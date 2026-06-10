@@ -9,6 +9,10 @@
     <meta name="keywords" content="Image to PDF, Professional PDF Foundry, Aethercore Interactive, High-res PDF converter, Private PDF tool, Page Forge">
     <meta name="author" content="Aethercore Interactive">
     
+    <meta property="og:title" content="Page Forge | Architectural Document Foundry">
+    <meta property="og:description" content="Transform visual assets into professional PDF documents with enterprise-grade precision.">
+    <meta property="og:type" content="website">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
@@ -70,11 +74,16 @@
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .sort-number { position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); color: #fff; font-size: 0.5rem; padding: 3px 6px; border-radius: 4px; z-index: 2; pointer-events: none; }
 
+        .seo-content { padding-top: 40px; border-top: 1px solid var(--border); }
+        .seo-block { margin-bottom: 50px; }
+        .seo-block h2 { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.3em; font-weight: 500; margin-bottom: 20px; }
+        .seo-block p { color: var(--text-muted); line-height: 1.8; font-weight: 300; font-size: 0.95rem; margin: 0; }
+
         #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 20px; touch-action: none; }
         #focus-overlay.active { display: flex; }
         .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
-        .page-counter { position: absolute; top: 75px; color: var(--accent); font-size: 0.85rem; font-weight: 400; letter-spacing: 0.1em; pointer-events: none; }
-        #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 90vw; max-height: 80vh; position: relative; }
+        
+        #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; position: relative; }
         #focus-card { width: 70vw; max-width: 380px; aspect-ratio: 1 / 1.4142; background: #050505; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); position: relative; }
         
         .gallery-track { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
@@ -84,25 +93,20 @@
         #pane-adjacent { left: 0; z-index: 1; display: none; }
 
         .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
-        .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; }
-        
+        .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; z-index: 1; }
         .sortable-ghost { opacity: 0; }
+        .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
     </style>
 </head>
 <body oncontextmenu="if(event.target.id !== 'filename-input') return false;">
 
 <div id="focus-overlay" onclick="cancelDelete()">
     <div class="cancel-hint">Tap anywhere to cancel</div>
-    <div class="page-counter" id="focus-page-counter">00 / 00</div>
     <div id="focus-container" onclick="event.stopPropagation()">
         <div id="focus-card">
             <div class="gallery-track">
-                <div id="pane-current" class="focus-img-pane">
-                    <img id="focus-img-curr" src="">
-                </div>
-                <div id="pane-adjacent" class="focus-img-pane">
-                    <img id="focus-img-adj" src="">
-                </div>
+                <div id="pane-current" class="focus-img-pane"><img id="focus-img-curr" src=""></div>
+                <div id="pane-adjacent" class="focus-img-pane"><img id="focus-img-adj" src=""></div>
             </div>
         </div>
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
@@ -120,10 +124,15 @@
         <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>Generate PDF</button>
     </section>
     <main class="gallery"><div class="empty-placeholder" id="placeholder-text">Foundry Offline</div><div id="sortable-grid"></div></main>
+    <article class="seo-content">
+        <div class="seo-block"><h2>The Premium PDF Foundry</h2><p>Page Forge by Aethercore Interactive represents the pinnacle of web-based document synthesis. Built for architects, designers, and corporate professionals, our tool converts images into structured PDF portfolios with zero quality loss.</p></div>
+        <div class="seo-block"><h2>Local-First Privacy Architecture</h2><p>Unlike standard online converters, Page Forge operates entirely within your browser's local environment. Your data never touches a server, ensuring that your intellectual property and private visual assets remain strictly confidential and secure.</p></div>
+        <div class="seo-block"><h2>Optimized Digital Workflow</h2><p>Streamline your document creation with our architectural drag-and-drop interface. Reorder assets instantaneously, preview with focus mode, and generate production-ready PDFs in seconds. Experience the standard of Aethercore Interactive excellence.</p></div>
+    </article>
 </div>
 
 <script>
-    const grid = document.getElementById('sortable-grid'), mainBtn = document.getElementById('mainBtn'), filenameInput = document.getElementById('filename-input'), placeholder = document.getElementById('placeholder-text'), overlay = document.getElementById('focus-overlay'), focusCard = document.getElementById('focus-card'), paneCurrent = document.getElementById('pane-current'), paneAdjacent = document.getElementById('pane-adjacent'), imgCurrent = document.getElementById('focus-img-curr'), imgAdjacent = document.getElementById('focus-img-adj'), pageCounter = document.getElementById('focus-page-counter');
+    const grid = document.getElementById('sortable-grid'), mainBtn = document.getElementById('mainBtn'), filenameInput = document.getElementById('filename-input'), placeholder = document.getElementById('placeholder-text'), overlay = document.getElementById('focus-overlay'), paneCurrent = document.getElementById('pane-current'), paneAdjacent = document.getElementById('pane-adjacent'), imgCurrent = document.getElementById('focus-img-curr'), imgAdjacent = document.getElementById('focus-img-adj');
     let isComplete = false, targetCard = null, touchStartX = 0, currentXOffset = 0, isSwiping = false, activeDirection = null;
 
     new Sortable(grid, { animation: 250, ghostClass: 'sortable-ghost', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: syncIndices });
@@ -131,12 +140,8 @@
     overlay.addEventListener('touchstart', (e) => {
         if (!targetCard) return;
         touchStartX = e.touches[0].clientX;
-        isSwiping = true;
-        currentXOffset = 0;
-        activeDirection = null;
-        paneCurrent.style.transition = 'none';
-        paneAdjacent.style.transition = 'none';
-        paneAdjacent.style.display = 'none';
+        isSwiping = true; currentXOffset = 0; activeDirection = null;
+        paneCurrent.style.transition = 'none'; paneAdjacent.style.transition = 'none'; paneAdjacent.style.display = 'none';
     }, { passive: true });
 
     overlay.addEventListener('touchmove', (e) => {
@@ -144,74 +149,58 @@
         currentXOffset = e.touches[0].clientX - touchStartX;
         const items = Array.from(grid.querySelectorAll('.item')), currentIndex = items.indexOf(targetCard);
         let targetDirection = currentXOffset < 0 ? 'next' : (currentXOffset > 0 ? 'prev' : null);
-        
         if (targetDirection !== activeDirection) {
             activeDirection = targetDirection;
             let adjIndex = activeDirection === 'next' ? currentIndex + 1 : currentIndex - 1;
-            if (adjIndex >= 0 && adjIndex < items.length) {
-                imgAdjacent.src = items[adjIndex].querySelector('img').src;
-                paneAdjacent.style.display = 'flex';
-            } else { paneAdjacent.style.display = 'none'; activeDirection = null; }
+            if (items[adjIndex]) { imgAdjacent.src = items[adjIndex].querySelector('img').src; paneAdjacent.style.display = 'flex'; }
+            else { paneAdjacent.style.display = 'none'; activeDirection = null; }
         }
         paneCurrent.style.transform = `translateX(${currentXOffset}px)`;
-        if (activeDirection === 'next') paneAdjacent.style.transform = `translateX(${focusCard.offsetWidth + currentXOffset}px)`;
-        else if (activeDirection === 'prev') paneAdjacent.style.transform = `translateX(${-focusCard.offsetWidth + currentXOffset}px)`;
+        if (activeDirection === 'next') paneAdjacent.style.transform = `translateX(${380 + currentXOffset}px)`;
+        else if (activeDirection === 'prev') paneAdjacent.style.transform = `translateX(${-380 + currentXOffset}px)`;
     }, { passive: true });
 
     overlay.addEventListener('touchend', (e) => {
         if (!isSwiping) return;
         isSwiping = false;
-        const cardWidth = focusCard.offsetWidth;
         paneCurrent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
         paneAdjacent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
-
-        if (activeDirection && Math.abs(currentXOffset) > cardWidth * 0.5) {
-            paneCurrent.style.transform = `translateX(${activeDirection === 'next' ? -cardWidth : cardWidth}px)`;
+        if (activeDirection && Math.abs(currentXOffset) > 150) {
+            const items = Array.from(grid.querySelectorAll('.item'));
+            targetCard = items[items.indexOf(targetCard) + (activeDirection === 'next' ? 1 : -1)];
+            imgCurrent.src = imgAdjacent.src;
+            paneCurrent.style.transform = `translateX(${activeDirection === 'next' ? -380 : 380}px)`;
             paneAdjacent.style.transform = 'translateX(0px)';
-            setTimeout(() => {
-                const items = Array.from(grid.querySelectorAll('.item'));
-                targetCard = items[items.indexOf(targetCard) + (activeDirection === 'next' ? 1 : -1)];
-                imgCurrent.src = imgAdjacent.src;
-                paneCurrent.style.transition = 'none'; paneCurrent.style.transform = 'translateX(0px)';
-                paneAdjacent.style.display = 'none'; updatePageCounter(); activeDirection = null;
-            }, 300);
-        } else {
-            paneCurrent.style.transform = 'translateX(0px)';
-            if (activeDirection === 'next') paneAdjacent.style.transform = `translateX(${cardWidth}px)`;
-            else if (activeDirection === 'prev') paneAdjacent.style.transform = `translateX(${-cardWidth}px)`;
-            setTimeout(() => { paneAdjacent.style.display = 'none'; activeDirection = null; }, 300);
-        }
+            setTimeout(() => { paneCurrent.style.transition = 'none'; paneCurrent.style.transform = 'translateX(0px)'; paneAdjacent.style.display = 'none'; activeDirection = null; }, 300);
+        } else { paneCurrent.style.transform = 'translateX(0px)'; setTimeout(() => { paneAdjacent.style.display = 'none'; activeDirection = null; }, 300); }
     });
 
-    function updatePageCounter() {
-        const items = Array.from(grid.querySelectorAll('.item'));
-        pageCounter.innerText = `${String(items.indexOf(targetCard) + 1).padStart(2, '0')} / ${String(items.length).padStart(2, '0')}`;
-    }
-
     async function addPhotos(files) {
+        if (grid.querySelectorAll('.item').length + files.length > 20) return;
         placeholder.style.display = 'none';
         for (let file of files) {
-            const data = await new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(file); });
-            const card = document.createElement('div'); card.className = 'item'; card.onclick = function() { openFocus(this); };
+            const data = await new Promise(r => { const reader = new FileReader(); reader.onload = () => r(reader.result); reader.readAsDataURL(file); });
+            const card = document.createElement('div'); card.className = 'item'; card.onclick = function() { targetCard = this; imgCurrent.src = this.querySelector('img').src; overlay.classList.add('active'); };
             card.innerHTML = `<div class="sort-number"></div><img src="${data}">`;
             grid.appendChild(card);
         }
-        syncIndices();
+        resetState(); syncIndices();
     }
 
-    function openFocus(card) { targetCard = card; imgCurrent.src = targetCard.querySelector('img').src; overlay.classList.add('active'); updatePageCounter(); }
     function cancelDelete() { overlay.classList.remove('active'); targetCard = null; }
-    function executeDelete() { targetCard.remove(); if (grid.children.length === 0) placeholder.style.display = 'block'; cancelDelete(); syncIndices(); }
-    function syncIndices() { grid.querySelectorAll('.item').forEach((item, i) => item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0')); mainBtn.disabled = grid.children.length === 0; mainBtn.innerText = `Generate PDF (${grid.children.length})`; }
-    function handleAction() { forgeDocument(); }
+    function executeDelete() { if (targetCard) { targetCard.remove(); cancelDelete(); if (grid.children.length === 0) placeholder.style.display = 'block'; resetState(); syncIndices(); } }
+    function syncIndices() { grid.querySelectorAll('.item').forEach((item, i) => item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0')); mainBtn.disabled = grid.children.length === 0; if (grid.children.length > 0) mainBtn.innerText = `Generate PDF (${grid.children.length})`; }
+    function resetState() { isComplete = false; mainBtn.classList.remove('complete'); }
+    function handleAction() { if (isComplete) resetState(); forgeDocument(); }
 
     function forgeDocument() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'pt', 'a4');
         grid.querySelectorAll('.item img').forEach((img, i) => {
             if (i > 0) doc.addPage();
-            doc.addImage(img.src, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight(), undefined, 'NONE');
+            doc.addImage(img.src, 'JPEG', 0, 0, 595.28, 841.89, undefined, 'NONE');
         });
-        doc.save(`${filenameInput.value || "Document"}.pdf`);
+        doc.save(`${filenameInput.value.trim() || "Exported_Document"}.pdf`);
+        isComplete = true; mainBtn.innerText = "Document Downloaded"; mainBtn.classList.add('complete');
     }
 </script>
 </body>
