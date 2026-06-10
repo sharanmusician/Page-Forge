@@ -109,20 +109,22 @@
 
         #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 20px; overflow: hidden; }
         #focus-overlay.active { display: flex; }
-        .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
+        
+        .cancel-hint { position: absolute; top: 20px; color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
+        .focus-counter { position: absolute; top: 50px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 6px 14px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; color: var(--accent); z-index: 10001; border: 1px solid rgba(255,255,255,0.1); pointer-events: none; }
+        
         #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-width: 90vw; max-height: 80vh; position: relative; width: 100%; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
         /* Smooth infinite canvas viewport layout for immediate response */
-        .slider-viewport { width: 100%; max-height: 60vh; position: relative; overflow: visible; display: flex; justify-content: center; }
-        #focus-card { max-width: 100%; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); will-change: transform; position: relative; z-index: 2; }
-        #focus-card img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; width: auto; height: auto; }
+        .slider-viewport { width: 100%; display: flex; align-items: center; justify-content: center; position: relative; will-change: transform; touch-action: none; }
         
-        /* Side buffers to keep content loaded adjacent during drag transitions */
-        .side-buffer { position: absolute; top: 0; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); display: none; width: 100%; }
-        .side-buffer img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; margin: 0 auto; }
-        #prev-card { right: calc(100% + 20px); }
-        #next-card { left: calc(100% + 20px); }
+        .card-wrap { max-width: 100%; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); flex-shrink: 0; }
+        .card-wrap img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; width: auto; height: auto; }
+        
+        #focus-card { position: relative; z-index: 2; }
+        #prev-card { position: absolute; right: calc(100% + 40px); display: none; }
+        #next-card { position: absolute; left: calc(100% + 40px); display: none; }
 
         .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; position: relative; z-index: 3; }
 
@@ -148,13 +150,12 @@
 
 <div id="focus-overlay" onclick="cancelDelete()">
     <div class="cancel-hint">Tap anywhere to cancel</div>
+    <div id="focus-counter" class="focus-counter"></div>
     <div id="focus-container" onclick="event.stopPropagation()">
-        <div class="slider-viewport">
-            <div id="prev-card" class="side-buffer"><img src=""></div>
-            <div id="focus-card">
-                <img id="focus-img" src="">
-            </div>
-            <div id="next-card" class="side-buffer"><img src=""></div>
+        <div id="slider-viewport" class="slider-viewport">
+            <div id="prev-card" class="card-wrap side-buffer"><img src=""></div>
+            <div id="focus-card" class="card-wrap"><img id="focus-img" src=""></div>
+            <div id="next-card" class="card-wrap side-buffer"><img src=""></div>
         </div>
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
     </div>
@@ -213,32 +214,32 @@
     const focusImg = document.getElementById('focus-img');
     const focusCard = document.getElementById('focus-card');
     
+    const sliderViewport = document.getElementById('slider-viewport');
     const prevCard = document.getElementById('prev-card');
     const nextCard = document.getElementById('next-card');
     const prevImg = prevCard.querySelector('img');
     const nextImg = nextCard.querySelector('img');
+    const focusCounter = document.getElementById('focus-counter');
 
     let isComplete = false;
     let targetCard = null;
+    let slideTimeout;
 
     let startX = 0;
     let currentX = 0;
     let isDragging = false;
 
-    focusCard.addEventListener('touchstart', (e) => {
+    sliderViewport.addEventListener('touchstart', (e) => {
+        clearTimeout(slideTimeout);
         startX = e.touches[0].clientX;
         currentX = startX;
         isDragging = true;
         
-        focusCard.style.transition = 'none';
-        prevCard.style.transition = 'none';
-        nextCard.style.transition = 'none';
+        sliderViewport.style.transition = 'none';
 
-        // Preload layout buffers immediately on contact
         if (targetCard.previousElementSibling) {
             prevImg.src = targetCard.previousElementSibling.querySelector('img').src;
             prevCard.style.display = 'block';
-            prevCard.style.width = focusCard.offsetWidth + 'px';
         } else {
             prevCard.style.display = 'none';
         }
@@ -246,58 +247,44 @@
         if (targetCard.nextElementSibling) {
             nextImg.src = targetCard.nextElementSibling.querySelector('img').src;
             nextCard.style.display = 'block';
-            nextCard.style.width = focusCard.offsetWidth + 'px';
         } else {
             nextCard.style.display = 'none';
         }
     }, { passive: true });
 
-    focusCard.addEventListener('touchmove', (e) => {
+    sliderViewport.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         currentX = e.touches[0].clientX;
         const diffX = currentX - startX;
 
-        // Move the entire framework symmetrically
-        focusCard.style.transform = `translateX(${diffX}px)`;
-        if (prevCard.style.display === 'block') {
-            prevCard.style.transform = `translateX(${diffX}px)`;
-        }
-        if (nextCard.style.display === 'block') {
-            nextCard.style.transform = `translateX(${diffX}px)`;
-        }
+        sliderViewport.style.transform = `translateX(${diffX}px)`;
 
         if (e.cancelable) e.preventDefault();
     }, { passive: false });
 
-    focusCard.addEventListener('touchend', () => {
+    sliderViewport.addEventListener('touchend', () => {
         if (!isDragging) return;
         isDragging = false;
         const diffX = currentX - startX;
-        const threshold = window.innerWidth * 0.25;
+        const threshold = window.innerWidth * 0.15;
 
-        const ease = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
-        focusCard.style.transition = ease;
-        prevCard.style.transition = ease;
-        nextCard.style.transition = ease;
+        const ease = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+        sliderViewport.style.transition = ease;
 
         if (diffX > threshold && targetCard.previousElementSibling) {
-            const travel = focusCard.offsetWidth + 20;
-            focusCard.style.transform = `translateX(${travel}px)`;
-            prevCard.style.transform = `translateX(${travel}px)`;
-            setTimeout(() => {
+            const offset = (focusCard.offsetWidth / 2) + 40 + (prevCard.offsetWidth / 2);
+            sliderViewport.style.transform = `translateX(${offset}px)`;
+            slideTimeout = setTimeout(() => {
                 openFocus(targetCard.previousElementSibling);
-            }, 200);
+            }, 300);
         } else if (diffX < -threshold && targetCard.nextElementSibling) {
-            const travel = -(focusCard.offsetWidth + 20);
-            focusCard.style.transform = `translateX(${travel}px)`;
-            nextCard.style.transform = `translateX(${travel}px)`;
-            setTimeout(() => {
+            const offset = (focusCard.offsetWidth / 2) + 40 + (nextCard.offsetWidth / 2);
+            sliderViewport.style.transform = `translateX(${-offset}px)`;
+            slideTimeout = setTimeout(() => {
                 openFocus(targetCard.nextElementSibling);
-            }, 200);
+            }, 300);
         } else {
-            focusCard.style.transform = 'none';
-            prevCard.style.transform = 'none';
-            nextCard.style.transform = 'none';
+            sliderViewport.style.transform = 'none';
         }
     });
 
@@ -336,23 +323,26 @@
             reader.readAsDataURL(file);
         });
     }
+    
+    function updateCounter() {
+        const items = Array.from(grid.querySelectorAll('.item'));
+        if(items.length === 0) return;
+        const index = items.indexOf(targetCard) + 1;
+        focusCounter.innerText = `${index} OF ${items.length}`;
+    }
 
     function openFocus(card) {
         targetCard = card;
         focusImg.src = targetCard.querySelector('img').src;
         overlay.classList.add('active');
         
-        // Dynamic clean reset with zero screen flicker
-        focusCard.style.transition = 'none';
-        prevCard.style.transition = 'none';
-        nextCard.style.transition = 'none';
-        
-        focusCard.style.transform = 'none';
-        prevCard.style.transform = 'none';
-        nextCard.style.transform = 'none';
+        sliderViewport.style.transition = 'none';
+        sliderViewport.style.transform = 'none';
         
         prevCard.style.display = 'none';
         nextCard.style.display = 'none';
+        
+        updateCounter();
     }
 
     function cancelDelete() {
@@ -383,6 +373,9 @@
         if (!isComplete) {
             mainBtn.disabled = items.length === 0;
             if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
+        }
+        if (overlay.classList.contains('active') && targetCard) {
+            updateCounter();
         }
     }
 
