@@ -95,18 +95,15 @@
 
         .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; z-index: 1; }
 
-        /* ABSOLUTE MOBILE-SAFE OVERLAY CORE */
+        /* PERSISTENT NON-COLLAPSIBLE OVERLAY WORKSPACE */
         #focus-overlay { 
             position: fixed; 
             inset: 0; 
             width: 100vw;
-            height: 100dvh; /* Uses Dynamic Viewport Height to protect against mobile status bars */
+            height: 100dvh;
             background: rgba(0, 0, 0, 0.98); 
             backdrop-filter: blur(25px); 
             display: none; 
-            
-            /* Rigorous 3-Row Grid System: Header, Center slider, Footer. Absolutely zero overlap possible */
-            display: none;
             grid-template-rows: auto minmax(0, 1fr) auto;
             align-items: center;
             justify-items: center;
@@ -118,7 +115,7 @@
         #focus-overlay.active { display: grid; animation: fadeIn 0.15s linear; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ROW 1: HEADER BAR CONTROLS */
+        /* ROW 1: CONTROLS */
         .header-controls { 
             grid-row: 1;
             width: 100%; 
@@ -157,7 +154,7 @@
         }
         .close-btn:active { background: rgba(255, 255, 255, 0.2); }
 
-        /* ROW 2: CONTIGUOUS PREVIEW TRACK CONTAINER */
+        /* ROW 2: TRACK VIEWPORT */
         .slider-viewport-container {
             grid-row: 2;
             width: 100%;
@@ -186,16 +183,15 @@
             justify-content: center; 
             align-items: center; 
             scroll-snap-align: center; 
-            padding: 10px 24px;
+            padding: 12px 24px;
         }
         
-        /* STRICT A4 BOUNDARY AUTO-SCALER */
+        /* RESPONSIVE MOBILE-OPTIMIZED A4 FRAME ENGINE */
         .a4-frame { 
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            aspect-ratio: 210 / 297; /* Preserves absolute geometric profile */
+            /* Mathematical formula makes sure height never overflows the viewport on tall landscape or narrow mobile phones */
+            width: min(100%, calc((100dvh - 180px) * (210 / 297)));
+            height: min(calc(100vw * (297 / 210)), calc(100dvh - 180px));
+            aspect-ratio: 210 / 297; 
             background: #060606; 
             border-radius: 12px; 
             border: 1px solid rgba(255, 255, 255, 0.12); 
@@ -207,13 +203,13 @@
         }
         
         .a4-frame img { 
-            max-width: 100%; 
-            max-height: 100%; 
+            width: 100%; 
+            height: 100%; 
             object-fit: contain; 
             display: block; 
         }
 
-        /* ROW 3: FOOTER ACTION BUTTONS */
+        /* ROW 3: FOOTER ACTIONS */
         .footer-controls { 
             grid-row: 3;
             width: 100%; 
@@ -313,7 +309,7 @@
                     updateCounter();
                 }
             });
-        }, { threshold: 0.51, root: track }); // Highly defensive center snap registration
+        }, { threshold: 0.51, root: track });
     }
 
     function generateId() {
