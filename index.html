@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <title>Page Forge | Professional Image to PDF Converter | Aethercore Interactive</title>
     
@@ -95,28 +95,143 @@
 
         .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; z-index: 1; }
 
-        /* Focus Mode Styles */
-        #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; z-index: 10000; overflow: hidden; }
-        #focus-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+        /* OPTIMIZED MOBILE POPUP FRAMEWORK */
+        #focus-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0, 0, 0, 0.98); 
+            backdrop-filter: blur(25px); 
+            display: none; 
+            flex-direction: column; 
+            justify-content: space-between;
+            align-items: center; 
+            z-index: 10000; 
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            overflow: hidden; 
+        }
+        #focus-overlay.active { display: flex; animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .header-controls { position: absolute; top: 0; left: 0; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10001; }
+        /* PERFECT ACCENT ALIGNMENT: HEADER BAR */
+        .header-controls { 
+            width: 100%; 
+            max-width: 500px;
+            padding: 0 24px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            height: 60px;
+            flex-shrink: 0;
+        }
         
-        .focus-counter { background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; color: var(--accent); border: 1px solid rgba(255,255,255,0.1); pointer-events: none; }
+        .focus-counter { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px); 
+            padding: 10px 18px; 
+            border-radius: 20px; 
+            font-size: 0.7rem; 
+            font-weight: 600; 
+            letter-spacing: 0.15em; 
+            color: var(--accent); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            pointer-events: none; 
+        }
         
-        .close-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); }
+        .close-btn { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            color: #fff; 
+            font-size: 1rem; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            backdrop-filter: blur(10px); 
+            transition: background 0.2s;
+        }
+        .close-btn:active { background: rgba(255, 255, 255, 0.2); }
 
-        /* NATIVE HORIZONTAL SCROLL SNAP */
-        .slider-track { display: flex; width: 100%; height: 75vh; margin-top: 80px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-behavior: auto; align-items: center; }
+        /* 1:1 SCROLL SENSOR TRACK */
+        .slider-track { 
+            display: flex; 
+            width: 100%; 
+            flex: 1;
+            min-height: 0; /* Prevents flex boxes from blowing out item sizing bounds */
+            overflow-x: auto; 
+            scroll-snap-type: x mandatory; 
+            scrollbar-width: none; 
+            -webkit-overflow-scrolling: touch; 
+            align-items: center; 
+        }
         .slider-track::-webkit-scrollbar { display: none; }
         
-        .slide { flex: 0 0 100vw; height: 100%; display: flex; justify-content: center; align-items: center; scroll-snap-align: center; padding: 0 20px; }
+        .slide { 
+            flex: 0 0 100vw; 
+            height: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            scroll-snap-align: center; 
+            padding: 16px 24px;
+        }
         
-        .slide-inner { max-width: 100%; max-height: 100%; background: #000; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); overflow: hidden; display: flex; }
-        .slide-inner img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+        /* HARD IMMUTABLE STANDARD A4 FRAMING CORE */
+        .a4-frame { 
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            aspect-ratio: 210 / 297; /* Dynamic Mathematical A4 Form Factor */
+            background: #060606; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9); 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+        
+        /* Forces any uploaded landscape or disproportionate asset to fit safely within boundaries */
+        .a4-frame img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            display: block; 
+        }
 
-        .footer-controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; z-index: 10001; padding: 0 20px; }
-        .delete-btn-focused { width: 100%; max-width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
+        /* PERFECT ACCENT ALIGNMENT: FOOTER BAR */
+        .footer-controls { 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            padding: 12px 24px 0 24px; 
+            flex-shrink: 0;
+        }
+        .delete-btn-focused { 
+            width: 100%; 
+            max-width: 320px; 
+            height: 54px; 
+            background: var(--danger); 
+            color: #fff; 
+            border-radius: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 0.15em; 
+            cursor: pointer; 
+            border: none; 
+            box-shadow: 0 4px 20px rgba(255, 59, 48, 0.2);
+        }
+        .delete-btn-focused:active { opacity: 0.82; }
 
         .sortable-ghost { opacity: 0; }
         .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
@@ -126,7 +241,7 @@
 
 <div id="focus-overlay">
     <div class="header-controls">
-        <div id="focus-counter" class="focus-counter">0 OF 0</div>
+        <div id="focus-counter" class="focus-counter">00 OF 00</div>
         <button class="close-btn" onclick="closeFocus()">✕</button>
     </div>
     
@@ -179,7 +294,6 @@
     let currentActiveId = null;
     let observer;
 
-    // Intersection Observer to detect exactly which slide is in the center
     function initObserver() {
         if(observer) observer.disconnect();
         observer = new IntersectionObserver((entries) => {
@@ -189,10 +303,9 @@
                     updateCounter();
                 }
             });
-        }, { threshold: 0.6, root: track }); // Triggers when slide is 60% visible
+        }, { threshold: 0.55, root: track });
     }
 
-    // Generate unique ID for linking Grid Items to Focus Slides
     function generateId() {
         return 'id-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
     }
@@ -214,7 +327,7 @@
             const data = await toBase64(file);
             const card = document.createElement('div');
             card.className = 'item';
-            card.dataset.id = generateId(); // Attach ID
+            card.dataset.id = generateId();
             card.onclick = function() { openFocus(this); };
             card.innerHTML = `
                 <div class="sort-number"></div>
@@ -241,23 +354,23 @@
         if(!activeSlide) return;
         
         const index = slides.indexOf(activeSlide) + 1;
-        focusCounter.innerText = `${index} OF ${slides.length}`;
+        focusCounter.innerText = `${String(index).padStart(2, '0')} OF ${String(slides.length).padStart(2, '0')}`;
     }
 
     function openFocus(clickedCard) {
         initObserver();
-        track.innerHTML = ''; // Clear track before opening
+        track.innerHTML = '';
         
         const items = Array.from(grid.querySelectorAll('.item'));
         
-        // Build the contiguous slide track
         items.forEach((item) => {
             const slide = document.createElement('div');
             slide.className = 'slide';
             slide.dataset.id = item.dataset.id;
             
             const imgSrc = item.querySelector('img').src;
-            slide.innerHTML = `<div class="slide-inner"><img src="${imgSrc}"></div>`;
+            // Native structural A4 framing injected seamlessly here
+            slide.innerHTML = `<div class="a4-frame"><img src="${imgSrc}"></div>`;
             track.appendChild(slide);
             
             observer.observe(slide);
@@ -265,7 +378,6 @@
 
         overlay.classList.add('active');
         
-        // Instantly snap to the clicked image without animating the scroll
         const targetIndex = items.indexOf(clickedCard);
         requestAnimationFrame(() => {
             track.scrollLeft = targetIndex * window.innerWidth;
@@ -295,9 +407,7 @@
             closeFocus();
             placeholder.style.display = 'block';
         } else {
-            // The next slide automatically falls into place natively, 
-            // the observer will detect it and update the counter.
-            setTimeout(updateCounter, 100);
+            setTimeout(updateCounter, 50);
         }
         
         resetState();
