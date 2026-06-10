@@ -110,14 +110,10 @@
         #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
         #focus-overlay.active { display: flex; }
         .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
-        #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-width: 90vw; max-height: 80vh; width: 100%; }
+        #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-width: 90vw; max-height: 80vh; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        #focus-card { max-width: 100%; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); position: relative; display: flex; width: 100%; justify-content: center; }
-        .focus-slider-track { display: flex; width: 100%; align-items: center; justify-content: center; position: relative; height: 60vh; max-height: 60vh; overflow: hidden; background: #000; touch-action: none; }
-        .focus-slider-track img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; position: absolute; left: 0; right: 0; top: 0; bottom: 0; margin: auto; will-change: transform; pointer-events: none; }
-        
-        .focus-page-number { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); color: #fff; font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; z-index: 10; font-weight: 500; letter-spacing: 0.05em; border: 1px solid rgba(255, 255, 255, 0.1); pointer-events: none; }
+        #focus-card { max-width: 100%; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); will-change: transform; }
+        #focus-card img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; }
         .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
 
         .empty-placeholder { 
@@ -144,8 +140,7 @@
     <div class="cancel-hint">Tap anywhere to cancel</div>
     <div id="focus-container" onclick="event.stopPropagation()">
         <div id="focus-card">
-            <div class="focus-page-number" id="focus-page-indicator">00 / 00</div>
-            <div class="focus-slider-track" id="focus-track"></div>
+            <img id="focus-img" src="">
         </div>
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
     </div>
@@ -201,146 +196,52 @@
     const filenameInput = document.getElementById('filename-input');
     const placeholder = document.getElementById('placeholder-text');
     const overlay = document.getElementById('focus-overlay');
-    const focusTrack = document.getElementById('focus-track');
-    const focusPageIndicator = document.getElementById('focus-page-indicator');
+    const focusImg = document.getElementById('focus-img');
+    const focusCard = document.getElementById('focus-card');
     let isComplete = false;
     let targetCard = null;
 
-    let touchStartX = 0;
+    let startX = 0;
     let currentX = 0;
-    let isSwiping = false;
-    let isAnimating = false;
-    let containerWidth = 0;
+    let isDragging = false;
 
-    let currentImgEl = null;
-    let prevImgEl = null;
-    let nextImgEl = null;
-
-    focusTrack.addEventListener('touchstart', e => {
-        if (isAnimating || !targetCard) return;
-        touchStartX = e.touches[0].clientX;
-        currentX = touchStartX;
-        isSwiping = true;
-        containerWidth = focusTrack.offsetWidth;
-        setupAdjacentImages();
+    focusCard.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        currentX = startX;
+        isDragging = true;
+        focusCard.style.transition = 'none';
     }, { passive: true });
 
-    focusTrack.addEventListener('touchmove', e => {
-        if (!isSwiping || isAnimating) return;
+    focusCard.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
         currentX = e.touches[0].clientX;
-        const deltaX = currentX - touchStartX;
-        
-        if (currentImgEl) currentImgEl.style.transform = `translateX(${deltaX}px)`;
-        if (prevImgEl) prevImgEl.style.transform = `translateX(${-containerWidth + deltaX}px)`;
-        if (nextImgEl) nextImgEl.style.transform = `translateX(${containerWidth + deltaX}px)`;
-    }, { passive: true });
+        const diffX = currentX - startX;
+        focusCard.style.transform = `translateX(${diffX}px)`;
+        if (e.cancelable) e.preventDefault();
+    }, { passive: false });
 
-    focusTrack.addEventListener('touchend', e => {
-        if (!isSwiping || isAnimating) return;
-        isSwiping = false;
-        const deltaX = currentX - touchStartX;
-        const threshold = containerWidth * 0.2;
+    focusCard.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = currentX - startX;
+        const threshold = 70;
 
-        if (deltaX < -threshold && nextImgEl) {
-            snapToImage('next');
-        } else if (deltaX > threshold && prevImgEl) {
-            snapToImage('prev');
+        focusCard.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+
+        if (diffX > threshold && targetCard && targetCard.previousElementSibling) {
+            focusCard.style.transform = `translateX(${window.innerWidth}px)`;
+            setTimeout(() => {
+                openFocus(targetCard.previousElementSibling);
+            }, 200);
+        } else if (diffX < -threshold && targetCard && targetCard.nextElementSibling) {
+            focusCard.style.transform = `translateX(${-window.innerWidth}px)`;
+            setTimeout(() => {
+                openFocus(targetCard.nextElementSibling);
+            }, 200);
         } else {
-            snapBack();
+            focusCard.style.transform = 'none';
         }
-    }, { passive: true });
-
-    function setupAdjacentImages() {
-        const items = Array.from(grid.querySelectorAll('.item'));
-        const currentIndex = items.indexOf(targetCard);
-        if (currentIndex === -1) return;
-
-        focusTrack.innerHTML = '';
-
-        currentImgEl = document.createElement('img');
-        currentImgEl.src = targetCard.querySelector('img').src;
-        currentImgEl.style.transform = 'translateX(0px)';
-        focusTrack.appendChild(currentImgEl);
-
-        if (currentIndex > 0) {
-            prevImgEl = document.createElement('img');
-            prevImgEl.src = items[currentIndex - 1].querySelector('img').src;
-            prevImgEl.style.transform = `translateX(${-focusTrack.offsetWidth}px)`;
-            focusTrack.appendChild(prevImgEl);
-        } else {
-            prevImgEl = null;
-        }
-
-        if (currentIndex < items.length - 1) {
-            nextImgEl = document.createElement('img');
-            nextImgEl.src = items[currentIndex + 1].querySelector('img').src;
-            nextImgEl.style.transform = `translateX(${focusTrack.offsetWidth}px)`;
-            focusTrack.appendChild(nextImgEl);
-        } else {
-            nextImgEl = null;
-        }
-    }
-
-    function snapToImage(direction) {
-        isAnimating = true;
-        const items = Array.from(grid.querySelectorAll('.item'));
-        const currentIndex = items.indexOf(targetCard);
-        const targetIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
-        
-        if (currentImgEl) currentImgEl.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        if (prevImgEl) prevImgEl.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        if (nextImgEl) nextImgEl.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-
-        requestAnimationFrame(() => {
-            if (direction === 'next') {
-                if (currentImgEl) currentImgEl.style.transform = `translateX(${-containerWidth}px)`;
-                if (nextImgEl) nextImgEl.style.transform = 'translateX(0px)';
-            } else {
-                if (currentImgEl) currentImgEl.style.transform = `translateX(${containerWidth}px)`;
-                if (prevImgEl) prevImgEl.style.transform = 'translateX(0px)';
-            }
-        });
-
-        setTimeout(() => {
-            targetCard = items[targetIndex];
-            updatePageIndicator();
-            if (currentImgEl) currentImgEl.style.transition = '';
-            if (prevImgEl) prevImgEl.style.transition = '';
-            if (nextImgEl) nextImgEl.style.transition = '';
-            setupAdjacentImages();
-            isAnimating = false;
-        }, 300);
-    }
-
-    function snapBack() {
-        isAnimating = true;
-        if (currentImgEl) currentImgEl.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        if (prevImgEl) prevImgEl.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        if (nextImgEl) nextImgEl.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-
-        requestAnimationFrame(() => {
-            if (currentImgEl) currentImgEl.style.transform = 'translateX(0px)';
-            if (prevImgEl) prevImgEl.style.transform = `translateX(${-containerWidth}px)`;
-            if (nextImgEl) nextImgEl.style.transform = `translateX(${containerWidth}px)`;
-        });
-
-        setTimeout(() => {
-            if (currentImgEl) currentImgEl.style.transition = '';
-            if (prevImgEl) prevImgEl.style.transition = '';
-            if (nextImgEl) nextImgEl.style.transition = '';
-            isAnimating = false;
-        }, 300);
-    }
-
-    function updatePageIndicator() {
-        if (!targetCard) return;
-        const items = Array.from(grid.querySelectorAll('.item'));
-        const currentIndex = items.indexOf(targetCard);
-        if (currentIndex === -1) return;
-        const currentStr = String(currentIndex + 1).padStart(2, '0');
-        const totalStr = String(items.length).padStart(2, '0');
-        focusPageIndicator.innerText = `${currentStr} / ${totalStr}`;
-    }
+    });
 
     new Sortable(grid, {
         animation: 250,
@@ -380,45 +281,24 @@
 
     function openFocus(card) {
         targetCard = card;
-        updatePageIndicator();
+        focusImg.src = targetCard.querySelector('img').src;
         overlay.classList.add('active');
-        containerWidth = focusTrack.offsetWidth;
-        setupAdjacentImages();
+        focusCard.style.transition = 'none';
+        focusCard.style.transform = 'none';
     }
 
     function cancelDelete() {
         overlay.classList.remove('active');
         targetCard = null;
-        focusTrack.innerHTML = '';
     }
 
     function executeDelete() {
         if (targetCard) {
-            const items = Array.from(grid.querySelectorAll('.item'));
-            const currentIndex = items.indexOf(targetCard);
-            let nextToFocus = null;
-
-            if (items.length > 1) {
-                if (currentIndex < items.length - 1) {
-                    nextToFocus = items[currentIndex + 1];
-                } else if (currentIndex > 0) {
-                    nextToFocus = items[currentIndex - 1];
-                }
-            }
-
             targetCard.remove();
-            
+            cancelDelete();
             if (grid.querySelectorAll('.item').length === 0) {
                 placeholder.style.display = 'block';
-                cancelDelete();
-            } else if (nextToFocus) {
-                targetCard = nextToFocus;
-                updatePageIndicator();
-                setupAdjacentImages();
-            } else {
-                cancelDelete();
             }
-            
             resetState();
             syncIndices();
         }
@@ -447,4 +327,44 @@
     }
 
     function forgeDocument() {
-        const images = g
+        const images = grid.querySelectorAll('.item img');
+        const fileName = filenameInput.value.trim() || "Exported_Document";
+        mainBtn.innerText = "Forging...";
+        mainBtn.disabled = true;
+        
+        setTimeout(() => {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'pt', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                images.forEach((img, i) => {
+                    if (i > 0) doc.addPage();
+                    const imgObj = new Image();
+                    imgObj.src = img.src;
+                    const imgWidth = imgObj.width;
+                    const imgHeight = imgObj.height;
+                    const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+                    const finalWidth = imgWidth * ratio;
+                    const finalHeight = imgHeight * ratio;
+                    const x = (pageWidth - finalWidth) / 2;
+                    const y = (pageHeight - finalHeight) / 2;
+                    doc.addImage(img.src, 'JPEG', x, y, finalWidth, finalHeight, undefined, 'NONE');
+                });
+                
+                doc.save(`${fileName}.pdf`);
+                isComplete = true;
+                mainBtn.disabled = false;
+                mainBtn.innerText = "Document Downloaded";
+                mainBtn.classList.add('complete');
+            } catch (err) {
+                mainBtn.innerText = "Error";
+                mainBtn.disabled = false;
+            }
+        }, 200);
+    }
+</script>
+
+</body>
+</html>
