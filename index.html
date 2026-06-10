@@ -9,13 +9,9 @@
     <meta name="keywords" content="Image to PDF, Professional PDF Foundry, Aethercore Interactive, High-res PDF converter, Private PDF tool, Page Forge">
     <meta name="author" content="Aethercore Interactive">
     
-    <meta property="og:title" content="Page Forge | Architectural Document Foundry">
-    <meta property="og:description" content="Transform visual assets into professional PDF documents with enterprise-grade precision.">
-    <meta property="og:type" content="website">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=100;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -39,13 +35,11 @@
             overflow-y: auto;
             overflow-x: hidden;
             font-family: 'Inter', sans-serif;
-            /* Disable selection and native context menu globally */
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
         }
 
-        /* Explicitly allow standard interaction for the input */
         #filename-input {
             -webkit-user-select: text !important;
             user-select: text !important;
@@ -53,29 +47,12 @@
             pointer-events: auto !important;
         }
 
-        .app-wrapper { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 40px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 30px; 
-        }
-
+        .app-wrapper { max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 30px; }
         header { text-align: center; padding: 40px 0 20px 0; }
         header h1 { font-weight: 100; font-size: 2.5rem; letter-spacing: -0.06em; margin: 0; }
         .branding-sub { color: var(--text-muted); font-weight: 400; font-size: 0.6rem; margin-top: 8px; letter-spacing: 0.5em; text-transform: uppercase; }
 
-        .control-panel { 
-            background: var(--surface); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            padding: 25px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-        }
-
+        .control-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 25px; display: flex; flex-direction: column; gap: 12px; }
         .input-group { display: flex; flex-direction: column; gap: 8px; }
         .input-group label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.1em; }
         #filename-input { width: 100%; height: 54px; background: #000; border: 1px solid var(--border); border-radius: 12px; color: #fff; padding: 0 15px; font-family: 'Inter', sans-serif; outline: none; }
@@ -87,25 +64,11 @@
         .btn-action:disabled { opacity: 0.1; cursor: not-allowed; }
         .btn-action.complete { background: var(--success); color: #000; border: none; }
 
-        .gallery { 
-            background: var(--surface); 
-            border: 1px solid var(--border); 
-            border-radius: 20px; 
-            padding: 15px; 
-            min-height: 300px;
-            position: relative;
-        }
-        
+        .gallery { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 15px; min-height: 300px; position: relative; }
         #sortable-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 300px; }
-
         .item { aspect-ratio: 1; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; cursor: pointer; }
         .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         .sort-number { position: absolute; top: 6px; left: 6px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); color: #fff; font-size: 0.5rem; padding: 3px 6px; border-radius: 4px; z-index: 2; pointer-events: none; }
-
-        .seo-content { padding-top: 40px; border-top: 1px solid var(--border); }
-        .seo-block { margin-bottom: 50px; }
-        .seo-block h2 { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.3em; font-weight: 500; margin-bottom: 20px; }
-        .seo-block p { color: var(--text-muted); line-height: 1.8; font-weight: 300; font-size: 0.95rem; margin: 0; }
 
         #focus-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; padding: 20px; touch-action: none; }
         #focus-overlay.active { display: flex; }
@@ -117,28 +80,13 @@
         .gallery-track { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
         .focus-img-pane { position: absolute; width: 100%; height: 100%; padding: 10px; display: flex; align-items: center; justify-content: center; pointer-events: none; will-change: transform; }
         .focus-img-pane img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
-        
         #pane-current { left: 0; z-index: 2; }
         #pane-adjacent { left: 0; z-index: 1; display: none; }
 
-        .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; box-shadow: none; }
-
-        .empty-placeholder { 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            text-align: center; 
-            color: #333; 
-            font-size: 0.7rem; 
-            text-transform: uppercase; 
-            letter-spacing: 0.1em; 
-            pointer-events: none;
-            z-index: 1;
-        }
+        .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
+        .empty-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #333; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; pointer-events: none; }
         
         .sortable-ghost { opacity: 0; }
-        .sortable-chosen { opacity: 0.5; transform: scale(1.05); }
     </style>
 </head>
 <body oncontextmenu="if(event.target.id !== 'filename-input') return false;">
@@ -162,77 +110,23 @@
 </div>
 
 <div class="app-wrapper">
-    <header>
-        <h1>Page Forge</h1>
-        <div class="branding-sub">Aethercore Interactive</div>
-    </header>
-
+    <header><h1>Page Forge</h1><div class="branding-sub">Aethercore Interactive</div></header>
     <section class="control-panel">
         <div class="input-group">
             <label for="filename-input">Document Filename</label>
             <input type="text" id="filename-input" placeholder="e.g. Project_Documentation_2026">
         </div>
-        <label for="uploader" class="btn btn-primary">
-            Upload Images
-            <input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)">
-        </label>
-        
-        <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>
-            Generate PDF
-        </button>
+        <label for="uploader" class="btn btn-primary">Upload Images<input type="file" id="uploader" multiple accept="image/*" style="display:none" onchange="addPhotos(this.files)"></label>
+        <button class="btn btn-action" id="mainBtn" onclick="handleAction()" disabled>Generate PDF</button>
     </section>
-
-    <main class="gallery">
-        <div class="empty-placeholder" id="placeholder-text">Foundry Offline</div>
-        <div id="sortable-grid"></div>
-    </main>
-
-    <article class="seo-content">
-        <div class="seo-block">
-            <h2>The Premium PDF Foundry</h2>
-            <p>Page Forge by Aethercore Interactive represents the pinnacle of web-based document synthesis. Built for architects, designers, and corporate professionals, our tool converts images into structured PDF portfolios with zero quality loss.</p>
-        </div>
-
-        <div class="seo-block">
-            <h2>Local-First Privacy Architecture</h2>
-            <p>Unlike standard online converters, Page Forge operates entirely within your browser's local environment. Your data never touches a server, ensuring that your intellectual property and private visual assets remain strictly confidential and secure.</p>
-        </div>
-
-        <div class="seo-block">
-            <h2>Optimized Digital Workflow</h2>
-            <p>Streamline your document creation with our architectural drag-and-drop interface. Reorder assets instantaneously, preview with focus mode, and generate production-ready PDFs in seconds. Experience the standard of Aethercore Interactive excellence.</p>
-        </div>
-    </article>
+    <main class="gallery"><div class="empty-placeholder" id="placeholder-text">Foundry Offline</div><div id="sortable-grid"></div></main>
 </div>
 
 <script>
-    const grid = document.getElementById('sortable-grid');
-    const mainBtn = document.getElementById('mainBtn');
-    const filenameInput = document.getElementById('filename-input');
-    const placeholder = document.getElementById('placeholder-text');
-    const overlay = document.getElementById('focus-overlay');
-    const focusCard = document.getElementById('focus-card');
-    const paneCurrent = document.getElementById('pane-current');
-    const paneAdjacent = document.getElementById('pane-adjacent');
-    const imgCurrent = document.getElementById('focus-img-curr');
-    const imgAdjacent = document.getElementById('focus-img-adj');
-    const pageCounter = document.getElementById('focus-page-counter');
-    let isComplete = false;
-    let targetCard = null;
+    const grid = document.getElementById('sortable-grid'), mainBtn = document.getElementById('mainBtn'), filenameInput = document.getElementById('filename-input'), placeholder = document.getElementById('placeholder-text'), overlay = document.getElementById('focus-overlay'), focusCard = document.getElementById('focus-card'), paneCurrent = document.getElementById('pane-current'), paneAdjacent = document.getElementById('pane-adjacent'), imgCurrent = document.getElementById('focus-img-curr'), imgAdjacent = document.getElementById('focus-img-adj'), pageCounter = document.getElementById('focus-page-counter');
+    let isComplete = false, targetCard = null, touchStartX = 0, currentXOffset = 0, isSwiping = false, activeDirection = null;
 
-    let touchStartX = 0;
-    let currentXOffset = 0;
-    let isSwiping = false;
-    let activeDirection = null; 
-
-    new Sortable(grid, {
-        animation: 250,
-        ghostClass: 'sortable-ghost',
-        delay: 200, 
-        delayOnTouchOnly: true,
-        touchStartThreshold: 5, 
-        onEnd: syncIndices
-    });
+    new Sortable(grid, { animation: 250, ghostClass: 'sortable-ghost', delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, onEnd: syncIndices });
 
     overlay.addEventListener('touchstart', (e) => {
         if (!targetCard) return;
@@ -248,202 +142,77 @@
     overlay.addEventListener('touchmove', (e) => {
         if (!isSwiping) return;
         currentXOffset = e.touches[0].clientX - touchStartX;
-        
-        const items = Array.from(grid.querySelectorAll('.item'));
-        const currentIndex = items.indexOf(targetCard);
-        
-        let targetDirection = null;
-        if (currentXOffset < 0) targetDirection = 'next';
-        if (currentXOffset > 0) targetDirection = 'prev';
+        const items = Array.from(grid.querySelectorAll('.item')), currentIndex = items.indexOf(targetCard);
+        let targetDirection = currentXOffset < 0 ? 'next' : (currentXOffset > 0 ? 'prev' : null);
         
         if (targetDirection !== activeDirection) {
             activeDirection = targetDirection;
             let adjIndex = activeDirection === 'next' ? currentIndex + 1 : currentIndex - 1;
-            
             if (adjIndex >= 0 && adjIndex < items.length) {
                 imgAdjacent.src = items[adjIndex].querySelector('img').src;
                 paneAdjacent.style.display = 'flex';
-            } else {
-                paneAdjacent.style.display = 'none';
-                activeDirection = null; 
-            }
+            } else { paneAdjacent.style.display = 'none'; activeDirection = null; }
         }
-
         paneCurrent.style.transform = `translateX(${currentXOffset}px)`;
-        const cardWidth = focusCard.offsetWidth;
-        if (activeDirection === 'next') {
-            paneAdjacent.style.transform = `translateX(${cardWidth + currentXOffset}px)`;
-        } else if (activeDirection === 'prev') {
-            paneAdjacent.style.transform = `translateX(${-cardWidth + currentXOffset}px)`;
-        }
+        if (activeDirection === 'next') paneAdjacent.style.transform = `translateX(${focusCard.offsetWidth + currentXOffset}px)`;
+        else if (activeDirection === 'prev') paneAdjacent.style.transform = `translateX(${-focusCard.offsetWidth + currentXOffset}px)`;
     }, { passive: true });
 
     overlay.addEventListener('touchend', (e) => {
         if (!isSwiping) return;
         isSwiping = false;
         const cardWidth = focusCard.offsetWidth;
-        const threshold = cardWidth * 0.5; // Half cross threshold
-
         paneCurrent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
         paneAdjacent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
 
-        if (activeDirection && Math.abs(currentXOffset) > threshold) {
-            // Animate completely out
-            if (activeDirection === 'next') {
-                paneCurrent.style.transform = `translateX(${-cardWidth}px)`;
-                paneAdjacent.style.transform = 'translateX(0px)';
-            } else {
-                paneCurrent.style.transform = `translateX(${cardWidth}px)`;
-                paneAdjacent.style.transform = 'translateX(0px)';
-            }
-
-            // Perform image target swap clean after complete frame alignment
+        if (activeDirection && Math.abs(currentXOffset) > cardWidth * 0.5) {
+            paneCurrent.style.transform = `translateX(${activeDirection === 'next' ? -cardWidth : cardWidth}px)`;
+            paneAdjacent.style.transform = 'translateX(0px)';
             setTimeout(() => {
                 const items = Array.from(grid.querySelectorAll('.item'));
-                const currentIndex = items.indexOf(targetCard);
-                let adjIndex = activeDirection === 'next' ? currentIndex + 1 : currentIndex - 1;
-                
-                targetCard = items[adjIndex];
+                targetCard = items[items.indexOf(targetCard) + (activeDirection === 'next' ? 1 : -1)];
                 imgCurrent.src = imgAdjacent.src;
-                
-                paneCurrent.style.transition = 'none';
-                paneAdjacent.style.transition = 'none';
-                paneCurrent.style.transform = 'translateX(0px)';
-                paneAdjacent.style.display = 'none';
-                
-                updatePageCounter();
-                activeDirection = null;
-                currentXOffset = 0;
+                paneCurrent.style.transition = 'none'; paneCurrent.style.transform = 'translateX(0px)';
+                paneAdjacent.style.display = 'none'; updatePageCounter(); activeDirection = null;
             }, 300);
         } else {
-            // Snap back home safely
             paneCurrent.style.transform = 'translateX(0px)';
-            if (activeDirection === 'next') {
-                paneAdjacent.style.transform = `translateX(${cardWidth}px)`;
-            } else if (activeDirection === 'prev') {
-                paneAdjacent.style.transform = `translateX(${-cardWidth}px)`;
-            }
-            setTimeout(() => {
-                paneAdjacent.style.display = 'none';
-                activeDirection = null;
-                currentXOffset = 0;
-            }, 300);
+            if (activeDirection === 'next') paneAdjacent.style.transform = `translateX(${cardWidth}px)`;
+            else if (activeDirection === 'prev') paneAdjacent.style.transform = `translateX(${-cardWidth}px)`;
+            setTimeout(() => { paneAdjacent.style.display = 'none'; activeDirection = null; }, 300);
         }
     });
 
     function updatePageCounter() {
-        if (!targetCard) return;
         const items = Array.from(grid.querySelectorAll('.item'));
-        const currentIndex = items.indexOf(targetCard) + 1;
-        const totalItems = items.length;
-        pageCounter.innerText = `${String(currentIndex).padStart(2, '0')} / ${String(totalItems).padStart(2, '0')}`;
+        pageCounter.innerText = `${String(items.indexOf(targetCard) + 1).padStart(2, '0')} / ${String(items.length).padStart(2, '0')}`;
     }
 
     async function addPhotos(files) {
-        if (grid.querySelectorAll('.item').length + files.length > 20) return;
         placeholder.style.display = 'none';
-
         for (let file of files) {
-            const data = await toBase64(file);
-            const card = document.createElement('div');
-            card.className = 'item';
-            card.onclick = function() { openFocus(this); };
-            card.innerHTML = `
-                <div class="sort-number"></div>
-                <img src="${data}">
-            `;
+            const data = await new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(file); });
+            const card = document.createElement('div'); card.className = 'item'; card.onclick = function() { openFocus(this); };
+            card.innerHTML = `<div class="sort-number"></div><img src="${data}">`;
             grid.appendChild(card);
         }
-        resetState();
         syncIndices();
     }
 
-    function toBase64(file) {
-        return new Promise(res => {
-            const reader = new FileReader();
-            reader.onload = () => res(reader.result);
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function openFocus(card) {
-        targetCard = card;
-        imgCurrent.src = targetCard.querySelector('img').src;
-        overlay.classList.add('active');
-        paneCurrent.style.transition = 'none';
-        paneAdjacent.style.transition = 'none';
-        paneCurrent.style.transform = 'translateX(0px)';
-        paneAdjacent.style.display = 'none';
-        currentXOffset = 0;
-        activeDirection = null;
-        updatePageCounter();
-    }
-
-    function cancelDelete() {
-        overlay.classList.remove('active');
-        targetCard = null;
-    }
-
-    function executeDelete() {
-        if (targetCard) {
-            const nextItem = targetCard.nextElementSibling || targetCard.previousElementSibling;
-            targetCard.remove();
-            
-            const remainingItems = grid.querySelectorAll('.item');
-            if (remainingItems.length === 0) {
-                placeholder.style.display = 'block';
-                cancelDelete();
-            } else if (nextItem) {
-                openFocus(nextItem);
-            } else {
-                cancelDelete();
-            }
-            resetState();
-            syncIndices();
-        }
-    }
-
-    function syncIndices() {
-        const items = grid.querySelectorAll('.item');
-        items.forEach((item, i) => {
-            item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0');
-        });
-        if (!isComplete) {
-            mainBtn.disabled = items.length === 0;
-            if (items.length > 0) mainBtn.innerText = `Generate PDF (${items.length})`;
-        }
-        updatePageCounter();
-    }
-
-    function resetState() {
-        isComplete = false;
-        mainBtn.classList.remove('complete');
-        syncIndices();
-    }
-
-    function handleAction() {
-        if (isComplete) resetState();
-        forgeDocument();
-    }
+    function openFocus(card) { targetCard = card; imgCurrent.src = targetCard.querySelector('img').src; overlay.classList.add('active'); updatePageCounter(); }
+    function cancelDelete() { overlay.classList.remove('active'); targetCard = null; }
+    function executeDelete() { targetCard.remove(); if (grid.children.length === 0) placeholder.style.display = 'block'; cancelDelete(); syncIndices(); }
+    function syncIndices() { grid.querySelectorAll('.item').forEach((item, i) => item.querySelector('.sort-number').innerText = String(i + 1).padStart(2, '0')); mainBtn.disabled = grid.children.length === 0; mainBtn.innerText = `Generate PDF (${grid.children.length})`; }
+    function handleAction() { forgeDocument(); }
 
     function forgeDocument() {
-        const images = grid.querySelectorAll('.item img');
-        const fileName = filenameInput.value.trim() || "Exported_Document";
-        mainBtn.innerText = "Forging...";
-        mainBtn.disabled = true;
-        
-        setTimeout(() => {
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'a4');
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-
-                images.forEach((img, i) => {
-                    if (i > 0) doc.addPage();
-                    const imgObj = new Image();
-                    imgObj.src = img.src;
-                    const imgWidth = imgObj.width;
-                    const imgHeight = imgObj.height;
-                    const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      
+        const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'pt', 'a4');
+        grid.querySelectorAll('.item img').forEach((img, i) => {
+            if (i > 0) doc.addPage();
+            doc.addImage(img.src, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight(), undefined, 'NONE');
+        });
+        doc.save(`${filenameInput.value || "Document"}.pdf`);
+    }
+</script>
+</body>
+</html>
