@@ -112,8 +112,15 @@
         .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
         .page-counter { position: absolute; top: 75px; color: var(--accent); font-size: 0.85rem; font-weight: 400; letter-spacing: 0.1em; pointer-events: none; }
         #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 90vw; max-height: 80vh; position: relative; }
-        #focus-card { width: 70vw; max-width: 380px; aspect-ratio: 1 / 1.4142; background: #050505; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; padding: 10px; position: relative; }
-        #focus-img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; pointer-events: none; will-change: transform; transition: none !important; }
+        #focus-card { width: 70vw; max-width: 380px; aspect-ratio: 1 / 1.4142; background: #050505; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); position: relative; }
+        
+        .gallery-track { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
+        .focus-img-pane { position: absolute; width: 100%; height: 100%; padding: 10px; display: flex; align-items: center; justify-content: center; pointer-events: none; will-change: transform; }
+        .focus-img-pane img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+        
+        #pane-current { left: 0; }
+        #pane-adjacent { left: 0; display: none; }
+
         .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; box-shadow: none; }
 
         .empty-placeholder { 
@@ -141,7 +148,14 @@
     <div class="page-counter" id="focus-page-counter">00 / 00</div>
     <div id="focus-container" onclick="event.stopPropagation()">
         <div id="focus-card">
-            <img id="focus-img" src="">
+            <div class="gallery-track">
+                <div id="pane-current" class="focus-img-pane">
+                    <img id="focus-img-curr" src="">
+                </div>
+                <div id="pane-adjacent" class="focus-img-pane">
+                    <img id="focus-img-adj" src="">
+                </div>
+            </div>
         </div>
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
     </div>
@@ -197,7 +211,10 @@
     const filenameInput = document.getElementById('filename-input');
     const placeholder = document.getElementById('placeholder-text');
     const overlay = document.getElementById('focus-overlay');
-    const focusImg = document.getElementById('focus-img');
+    const paneCurrent = document.getElementById('pane-current');
+    const paneAdjacent = document.getElementById('pane-adjacent');
+    const imgCurrent = document.getElementById('focus-img-curr');
+    const imgAdjacent = document.getElementById('focus-img-adj');
     const pageCounter = document.getElementById('focus-page-counter');
     let isComplete = false;
     let targetCard = null;
@@ -205,6 +222,7 @@
     let touchStartX = 0;
     let currentXOffset = 0;
     let isSwiping = false;
+    let activeDirection = null; // 'next' | 'prev' | null
 
     new Sortable(grid, {
         animation: 250,
@@ -219,47 +237,68 @@
         if (!targetCard) return;
         touchStartX = e.touches[0].clientX;
         isSwiping = true;
+        currentXOffset = 0;
+        activeDirection = null;
+        paneAdjacent.style.display = 'none';
     }, { passive: true });
 
     overlay.addEventListener('touchmove', (e) => {
         if (!isSwiping) return;
         currentXOffset = e.touches[0].clientX - touchStartX;
-        focusImg.style.transform = `translateX(${currentXOffset}px)`;
+        
+        const items = Array.from(grid.querySelectorAll('.item'));
+        const currentIndex = items.indexOf(targetCard);
+        
+        let targetDirection = null;
+        if (currentXOffset < 0) targetDirection = 'next';
+        if (currentXOffset > 0) targetDirection = 'prev';
+        
+        if (targetDirection !== activeDirection) {
+            activeDirection = targetDirection;
+            let adjIndex = activeDirection === 'next' ? currentIndex + 1 : currentIndex - 1;
+            
+            if (adjIndex >= 0 && adjIndex < items.length) {
+                imgAdjacent.src = items[adjIndex].querySelector('img').src;
+                paneAdjacent.style.display = 'flex';
+            } else {
+                paneAdjacent.style.display = 'none';
+                activeDirection = null; 
+            }
+        }
+
+        paneCurrent.style.transform = `translateX(${currentXOffset}px)`;
+        if (activeDirection === 'next') {
+            paneAdjacent.style.transform = `translateX(${focusCard.offsetWidth + currentXOffset}px)`;
+        } else if (activeDirection === 'prev') {
+            paneAdjacent.style.transform = `translateX(${-focusCard.offsetWidth + currentXOffset}px)`;
+        }
     }, { passive: true });
 
     overlay.addEventListener('touchend', (e) => {
         if (!isSwiping) return;
         isSwiping = false;
-        const threshold = window.innerWidth * 0.25;
+        const cardWidth = focusCard.offsetWidth;
+        const threshold = cardWidth * 0.25;
 
-        if (currentXOffset < -threshold) {
-            navigateFocus('next');
-        } else if (currentXOffset > threshold) {
-            navigateFocus('prev');
-        } else {
-            resetFocusImgPosition();
+        if (activeDirection && Math.abs(currentXOffset) > threshold) {
+            const items = Array.from(grid.querySelectorAll('.item'));
+            const currentIndex = items.indexOf(targetCard);
+            let adjIndex = activeDirection === 'next' ? currentIndex + 1 : currentIndex - 1;
+            
+            targetCard = items[adjIndex];
+            imgCurrent.src = imgAdjacent.src;
+            updatePageCounter();
         }
+        
+        resetPanes();
     });
 
-    function navigateFocus(direction) {
-        const items = Array.from(grid.querySelectorAll('.item'));
-        const currentIndex = items.indexOf(targetCard);
-        let targetIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
-
-        if (targetIndex >= 0 && targetIndex < items.length) {
-            targetCard = items[targetIndex];
-            focusImg.src = targetCard.querySelector('img').src;
-            focusImg.style.transform = 'translateX(0px)';
-            currentXOffset = 0;
-            updatePageCounter();
-        } else {
-            resetFocusImgPosition();
-        }
-    }
-
-    function resetFocusImgPosition() {
-        focusImg.style.transform = 'translateX(0px)';
+    function resetPanes() {
+        paneCurrent.style.transform = 'translateX(0px)';
+        paneAdjacent.style.display = 'none';
+        paneAdjacent.style.transform = 'translateX(0px)';
         currentXOffset = 0;
+        activeDirection = null;
     }
 
     function updatePageCounter() {
@@ -299,17 +338,16 @@
 
     function openFocus(card) {
         targetCard = card;
-        focusImg.style.transform = 'translateX(0px)';
-        focusImg.src = targetCard.querySelector('img').src;
+        imgCurrent.src = targetCard.querySelector('img').src;
         overlay.classList.add('active');
-        currentXOffset = 0;
+        resetPanes();
         updatePageCounter();
     }
 
     function cancelDelete() {
         overlay.classList.remove('active');
         targetCard = null;
-        focusImg.style.transform = 'translateX(0px)';
+        resetPanes();
     }
 
     function executeDelete() {
