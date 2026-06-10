@@ -39,13 +39,11 @@
             overflow-y: auto;
             overflow-x: hidden;
             font-family: 'Inter', sans-serif;
-            /* Disable selection and native context menu globally */
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
         }
 
-        /* Explicitly allow standard interaction for the input */
         #filename-input {
             -webkit-user-select: text !important;
             user-select: text !important;
@@ -282,14 +280,13 @@
         if (!isSwiping) return;
         isSwiping = false;
         const cardWidth = focusCard.offsetWidth;
-        // Adjusted threshold from 0.5 (50%) to 0.1 (10%) for higher sensitivity
+        // Sensitivity set to 10% (0.1) instead of 50% (0.5)
         const threshold = cardWidth * 0.1; 
 
         paneCurrent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
         paneAdjacent.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
 
         if (activeDirection && Math.abs(currentXOffset) > threshold) {
-            // Animate completely out
             if (activeDirection === 'next') {
                 paneCurrent.style.transform = `translateX(${-cardWidth}px)`;
                 paneAdjacent.style.transform = 'translateX(0px)';
@@ -298,7 +295,6 @@
                 paneAdjacent.style.transform = 'translateX(0px)';
             }
 
-            // Perform image target swap clean after complete frame alignment
             setTimeout(() => {
                 const items = Array.from(grid.querySelectorAll('.item'));
                 const currentIndex = items.indexOf(targetCard);
@@ -317,7 +313,6 @@
                 currentXOffset = 0;
             }, 300);
         } else {
-            // Snap back home safely
             paneCurrent.style.transform = 'translateX(0px)';
             if (activeDirection === 'next') {
                 paneAdjacent.style.transform = `translateX(${cardWidth}px)`;
@@ -446,4 +441,9 @@
                     imgObj.src = img.src;
                     const imgWidth = imgObj.width;
                     const imgHeight = imgObj.height;
-                    const ratio = Math
+                    const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+                    const finalWidth = imgWidth * ratio;
+                    const finalHeight = imgHeight * ratio;
+                    const x = (pageWidth - finalWidth) / 2;
+                    const y = (pageHeight - finalHeight) / 2;
+                  
