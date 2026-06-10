@@ -230,7 +230,6 @@
         currentX = e.touches[0].clientX;
         const deltaX = currentX - touchStartX;
         
-        // Real-time translation coupled perfectly to user finger tracking
         if (currentImgEl) currentImgEl.style.transform = `translateX(${deltaX}px)`;
         if (prevImgEl) prevImgEl.style.transform = `translateX(${-containerWidth + deltaX}px)`;
         if (nextImgEl) nextImgEl.style.transform = `translateX(${containerWidth + deltaX}px)`;
@@ -383,7 +382,6 @@
         targetCard = card;
         updatePageIndicator();
         overlay.classList.add('active');
-        // Instantly measure track width and initialize image positions securely without any flash
         containerWidth = focusTrack.offsetWidth;
         setupAdjacentImages();
     }
@@ -440,4 +438,13 @@
     function resetState() {
         isComplete = false;
         mainBtn.classList.remove('complete');
-        syn
+        syncIndices();
+    }
+
+    function handleAction() {
+        if (isComplete) resetState();
+        forgeDocument();
+    }
+
+    function forgeDocument() {
+        const images = g
