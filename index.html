@@ -15,7 +15,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=100;300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -112,9 +112,9 @@
         .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
         .page-counter { position: absolute; top: 75px; color: var(--accent); font-size: 0.85rem; font-weight: 400; letter-spacing: 0.1em; pointer-events: none; }
         #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 90vw; max-height: 80vh; position: relative; }
-        #focus-card { width: 70vw; max-width: 380px; aspect-ratio: 1 / 1.4142; background: #050505; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; padding: 10px; position: relative; will-change: transform, opacity; }
-        #focus-card img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; pointer-events: none; }
-        .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
+        #focus-card { width: 70vw; max-width: 380px; aspect-ratio: 1 / 1.4142; background: #050505; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; padding: 10px; position: relative; }
+        #focus-img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; pointer-events: none; will-change: transform, opacity; }
+        .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; box-shadow: none; }
 
         .empty-placeholder { 
             position: absolute; 
@@ -198,7 +198,6 @@
     const placeholder = document.getElementById('placeholder-text');
     const overlay = document.getElementById('focus-overlay');
     const focusImg = document.getElementById('focus-img');
-    const focusCard = document.getElementById('focus-card');
     const pageCounter = document.getElementById('focus-page-counter');
     let isComplete = false;
     let targetCard = null;
@@ -220,13 +219,13 @@
         if (!targetCard) return;
         touchStartX = e.touches[0].clientX;
         isSwiping = true;
-        focusCard.style.transition = 'none';
+        focusImg.style.transition = 'none';
     }, { passive: true });
 
     overlay.addEventListener('touchmove', (e) => {
         if (!isSwiping) return;
         currentXOffset = e.touches[0].clientX - touchStartX;
-        focusCard.style.transform = `translateX(${currentXOffset}px)`;
+        focusImg.style.transform = `translateX(${currentXOffset}px)`;
     }, { passive: true });
 
     overlay.addEventListener('touchend', (e) => {
@@ -239,7 +238,7 @@
         } else if (currentXOffset > threshold) {
             navigateFocus('prev');
         } else {
-            resetFocusCardPosition();
+            resetFocusImgPosition();
         }
     });
 
@@ -249,29 +248,26 @@
         let targetIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
 
         if (targetIndex >= 0 && targetIndex < items.length) {
-            focusCard.style.transition = 'transform 0.2s ease-out, opacity 0.2s';
-            focusCard.style.opacity = '0';
-            focusCard.style.transform = `translateX(${direction === 'next' ? -100 : 100}%)`;
+            targetCard = items[targetIndex];
+            focusImg.style.transition = 'none';
+            focusImg.src = targetCard.querySelector('img').src;
+            focusImg.style.transform = `translateX(${direction === 'next' ? 100 : -100}%)`;
+            
+            updatePageCounter();
 
-            setTimeout(() => {
-                openFocus(items[targetIndex]);
-                focusCard.style.transition = 'none';
-                focusCard.style.transform = `translateX(${direction === 'next' ? 100 : -100}%)`;
-                
-                requestAnimationFrame(() => {
-                    focusCard.style.transition = 'transform 0.2s ease-out, opacity 0.2s';
-                    focusCard.style.opacity = '1';
-                    focusCard.style.transform = 'translateX(0px)';
-                });
-            }, 200);
+            requestAnimationFrame(() => {
+                focusImg.style.transition = 'transform 0.15s ease-out';
+                focusImg.style.transform = 'translateX(0px)';
+                currentXOffset = 0;
+            });
         } else {
-            resetFocusCardPosition();
+            resetFocusImgPosition();
         }
     }
 
-    function resetFocusCardPosition() {
-        focusCard.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
-        focusCard.style.transform = 'translateX(0px)';
+    function resetFocusImgPosition() {
+        focusImg.style.transition = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+        focusImg.style.transform = 'translateX(0px)';
         currentXOffset = 0;
     }
 
@@ -312,6 +308,8 @@
 
     function openFocus(card) {
         targetCard = card;
+        focusImg.style.transition = 'none';
+        focusImg.style.transform = 'translateX(0px)';
         focusImg.src = targetCard.querySelector('img').src;
         overlay.classList.add('active');
         currentXOffset = 0;
@@ -321,7 +319,7 @@
     function cancelDelete() {
         overlay.classList.remove('active');
         targetCard = null;
-        focusCard.style.transform = 'translateX(0px)';
+        focusImg.style.transform = 'translateX(0px)';
     }
 
     function executeDelete() {
