@@ -112,8 +112,9 @@
         .cancel-hint { position: absolute; top: 40px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 300; pointer-events: none; }
         #focus-container { display: flex; flex-direction: column; align-items: center; gap: 20px; animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-width: 90vw; max-height: 80vh; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        #focus-card { max-width: 100%; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); }
-        #focus-card img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; }
+        #focus-card { max-width: 100%; max-height: 60vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.8); position: relative; }
+        #focus-card img { max-width: 100%; max-height: 60vh; object-fit: contain; display: block; transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
+        .focus-page-number { position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); color: #fff; font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; z-index: 10; font-weight: 500; letter-spacing: 0.05em; border: 1px solid rgba(255, 255, 255, 0.1); pointer-events: none; }
         .delete-btn-focused { width: 300px; height: 54px; background: var(--danger); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; border: none; }
 
         .empty-placeholder { 
@@ -140,6 +141,7 @@
     <div class="cancel-hint">Tap anywhere to cancel</div>
     <div id="focus-container" onclick="event.stopPropagation()">
         <div id="focus-card">
+            <div class="focus-page-number" id="focus-page-indicator">00 / 00</div>
             <img id="focus-img" src="">
         </div>
         <button class="delete-btn-focused" onclick="executeDelete()">Delete Image</button>
@@ -197,19 +199,24 @@
     const placeholder = document.getElementById('placeholder-text');
     const overlay = document.getElementById('focus-overlay');
     const focusImg = document.getElementById('focus-img');
+    const focusPageIndicator = document.getElementById('focus-page-indicator');
     let isComplete = false;
     let targetCard = null;
 
     let touchStartX = 0;
     let touchEndX = 0;
+    let isSwiping = false;
 
     overlay.addEventListener('touchstart', e => {
         touchStartX = e.changedTouches[0].screenX;
+        isSwiping = true;
     }, { passive: true });
 
     overlay.addEventListener('touchend', e => {
+        if (!isSwiping) return;
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
+        isSwiping = false;
     }, { passive: true });
 
     function handleSwipe() {
@@ -224,14 +231,45 @@
         if (diffX > swipeThreshold) {
             const prevIndex = currentIndex - 1;
             if (prevIndex >= 0) {
-                openFocus(items[prevIndex]);
+                animateTransition(items[prevIndex], 'prev');
             }
         } else if (diffX < -swipeThreshold) {
             const nextIndex = currentIndex + 1;
             if (nextIndex < items.length) {
-                openFocus(items[nextIndex]);
+                animateTransition(items[nextIndex], 'next');
             }
         }
+    }
+
+    function animateTransition(nextCard, direction) {
+        focusImg.style.transform = direction === 'next' ? 'translateX(-30px)' : 'translateX(30px)';
+        focusImg.style.opacity = '0';
+        
+        setTimeout(() => {
+            focusImg.style.transition = 'none';
+            targetCard = nextCard;
+            focusImg.src = targetCard.querySelector('img').src;
+            updatePageIndicator();
+            focusImg.style.transform = direction === 'next' ? 'translateX(30px)' : 'translateX(-30px)';
+            
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    focusImg.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+                    focusImg.style.transform = 'translateX(0)';
+                    focusImg.style.opacity = '1';
+                }, 20);
+            });
+        }, 130);
+    }
+
+    function updatePageIndicator() {
+        if (!targetCard) return;
+        const items = Array.from(grid.querySelectorAll('.item'));
+        const currentIndex = items.indexOf(targetCard);
+        if (currentIndex === -1) return;
+        const currentStr = String(currentIndex + 1).padStart(2, '0');
+        const totalStr = String(items.length).padStart(2, '0');
+        focusPageIndicator.innerText = `${currentStr} / ${totalStr}`;
     }
 
     new Sortable(grid, {
@@ -272,8 +310,15 @@
 
     function openFocus(card) {
         targetCard = card;
+        focusImg.style.transition = 'none';
+        focusImg.style.transform = 'translateX(0)';
+        focusImg.style.opacity = '1';
         focusImg.src = targetCard.querySelector('img').src;
+        updatePageIndicator();
         overlay.classList.add('active');
+        setTimeout(() => {
+            focusImg.style.transition = 'transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+        }, 50);
     }
 
     function cancelDelete() {
